@@ -8,7 +8,7 @@ class Main
     @app.use(require('morgan')('[:date] :method :url :status :res[content-length] - :response-time ms'))
 
     @app.get '/', (req, res) =>
-      res.send(200, "Success")
+      res.status(200).send("It's working")
 
   run: ->
     port = 3000
