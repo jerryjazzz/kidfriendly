@@ -1,0 +1,31 @@
+
+yum -y update
+
+yum -y install git
+
+yum -y groupinstall "Development Tools"
+
+cd /kfly/3rdparty
+
+wget http://nodejs.org/dist/v0.10.31/node-v0.10.31.tar.gz
+cd node-v0.10.31
+sudo ./configure
+sudo make
+sudo make install
+
+# sudo visudo
+# .. add /usr/local/bin to secure_path
+
+yum -y install nginx
+
+(edit /etc/nginx/nginx.conf to remove the default HTTP port 80 server)
+
+sudo ln -s /kfly/server/scripts/nginx.conf /etc/nginx/conf.d/kfly.conf
+sudo ln -s /kfly/server/scripts/node_upstart.conf /etc/init/kfly-node.conf
+
+sudo initctl reload-configuration
+sudo start kfly-node
+
+add a file "path.sh" to /etc/profile.d/
+with contents:
+  export PATH=$PATH:/usr/local/bin
