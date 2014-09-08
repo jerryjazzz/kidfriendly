@@ -1,5 +1,5 @@
 
 Host kfly-1
   HostName 54.165.120.132
-    User ec2-user
+    User dev
       IdentityFile ~/.ssh/...

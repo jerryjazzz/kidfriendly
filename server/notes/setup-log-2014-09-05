@@ -21,7 +21,7 @@ yum -y install nginx
 (edit /etc/nginx/nginx.conf to remove the default HTTP port 80 server)
 
 sudo ln -s /kfly/server/scripts/nginx.conf /etc/nginx/conf.d/kfly.conf
-sudo ln -s /kfly/server/scripts/node_upstart.conf /etc/init/kfly-node.conf
+sudo ln -s /kfly/server/scripts/node_upstart.conf /etc/init/forever.conf
 
 sudo initctl reload-configuration
 sudo start kfly-node

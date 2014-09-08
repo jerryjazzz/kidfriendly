@@ -1,9 +1,17 @@
 
+echo -- cd kfly
 cd $KFLY_HOME
 
-echo -- git reset
-git reset --hard HEAD
+echo -- git pull
+git pull
 
+echo -- cd kfly/server/forever
+cd $KFLY_HOME/server/forever
+
+echo -- npm install
+npm install
+
+echo -- cd kfly/server
 cd $KFLY_HOME/server
 
 echo -- npm install
@@ -12,8 +20,3 @@ npm install
 echo -- gulp build
 node node_modules/gulp/bin/gulp.js build
 
-echo -- initctl reload-configuration
-sudo initctl reload-configuration
-
-echo -- initctl reload improv-web
-sudo initctl restart kfly/node
