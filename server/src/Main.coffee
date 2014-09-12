@@ -7,8 +7,20 @@ class Main
     @app.use(require('express-domain-middleware'))
     @app.use(require('morgan')('[:date] :method :url :status :res[content-length] - :response-time ms'))
 
-    @app.get '/', (req, res) =>
-      res.status(200).send("It's working")
+    staticFileMap =
+      '/js/bootstrap.js': '../web/js/bootstrap.min.js'
+      '/css/bootstrap.css': '../web/css/bootstrap.min.css'
+      '/css/bootstrap-theme.css': '../web/css/bootstrap-theme.min.css'
+      '/fonts/glyphicons-halflings-regular.ttf': '../web/fonts/glyphicons-halflings-regular.ttf'
+      '/': '../web/html/splash.html'
+      '/assets/pasta_kid.jpg': '../web/assets/pasta_kid.jpg'
+      '/assets/kids_meal_kids.jpg': '../web/assets/kids_meal_kids.jpg'
+
+    for path, filename of staticFileMap
+      filename = require('path').resolve(filename)
+      do (path, filename) =>
+        @app.get path, (req,res) =>
+          res.sendFile(filename)
 
   run: ->
     port = 3000

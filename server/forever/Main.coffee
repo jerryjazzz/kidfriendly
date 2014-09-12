@@ -12,6 +12,7 @@ log = ->
   console.log.apply(null, args)
 
 web = new (forever.Monitor) '/kfly/server',
+  cwd: '/kfly/server'
   command: 'node'
   silent: true
   options: []

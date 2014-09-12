@@ -20,6 +20,7 @@ yum -y install nginx
 
 (edit /etc/nginx/nginx.conf to remove the default HTTP port 80 server)
 
+(These may be out of date, see below for the symlinks list)
 sudo ln -s /kfly/server/scripts/nginx.conf /etc/nginx/conf.d/kfly.conf
 sudo ln -s /kfly/server/scripts/node_upstart.conf /etc/init/forever.conf
 
@@ -29,3 +30,9 @@ sudo start kfly-node
 add a file "path.sh" to /etc/profile.d/
 with contents:
   export PATH=$PATH:/usr/local/bin
+
+
+THE SYMLINK LIST
+
+  /etc/init/forever.conf -> /kfly/server/scripts/forever.conf
+  /etc/profile.d/kfly.sh -> /kfly/server/scripts/profile.d.sh
