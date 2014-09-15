@@ -27,5 +27,9 @@ class Main
     console.log("Launching server on port #{port}")
     @app.listen(port)
 
-main = new Main()
-main.run()
+startup = ->
+  # Change directory to top-level, one above the 'server' dir. (such as /kfly)
+  process.chdir(__dirname + '/..')
+  
+  main = new Main()
+  main.run()

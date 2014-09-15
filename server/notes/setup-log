@@ -31,7 +31,15 @@ sudo ./configure
 sudo make
 sudo make install
 
- # Sudo setup #
+# Dev user account #
+
+Add this to .bash_profile: PATH=$PATH:/kfly/server/tools:$HOME/bin
+
+Install global node tools:
+
+sudo npm install -g coffee-script
+
+# Sudo setup #
 
 sudo visudo
 (add /usr/local/bin to secure_path)
@@ -66,6 +74,9 @@ sudo gpasswd -a dev docker
 sudo service docker restart
 
 # Mysql from docker #
+
+# Useful links:
+#   https://github.com/tutumcloud/tutum-docker-mysql
 cd /kfly/3rdparty
 git clone https://github.com/tutumcloud/tutum-docker-mysql
 docker build -t tutum/mysql 5.5

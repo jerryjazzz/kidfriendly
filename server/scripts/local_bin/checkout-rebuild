@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+git fetch origin
+
+git checkout $1
+
+server-rebuild
