@@ -20,14 +20,15 @@ if not service.inbox?
 socket = nano.socket('req')
 socket.connect(service.inbox)
 socket.send(message)
+
 socket.on 'message', (buf) ->
   console.log(buf.toString())
   socket.close()
-  socket = null
+  process.exit(1)
 socket.on 'error', (err) ->
   console.log('error:', err)
   socket.close()
-  socket = null
+  process.exit(1)
 
 timeoutMs = 1000
 

@@ -2,7 +2,7 @@
 forever = require('forever-monitor')
 config = require('./../config')
 
-process.chdir(__dirname)
+process.chdir(__dirname+'/../..')
 
 listenStdout = (service, handler) ->
   service.on 'stdout', (data) ->
@@ -14,7 +14,7 @@ log = ->
   args = Array.prototype.slice.call(arguments, 0)
   console.log.apply(null, args)
 
-web = new (forever.Monitor) '..',
+web = new (forever.Monitor) 'server',
   command: 'node'
   silent: true
   options: []

@@ -37,7 +37,7 @@ Add this to .bash_profile: PATH=$PATH:/kfly/server/bin
 
 Install global node modules:
 
-sudo npm install -g coffee-script
+sudo npm install -g coffee-script grunt-cli
 
 # Sudo setup #
 

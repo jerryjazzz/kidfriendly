@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
+echo -- cd kfly
+cd $KFLY_HOME
+
 git fetch origin
 git reset --hard HEAD
 git checkout $1
 
+web-rebuild
 server-rebuild
