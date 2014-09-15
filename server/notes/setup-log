@@ -33,9 +33,9 @@ sudo make install
 
 # Dev user account #
 
-Add this to .bash_profile: PATH=$PATH:/kfly/server/tools:$HOME/bin
+Add this to .bash_profile: PATH=$PATH:/kfly/server/bin
 
-Install global node tools:
+Install global node modules:
 
 sudo npm install -g coffee-script
 
