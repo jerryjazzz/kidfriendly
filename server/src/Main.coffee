@@ -1,4 +1,5 @@
 
+mysql = require('mysql')
 path = require('path')
 
 class Main
@@ -19,6 +20,15 @@ class Main
     @app.get("/", staticFile('web/dist/index.html'))
     @app.get("/index.html", redirect('/'))
     @app.use(staticDir('web/dist'))
+
+    @db = mysql.createConnection
+      host: 'localhost'
+      user: 'web'
+      database: 'kidfriendly'
+
+    @db.connect()
+
+    @emailSignup = new EmailSignup(this)
 
   run: ->
     port = 3000

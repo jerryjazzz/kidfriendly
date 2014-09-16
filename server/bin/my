@@ -1,1 +1,1 @@
-mysql -uadmin -p`cat ~/.mysql_pass`
+mysql -h 127.0.0.1 -uadmin -p`cat ~/.mysql_pass` kidfriendly

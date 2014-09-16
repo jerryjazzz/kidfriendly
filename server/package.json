@@ -16,6 +16,7 @@
     "gulp-tar": "1.1.0",
     "express-handlebars": "~1.0.3",
     "morgan": "~1.3.0",
-    "nanomsg": "~0.2.9"
+    "nanomsg": "~0.2.9",
+    "mysql": "~2.5.0"
   }
 }
