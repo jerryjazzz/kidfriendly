@@ -7,3 +7,10 @@ create table user (
     on update CURRENT_TIMESTAMP,
   created_at TIMESTAMP not null
 );
+
+create table email_signup (
+  email VARCHAR(255) not null,
+  zipcode VARCHAR(10),
+  ip VARCHAR(15),
+  created_at DATETIME not null
+);

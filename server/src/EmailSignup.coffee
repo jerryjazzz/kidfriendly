@@ -4,10 +4,24 @@ class EmailSignup
 
     @server.app.post "/submit/email", (req, res) =>
 
-      data = {id: 1, email: 'theemail', json: '', created_at: Date.now()}
+      if not req.body.email?
+        res.status(400).send("'email' field is required")
+        return
+      if not req.body.zipcode?
+        res.status(400).send("'zipcode' field is required")
+        return
 
-      @server.db.query 'INSERT INTO user SET ?', data, (err, result) =>
+      data =
+        email: req.body.email
+        zipcode: req.body.zipcode
+        ip: req.get_ip()
+        created_at: DateUtil.timestamp()
+
+      @server.sinks.emailSignup.send(data)
+
+      res.status(200).end()
+
+      @server.db.query 'INSERT INTO email_signup SET ?', data, (err, result) =>
         if err?
-          console.log('err = ', err)
-        if result?
-          console.log('result = ', err)
+          console.log("email_signup mysql error: ", err)
+
