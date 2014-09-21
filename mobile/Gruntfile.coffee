@@ -85,6 +85,7 @@ module.exports = (grunt) ->
 
 
   # The actual grunt server settings
+
     connect:
       options:
         port: 9000

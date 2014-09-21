@@ -31,8 +31,23 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(../images/intro-bg.jpg) no-repeat center center;
+    background-image: url(../images/museum.jpg);
     background-size: cover;
+}
+
+.btn-kid-blue{
+    background-color:#25AAE1;
+
+
+    border-color: #55DAFF;
+}
+
+.mask {
+
+    /*-webkit-linear-gradient(270deg, rgba(47,174,143,0.9) 0%, rgba(47,146,174,0.9) 100%);*/
+    background:linear-gradient(-180deg, rgba(37,170,255,0.7), rgba(38,170,190,0.7));
+    /*background: rgba(37, 170, 255, .7) no-repeat center center;*/
+    /*background: rgba(38, 170, 35, .7) no-repeat center center;*/
 }
 
 .intro-message {
@@ -57,6 +72,22 @@ h6 {
     text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
 }
 
+.intro-message > h4 {
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+}
+
+
+.navbar-brand-small-pad {
+    padding: 5px 15px;
+}
+
+.form-box {
+    width: 45%;
+    margin: 0 auto;
+    /*background: rgba(50, 50, 50, 0.35);*/
+    padding:10px;
+    /*border-radius: 6px*/
+}
 @media(max-width:767px) {
     .intro-message {
         padding-bottom: 15%;
@@ -75,6 +106,7 @@ h6 {
     ul.intro-social-buttons > li:last-child {
         margin-bottom: 0;
     }
+
 
     .intro-divider {
         width: 100%;
@@ -112,7 +144,7 @@ h6 {
 .banner {
     padding: 100px 0;
     color: #f8f8f8;
-    background: url(../images/banner-bg.jpg) no-repeat center center;
+    background: url(../images/restaurant.jpg) no-repeat center center;
     background-size: cover;
 }
 
