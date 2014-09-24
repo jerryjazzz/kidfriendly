@@ -47,8 +47,8 @@ class Server
     @handlers =
       emailSignup: new EmailSignup(this)
 
-    @sinks =
-      emailSignup: new DataSink(config, 'email_signup')
+    @logs =
+      emailSignup: new Log(config, 'email_signup')
 
   run: ->
     port = 3000
