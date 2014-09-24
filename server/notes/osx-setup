@@ -1,0 +1,20 @@
+
+# Docker setup #
+
+Download latest VirtualBox (4.3 at time of this writing)
+
+brew install docker
+brew install boot2docker
+
+If there's an existing boot2docker image then delete it (open up /Applications/VirtualBox to check)
+
+boot2docker init
+boot2docker up
+
+# Export example #
+
+docker export 123 > container.tar
+
+# Import example #
+
+cat container.tar > docker import - containerName

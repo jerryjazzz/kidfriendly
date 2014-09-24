@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo -- cd kfly/server
+cd $KFLY_HOME/server
+
+echo -- npm install
+npm install --production
+
+echo -- gulp build
+node node_modules/gulp/bin/gulp.js build
+
+echo -- cd kfly/server/forever
+cd $KFLY_HOME/server/forever
+
+echo -- npm install
+npm install --production
+
+echo -- sending 'restart' to forever
+send forever restart

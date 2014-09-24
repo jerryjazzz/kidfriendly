@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo -- cd kfly/web
+cd $KFLY_HOME/web
+
+echo -- npm install
+npm install --production
+
+echo -- bower install
+node_modules/bower/bin/bower install
+
+echo -- grunt build
+grunt build
