@@ -9,8 +9,8 @@ create table user (
 );
 
 create table email_signup (
+  id INT unsigned not null primary key,
   email VARCHAR(255) not null,
-  zipcode VARCHAR(10),
   ip VARCHAR(15),
   created_at DATETIME not null
 );
