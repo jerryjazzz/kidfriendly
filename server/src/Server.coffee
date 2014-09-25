@@ -8,20 +8,20 @@ class Server
     express = require('express')
     @app = express()
 
+
     @app.use (req, res, next) ->
       req.get_ip = ->
         this.headers['x-forwarded-for'] or this.connection.remoteAddress
       next()
 
     # Middleware
-    handlebars = require('express-handlebars')
     @app.use(require('express-domain-middleware'))
-
-    bodyParser = require('body-parser')
-    @app.use(bodyParser.json())
+    @app.use(require('cookie-parser')())
+    @app.use(require('body-parser').json())
 
     @app.use(require('morgan')('[:date] :method :url :status :res[content-length] - :response-time ms'))
 
+    @app.use(@cors)
 
     # Routes
     staticFile = (filename) -> ((req,res) -> res.sendFile(path.resolve(filename)))
@@ -49,6 +49,13 @@ class Server
 
     @sinks =
       emailSignup: new DataSink(config, 'email_signup')
+
+  cors: (req, res, next) =>
+    res.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    res.set('Access-Control-Allow-Headers', 'Content-Type')
+    res.set('Access-Control-Allow-Origin', '*')
+    next()
+    #res.set('Access-Control-Expose-Headers', ...)
 
   run: ->
     port = 3000
