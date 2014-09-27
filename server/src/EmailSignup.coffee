@@ -10,8 +10,9 @@ class EmailSignup
 
       data =
         email: req.body.email
-        ip: req.get_ip()
         created_at: DateUtil.timestamp()
+        ip: req.get_ip()
+        source_ver: @server.sourceVersion
 
       @server.logs.emailSignup.send(data)
 

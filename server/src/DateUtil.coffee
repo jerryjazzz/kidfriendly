@@ -1,7 +1,10 @@
 
 DateUtil =
-  timestamp: ->
-    date = new Date()
+  timestamp: (value=null) ->
+    if value?
+      date = new Date(value)
+    else
+      date = new Date()
 
     pad = (number) ->
       if ( number < 10 )
@@ -14,3 +17,5 @@ DateUtil =
         ' ' + pad( date.getUTCHours() ) +
         ':' + pad( date.getUTCMinutes() ) +
         ':' + pad( date.getUTCSeconds() )
+
+exports.DateUtil = DateUtil

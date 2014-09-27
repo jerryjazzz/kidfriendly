@@ -1,7 +1,7 @@
 {
   "name": "kfly-node-server",
   "version": "0.0.0",
-  "main": "build/kfly_server.js",
+  "main": "main.js",
   "dependencies": {
     "express-domain-middleware": "0.1.0",
     "bluebird": "2.3.2",
