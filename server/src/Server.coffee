@@ -1,10 +1,55 @@
 
 path = require('path')
+Promise = require('bluebird')
+
 
 class Server
 
   constructor: (@config) ->
-    
+    @handlers = null
+    @sourceVersion = null
+    @currentGitCommit = null
+    @logs =
+      emailSignup: new Log(config, 'email_signup')
+
+  start: ->
+    @fetchCurrentGitVersion()
+      .then(@startMysql)
+      .then(@initializeSourceVersion)
+      .then(@startExpress)
+      .catch (err) ->
+        console.log(err.stack)
+
+  fetchCurrentGitVersion: =>
+    SourceUtil.getCurrentGitCommit()
+      .then (info) =>
+        console.log("Current git commit:", info)
+        @currentGitCommit = info
+
+  startMysql: =>
+    mysql = require('mysql')
+    new Promise (resolve, reject) =>
+      @db = mysql.createConnection
+        host: 'localhost'
+        user: 'web'
+        database: 'kidfriendly'
+        multipleStatements: true
+
+      @db.connect (err, conn) =>
+        if err?
+          console.log("[error] from db.connect: ", err)
+          reject(err)
+        else
+          console.log("Connected to Mysql")
+          resolve()
+
+  initializeSourceVersion: =>
+    Database.insertSourceVersion(this, @currentGitCommit)
+      .then (id) =>
+        @sourceVersion = id
+        console.log("Source version id is:", id)
+
+  startExpress: =>
     express = require('express')
     @app = express()
 
@@ -31,23 +76,12 @@ class Server
     @app.get("/index.html", redirect('/'))
     @app.use(staticDir('web/dist'))
 
-    mysql = require('mysql')
-    @db = mysql.createConnection
-      host: 'localhost'
-      user: 'web'
-      database: 'kidfriendly'
-
-    @db.connect (err, conn) ->
-      if err?
-        console.log("[error] from db.connect: ", err)
-      else
-        console.log("Mysql connected")
-
     @handlers =
       emailSignup: new EmailSignup(this)
 
-    @logs =
-      emailSignup: new Log(config, 'email_signup')
+    port = 3000
+    console.log("Launching server on port #{port}")
+    @app.listen(port)
 
   cors: (req, res, next) =>
     res.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
@@ -55,11 +89,6 @@ class Server
     res.set('Access-Control-Allow-Origin', '*')
     next()
     #res.set('Access-Control-Expose-Headers', ...)
-
-  run: ->
-    port = 3000
-    console.log("Launching server on port #{port}")
-    @app.listen(port)
 
 startup = ->
   # Change directory to top-level, one above the 'server' dir. (such as /kfly)
@@ -70,7 +99,7 @@ startup = ->
 
   config = require('./../config')
   
-  main = new Server(config)
-  main.run()
+  server = new Server(config)
+  server.start()
 
-startup()
+exports.startup = startup
