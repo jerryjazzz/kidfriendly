@@ -8,10 +8,9 @@ class Server
     express = require('express')
     @app = express()
 
-
     @app.use (req, res, next) ->
       req.get_ip = ->
-        this.headers['x-forwarded-for'] or this.connection.remoteAddress
+        this.headers['x-real-ip'] or this.connection.remoteAddress
       next()
 
     # Middleware
