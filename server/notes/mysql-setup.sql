@@ -33,3 +33,13 @@ create table survey_answer (
   created_at DATETIME not null,
   source_ver int
 );
+
+create table place (
+  id INT unsigned not null primary key,
+  name VARCHAR(255),
+  location VARCHAR(20),
+  google_id VARCHAR(20) unique key,
+  created_at timestamp,
+  updated_at timestamp,
+  source_ver int
+);

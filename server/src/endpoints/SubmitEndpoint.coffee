@@ -3,6 +3,7 @@ class SubmitEndpoint
   constructor: (@server) ->
 
     app = @server.app
+    @debug = @server.logs.debug
 
     withRequiredFields = (fields, next) ->
       (req, res) ->
@@ -42,8 +43,9 @@ class SubmitEndpoint
       @server.logs.surveyAnswer.write(row)
 
       Database.writeRow(@server, 'survey_answer', row)
-        .then (write) ->
+        .then (write) =>
           if write.error?
+            @debug.write(msg: 'SQL error', caused_by: write.error, row: row)
             res.status(400).send(msg: 'SQL error', caused_by: write.error)
             return
           res.status(200).end()

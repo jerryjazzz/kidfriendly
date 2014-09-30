@@ -9,14 +9,22 @@ class Server
     @handlers = null
     @sourceVersion = null
     @currentGitCommit = null
+    @db = null
+    @agents = {}
+
     @logs =
-      emailSignup: new Log(config, 'email_signup')
-      surveyAnswer: new Log(config, 'survey_answer')
+      emailSignup: new Log(config, 'email_signup.json')
+      surveyAnswer: new Log(config, 'survey_answer.json')
+      debug: new Log(config, 'debug.log')
+
+    @inbox = new Inbox(this)
 
   start: ->
     @fetchCurrentGitVersion()
       .then(@startMysql)
+      #.then(@startRedis)
       .then(@initializeSourceVersion)
+      .then(@startAgents)
       .then(@startExpress)
       .catch (err) ->
         console.log(err.stack)
@@ -40,9 +48,16 @@ class Server
         if err?
           console.log("[error] from db.connect: ", err)
           reject(err)
-        else
-          console.log("Connected to Mysql")
-          resolve()
+          return
+        console.log("Connected to Mysql")
+        resolve()
+
+  startRedis: =>
+    new Promise (resolve, reject) =>
+      @redis = require('redis').createClient()
+      @redis.on 'error', (err) =>
+        @logs.debug(msg: 'Redis error', caused_by: err)
+      resolve()
 
   initializeSourceVersion: =>
     Database.insertSourceVersion(this, @currentGitCommit)
@@ -50,21 +65,26 @@ class Server
         @sourceVersion = id
         console.log("Source version id is:", id)
 
+  startAgents: =>
+    new Promise (resolve, reject) =>
+      @agents.placeScraper = new PlaceScraper(this)
+      resolve()
+
   startExpress: =>
     express = require('express')
     @app = express()
 
-    @app.use (req, res, next) ->
-      req.get_ip = ->
-        this.headers['x-real-ip'] or this.connection.remoteAddress
-      next()
+    @app.use(@helpers)
 
     # Middleware
     @app.use(require('express-domain-middleware'))
     @app.use(require('cookie-parser')())
     @app.use(require('body-parser').json())
 
-    @app.use(require('morgan')('[:date] :method :url :status :res[content-length] - :response-time ms'))
+    morgan = require('morgan')
+    morgan.token('timestamp', (req, res) -> DateUtil.timestamp())
+    logFormat = '[:timestamp] :method :url :status :res[content-length] - :response-time ms'
+    @app.use(require('morgan')(logFormat, {stream: @logs.debug}))
 
     @app.use(@cors)
 
@@ -84,12 +104,18 @@ class Server
     console.log("Launching server on port #{port}")
     @app.listen(port)
 
+  helpers: (req, res, next) =>
+    req.get_ip = ->
+      this.headers['x-real-ip'] or this.connection.remoteAddress
+
+    next()
+
   cors: (req, res, next) =>
     res.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
     res.set('Access-Control-Allow-Headers', 'Content-Type')
     res.set('Access-Control-Allow-Origin', '*')
-    next()
     #res.set('Access-Control-Expose-Headers', ...)
+    next()
 
 startup = ->
   # Change directory to top-level, one above the 'server' dir. (such as /kfly)
