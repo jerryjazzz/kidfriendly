@@ -25,3 +25,11 @@ create table source_version (
   commit_date timestamp,
   first_deployed_at timestamp
 );
+
+create table survey_answer (
+  signup_id int,
+  survey_version VARCHAR(20),
+  answer VARCHAR(20),
+  created_at DATETIME not null,
+  source_ver int
+);

@@ -8,6 +8,6 @@ class Log
     @fileStream.on 'error', (err) =>
       console.log("error: File stream error for #{@filename}: ", err)
 
-  send: (obj) ->
+  write: (obj) ->
     jsonString = JSON.stringify(obj) + "\n"
     @fileStream.write(jsonString, 'utf8')

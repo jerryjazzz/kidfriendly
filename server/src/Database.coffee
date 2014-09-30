@@ -29,7 +29,7 @@ Database =
 
         server.db.query "INSERT INTO #{table} SET ?", data, (err, result) =>
 
-          if err? and err.code == 'ER_DUP_ENTRY' and attempts < 5
+          if generateId and err? and err.code == 'ER_DUP_ENTRY' and attempts < 5
             send(attempts + 1)
           else if err?
             resolve(error: err)

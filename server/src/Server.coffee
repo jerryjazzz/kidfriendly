@@ -11,6 +11,7 @@ class Server
     @currentGitCommit = null
     @logs =
       emailSignup: new Log(config, 'email_signup')
+      surveyAnswer: new Log(config, 'survey_answer')
 
   start: ->
     @fetchCurrentGitVersion()
@@ -77,7 +78,7 @@ class Server
     @app.use(staticDir('web/dist'))
 
     @handlers =
-      emailSignup: new EmailSignup(this)
+      submit: new SubmitEndpoint(this)
 
     port = 3000
     console.log("Launching server on port #{port}")
