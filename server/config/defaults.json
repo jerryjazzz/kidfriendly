@@ -1,6 +1,7 @@
 {
   "services": {
     "web": {
+      "inbox": "tcp://127.0.0.1:3501"
     },
     "forever": {
       "inbox": "tcp://127.0.0.1:3500"
