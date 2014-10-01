@@ -45,15 +45,16 @@ h6 {
 .mask {
 
     /*-webkit-linear-gradient(270deg, rgba(47,174,143,0.9) 0%, rgba(47,146,174,0.9) 100%);*/
-    background:linear-gradient(-180deg, rgba(37,170,255,0.7), rgba(38,170,190,0.7));
-    /*background: rgba(37, 170, 255, .7) no-repeat center center;*/
+    /*background:linear-gradient(-180deg, rgba(37,170,255,0.7), rgba(38,170,190,0.7));*/
+    background: rgba(37, 170, 255, .7) no-repeat center center;
     /*background: rgba(38, 170, 35, .7) no-repeat center center;*/
 }
 
 .intro-message {
     position: relative;
-    padding-top: 20%;
+    padding-top: 10%;
     padding-bottom: 20%;
+    height:600px
 }
 
 .intro-message > h1 {
@@ -195,4 +196,16 @@ footer {
 
 p.copyright {
     margin: 15px 0 0;
+}
+
+.radio input[type="radio"].custom-radio:checked + .icons .icon-checked {
+    color: #2ecc71;
+    filter: none;
+    opacity: 1;
+
+    -webkit-filter: none;
+}
+
+.success-border-color:focus {
+    border-color: #2ecc71
 }
