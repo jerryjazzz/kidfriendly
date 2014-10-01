@@ -1,0 +1,39 @@
+<div class="intro-message" >
+    <h1>Thank You!</h1>
+    <hr class="intro-divider">
+    <h4>You will receive an email shortly</h4>
+    <h4>In the mean time tell us which feature you are most excited about.</h4>
+    <div>
+        <div class="form-box" ng-controller="SurveyCtrl as survey">
+            <form role="form">
+                <div class="form-group form-group-lg" style="text-align: left">
+                    <label class="radio">
+                        <input type="radio" data-toggle="radio" name="optionsRadios" id="optionsRadio1" value="option1" class="custom-radio">
+                            <span class="icons">
+                                <span class="icon-unchecked"></span>
+                                <span class="icon-checked"></span>
+                            </span>
+                    Browsing reviews of Kid Friendly restaurants and other local businesses
+                    </label>
+                    <label class="radio">
+                        <input type="radio" data-toggle="radio" name="optionsRadios" id="optionsRadio2" value="option1" class="custom-radio">
+                            <span class="icons">
+                                <span class="icon-unchecked"></span>
+                                <span class="icon-checked"></span>
+                            </span>
+                    Notifications of kid friendly activities in my area
+                    </label>
+                    <label class="radio">
+                        <input type="radio" data-toggle="radio" name="optionsRadios" id="optionsRadio3" value="option1" class="custom-radio">
+                            <span class="icons">
+                                <span class="icon-unchecked"></span>
+                                <span class="icon-checked"></span>
+                            </span>
+                        Contributing reviews to the community
+                    </label>
+                </div>
+                <button type="submit" ng-click="survey.submitAnswer()" class="btn btn-sm btn-success btn-lg" disabled>Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
