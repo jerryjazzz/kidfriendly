@@ -13,7 +13,7 @@ class SurveyCtrl
       @$location.path '/thankyou'
       console.log 'success', data
       @$location.path '/survey'
-    .error (data) ->
+    .error (data) =>
       @$location.path '/thankyou'
       console.log 'error', data
 

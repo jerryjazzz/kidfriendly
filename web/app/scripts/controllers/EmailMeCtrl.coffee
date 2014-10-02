@@ -7,8 +7,8 @@ class EmailMeCtrl
     .success (data) =>
       @splashPageService.id = data.id
       @$location.path '/survey'
-    .error (data) ->
-      console.log 'error', data
+    .error (data) =>
+      @$location.path '/survey'
 
   sendEmail: () ->
     console.log 'email', @$scope.email
