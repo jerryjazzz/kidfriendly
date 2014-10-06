@@ -1,7 +1,8 @@
+mcapi = require('mailchimp-api');
 
 class SubmitEndpoint
   constructor: (@server) ->
-
+    mc = new mcapi.Mailchimp('7c0352fbb770ec2a76b0d631df95d473-us9')
     app = @server.app
     @debug = @server.logs.debug
 
@@ -39,6 +40,14 @@ class SubmitEndpoint
         answer: req.body.answer
         created_at: DateUtil.timestamp()
         source_ver: @server.sourceVersion
+
+        mc.lists.subscribe({id: '60e31526fb', email:{email:req.body.email}},
+          (data) ->
+          ,(error) =>
+            if error.error
+              @server.logs.surveyAnswer.write("MailChimp Error: #{error.error}")
+            else
+              @server.logs.surveyAnswer.write("MailChimp Error: unspecified error")
 
       @server.logs.surveyAnswer.write(row)
 
