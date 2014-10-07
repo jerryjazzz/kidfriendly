@@ -1,10 +1,17 @@
 {
   "services": {
-    "web": {
-      "inbox": "tcp://127.0.0.1:3501"
-    },
     "forever": {
       "inbox": "tcp://127.0.0.1:3500"
+    }
+  },
+  "apps": {
+    "web": {
+      "inbox": "tcp://127.0.0.1:3501",
+      "express": {
+        "port": 3000
+      }
+    },
+    "place-scraper": {
     }
   }
 }

@@ -1,10 +1,16 @@
 
 class Inbox
-  constructor: (@server) ->
+  constructor: (@app) ->
+    appConfig = @app.config.appConfig
+    if not appConfig.inbox?
+      console.log("nanomsg inbox: not started (config)")
+      return
+
     @inbox = require('nanomsg').socket('rep')
-    @inbox.bind(@server.config.services.web.inbox)
+    @inbox.bind(appConfig.inbox)
     @inbox.on 'message', @handleMessage
-    @debug = @server.logs.debug
+    @debug = @app.logs.debug
+    console.log("nanomsg inbox: listening on "+appConfig.inbox)
 
   handleMessage: (buf) =>
     msg = buf.toString()
