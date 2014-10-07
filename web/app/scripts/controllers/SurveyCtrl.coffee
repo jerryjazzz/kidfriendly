@@ -8,7 +8,7 @@ class SurveyCtrl
       survey_version: 1
       answer:@$scope.surveyAnswer
 
-    @$http.post('http://www.kidfriendly.biz/submit/survey_answer', payload)
+    @$http.post('/submit/survey_answer', payload)
     .success (data) =>
       @$location.path '/thankyou'
       console.log 'success', data
