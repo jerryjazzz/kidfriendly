@@ -24,6 +24,15 @@ class SubmitEndpoint
         source_ver: @server.sourceVersion
 
       @server.logs.emailSignup.write(data)
+      mc.lists.subscribe({id: '60e31526fb', email:{email:req.body.email}},
+      (data) ->
+        #do nothing
+        (error) =>
+          if error.error?
+            @debug.write("MailChimp Error: #{error.error}")
+          else
+            @debug.write("MailChimp Error: unspecified error")
+      )
 
       Database.writeRow(@server, 'email_signup', data, {generateId: true})
         .then (write) ->
@@ -40,14 +49,6 @@ class SubmitEndpoint
         answer: req.body.answer
         created_at: DateUtil.timestamp()
         source_ver: @server.sourceVersion
-
-        mc.lists.subscribe({id: '60e31526fb', email:{email:req.body.email}},
-          (data) ->
-          ,(error) =>
-            if error.error
-              @server.logs.surveyAnswer.write("MailChimp Error: #{error.error}")
-            else
-              @server.logs.surveyAnswer.write("MailChimp Error: unspecified error")
 
       @server.logs.surveyAnswer.write(row)
 
