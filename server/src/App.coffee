@@ -2,30 +2,27 @@
 path = require('path')
 Promise = require('bluebird')
 
-
-class Server
+class App
 
   constructor: (@config) ->
     @handlers = null
     @sourceVersion = null
     @currentGitCommit = null
     @db = null
-    @agents = {}
+    @express = null
 
     @logs =
-      emailSignup: new Log(config, 'email_signup.json')
-      surveyAnswer: new Log(config, 'survey_answer.json')
-      debug: new Log(config, 'debug.log')
+      debug: new Log("debug-#{config.appName}.log")
 
     @inbox = new Inbox(this)
 
   start: ->
     @fetchCurrentGitVersion()
-      .then(@startMysql)
-      #.then(@startRedis)
+      .then(@mysqlConnect)
+      #.then(@redisConnect)
       .then(@initializeSourceVersion)
-      .then(@startAgents)
       .then(@startExpress)
+      .then(@finishStartup)
       .catch (err) ->
         console.log(err.stack)
 
@@ -35,7 +32,7 @@ class Server
         console.log("Current git commit:", info)
         @currentGitCommit = info
 
-  startMysql: =>
+  mysqlConnect: =>
     mysql = require('mysql')
     new Promise (resolve, reject) =>
       @db = mysql.createConnection
@@ -52,7 +49,7 @@ class Server
         console.log("Connected to Mysql")
         resolve()
 
-  startRedis: =>
+  redisConnect: =>
     new Promise (resolve, reject) =>
       @redis = require('redis').createClient()
       @redis.on 'error', (err) =>
@@ -65,46 +62,48 @@ class Server
         @sourceVersion = id
         console.log("Source version id is:", id)
 
-  startAgents: =>
-    new Promise (resolve, reject) =>
-      @agents.placeScraper = new PlaceScraper(this)
-      resolve()
-
   startExpress: =>
-    express = require('express')
-    @app = express()
+    if not @config.appConfig.express?
+      return
 
-    @app.use(@helpers)
+    if not @config.appConfig.express.port?
+      throw new Error("missing required express config: port")
+
+    expressLib = require('express')
+    @express = expressLib()
+
+    @express.use(@expressHelpers)
 
     # Middleware
-    @app.use(require('express-domain-middleware'))
-    @app.use(require('cookie-parser')())
-    @app.use(require('body-parser').json())
+    @express.use(require('express-domain-middleware'))
+    @express.use(require('cookie-parser')())
+    @express.use(require('body-parser').json())
 
     morgan = require('morgan')
     morgan.token('timestamp', (req, res) -> DateUtil.timestamp())
     logFormat = '[:timestamp] :method :url :status :res[content-length] - :response-time ms'
-    @app.use(require('morgan')(logFormat, {stream: @logs.debug}))
+    @express.use(require('morgan')(logFormat, {stream: @logs.debug}))
 
-    @app.use(@cors)
+    @express.use(@cors)
 
     # Routes
     staticFile = (filename) -> ((req,res) -> res.sendFile(path.resolve(filename)))
-    staticDir = (dir) -> express.static(path.resolve(dir))
+    staticDir = (dir) -> expressLib.static(path.resolve(dir))
     redirect = (to) -> ((req,res) -> res.redirect(301, to))
 
-    @app.get("/", staticFile('web/dist/index.html'))
-    @app.get("/index.html", redirect('/'))
-    @app.use(staticDir('web/dist'))
+    @express.get("/", staticFile('web/dist/index.html'))
+    @express.get("/index.html", redirect('/'))
+    @express.use(staticDir('web/dist'))
 
     @handlers =
       submit: new SubmitEndpoint(this)
 
-    port = 3000
-    console.log("Launching server on port #{port}")
-    @app.listen(port)
+    port = @config.appConfig.express.port
+    console.log("launching Express server on port #{port}")
+    @express.listen(port)
+    return
 
-  helpers: (req, res, next) =>
+  expressHelpers: (req, res, next) =>
     req.get_ip = ->
       this.headers['x-real-ip'] or this.connection.remoteAddress
 
@@ -117,16 +116,27 @@ class Server
     #res.set('Access-Control-Expose-Headers', ...)
     next()
 
-startup = ->
+  finishStartup: =>
+    console.log("finished starting up")
+
+startApp = (appName = 'web') ->
+  console.log('launching app: '+appName)
+
   # Change directory to top-level, one above the 'server' dir. (such as /kfly)
   dir = path.resolve(path.join(__dirname, '../..'))
 
-  console.log('Changing current dir to: ' + dir)
+  console.log('changing current dir to: ' + dir)
   process.chdir(dir)
 
   config = require('./../config')
-  
-  server = new Server(config)
-  server.start()
 
-exports.startup = startup
+  if not config.apps[appName]?
+    throw new Error("service name not found in config: "+appName)
+
+  config.appName = appName
+  config.appConfig = config.apps[appName]
+
+  app = new App(config)
+  app.start()
+
+exports.startApp = startApp
