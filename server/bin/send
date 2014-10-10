@@ -4,35 +4,64 @@
 config = require('./../config')
 nano = require('nanomsg')
 
-destination = process.argv[2]
-message = process.argv[3]
+andListen = false
 
-service = config.services[destination]
+args = process.argv.slice(2)
 
-if not service?
-  console.log("Service not found: "+destination)
+if args[0] == '--and-listen'
+  andListen = true
+  args = args.slice(1)
+
+appName = args[0]
+commandStr = args.slice(1).join(' ')
+
+appConfig = config.apps[appName]
+
+if not appConfig?
+  console.log("App not found: "+appName)
   process.exit(1)
 
-if not service.inbox?
-  console.log("Service has no inbox: "+destination)
+if not appConfig.inbox?
+  console.log("App has no inbox: "+appName)
   process.exit(1)
+
+if andListen
+  if not appConfig.pub?
+    console.log("App has no pub channel: "+appName)
+    process.exit(1)
+
+  subSocket = nano.socket('sub')
+  subSocket.connect(appConfig.pub)
+  subSocket.on 'message', (buf) ->
+    console.log('[pub]   ' + buf.toString())
 
 socket = nano.socket('req')
-socket.connect(service.inbox)
-socket.send(message)
+socket.connect(appConfig.inbox)
+socket.send(commandStr)
+
+timeout = null
 
 socket.on 'message', (buf) ->
-  console.log(buf.toString())
+  line = buf.toString()
+  if andListen
+    line = '[reply] ' +line
+  console.log(line)
   socket.close()
-  process.exit(1)
+  socket = null
+
+  #if timeout?
+    # todo: cancel timeout
+
+
 socket.on 'error', (err) ->
   console.log('error:', err)
   socket.close()
+  socket = null
   process.exit(1)
 
 timeoutMs = 1000
 
-setTimeout((->
+timeout = setTimeout((->
   if socket?
     console.log("Timed out waiting for a reply (#{timeoutMs}ms)")
     process.exit(1)

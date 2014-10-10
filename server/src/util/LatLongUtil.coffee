@@ -4,6 +4,30 @@ toRadians = (degrees) ->
 toDegrees = (radians) ->
   radians / Math.PI * 180
 
+class Vec2
+  constructor: (@x, @y) ->
+  addX: (x) ->
+    new Vec2(@x + x, @y)
+  addY: (y) ->
+    new Vec2(@x, @y + y)
+
+class Location
+  constructor: (@lat, @long) ->
+  addLat: (lat) ->
+    new Location(@lat + lat, @long)
+  addLong: (long) ->
+    new Location(@lat, @long + long)
+
+class Square
+  isSquare: true
+  constructor: (@topLeft, @bottomRight) ->
+
+sort2 = (x, y) ->
+  if x > y
+    [y, x]
+  else
+    [x, y]
+
 LatLongUtil =
   earthRadiusMiles: 3959
   areas:
@@ -15,5 +39,29 @@ LatLongUtil =
     dlat = distanceMiles / LatLongUtil.earthRadiusMiles
     dlong = Math.asin(Math.sin(dlat) / Math.cos(toRadians(latLong.lat)))
     return {dlat: toDegrees(dlat), dlon: toDegrees(dlong)}
+
+  latticePointsForAreaSimpler: (area, radiusMiles) ->
+    console.log('latticePointsForAreaSimpler')
+
+    if not area.isSquare
+      throw new Error("only works on squares")
+
+    output = []
+    offsetLong = false
+    latLongDelta = LatLongUtil.latLongDeltaFromDistance(area.topLeft, radiusMiles*2)
+
+    rowStart = area.topLeft
+    [latStart, latEnd] = sort2(area.topLeft.lat, area.bottomRight.lat)
+    [longStart, longEnd] = sort2(area.topLeft.long, area.bottomRight.long)
+
+    console.log({latStart,latEnd,longStart,longEnd,latLongDelta})
+
+    for currentLat in [latStart..latEnd] by latLongDelta.lat
+      for currentLong in [longStart..longEnd] by latLongDelta.long
+        if offsetLong
+          currentLong += latLongDelta.long / 2
+        output.push(new Location(currentLat, currentLong))
+      offsetLong = not offsetLong
+    return output
 
 exports.LatLongUtil = LatLongUtil
