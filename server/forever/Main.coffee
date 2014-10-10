@@ -4,33 +4,35 @@ config = require('./../config')
 
 process.chdir(__dirname+'/../..')
 
-listenStdout = (service, handler) ->
-  service.on 'stdout', (data) ->
-    handler(data.toString().trim())
-  service.on 'stderr', (data) ->
-    handler(data.toString().trim())
-
 log = ->
   args = Array.prototype.slice.call(arguments, 0)
   console.log.apply(null, args)
 
-web = new (forever.Monitor) 'server',
-  command: 'node'
-  silent: true
-  options: []
-  warn: log
+startApp = (appName) ->
+  app = new (forever.Monitor) 'server',
+    command: 'node'
+    silent: true
+    options: [appName]
+    warn: log
 
-web.on 'restart', ->
-  log('Restarting web')
+  app.on 'restart', ->
+    log("[forever] Restarting "+ appName)
 
-listenStdout web, (line) ->
-  log("[web] #{line}")
+  app.on 'stdout', (data) ->
+    log("[#{appName}] #{data.toString().trim())
+  app.on 'stderr', (data) ->
+    log("[#{appName}] #{data.toString().trim())
 
-web.start()
+  app.start()
+  return app
+
+apps = for appName, appConfig in config.apps
+  startApp(appName)
 
 shutdown = ->
   log("Shutting down..")
-  web.kill(true)
+  for app in apps
+    app.kill(true)
   setTimeout((-> process.exit(0)), 500)
 
 process.on 'shutdown', shutdown
@@ -46,9 +48,11 @@ inbox.on 'message', (buf) ->
   log('received message: '+ msg)
   switch msg
     when 'restart'
-      web.restart()
+      for app in apps
+        app.restart()
       inbox.send('ok')
     when 'simulate_exception'
       throw new Error('simulated_exception')
     else
       inbox.send('command not recognized')
+

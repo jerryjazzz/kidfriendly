@@ -1,8 +1,8 @@
-bluebird = require('bluebird')
+Promise = require('bluebird')
 
 SourceUtil =
   getCurrentGitCommit: ->
-    new bluebird (resolve, reject) =>
+    new Promise (resolve, reject) =>
       exec = require('child_process').exec
       exec 'git rev-parse HEAD', (error, stdout, stderr) ->
         if error?
