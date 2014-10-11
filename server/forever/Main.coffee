@@ -19,14 +19,24 @@ startApp = (appName) ->
     log("[forever] Restarting "+ appName)
 
   app.on 'stdout', (data) ->
-    log("[#{appName}] #{data.toString().trim())
+    log("[#{appName}] #{data.toString().trim()}")
   app.on 'stderr', (data) ->
-    log("[#{appName}] #{data.toString().trim())
+    log("[#{appName}] #{data.toString().trim()}")
 
   app.start()
   return app
 
-apps = for appName, appConfig in config.apps
+args = process.argv.slice(2)
+appNames = []
+
+if args.length > 0
+  appNames = args
+  console.log("[forever] Launching specific apps: "+appNames)
+else
+  # default is to launch all apps in config.
+  appNames = Object.keys(config.apps)
+
+apps = for appName in appNames
   startApp(appName)
 
 shutdown = ->
@@ -45,7 +55,7 @@ inbox = require('nanomsg').socket('rep')
 inbox.bind(config.services.forever.inbox)
 inbox.on 'message', (buf) ->
   msg = buf.toString()
-  log('received message: '+ msg)
+  log('[forever] Received message: '+ msg)
   switch msg
     when 'restart'
       for app in apps
