@@ -38,7 +38,7 @@ LatLongUtil =
     # the location will be within +/- the delta.
     dlat = distanceMiles / LatLongUtil.earthRadiusMiles
     dlong = Math.asin(Math.sin(dlat) / Math.cos(toRadians(latLong.lat)))
-    return {dlat: toDegrees(dlat), dlon: toDegrees(dlong)}
+    return {dlat: toDegrees(dlat), dlong: toDegrees(dlong)}
 
   latticePointsForAreaSimpler: (area, radiusMiles) ->
     console.log('latticePointsForAreaSimpler')
@@ -56,10 +56,12 @@ LatLongUtil =
 
     console.log({latStart,latEnd,longStart,longEnd,latLongDelta})
 
-    for currentLat in [latStart..latEnd] by latLongDelta.lat
-      for currentLong in [longStart..longEnd] by latLongDelta.long
+    for currentLat in [latStart..latEnd] by latLongDelta.dlat
+      console.log('check1: ', currentLat)
+      for currentLong in [longStart..longEnd] by latLongDelta.dlong
+        console.log('check2: ', currentLong)
         if offsetLong
-          currentLong += latLongDelta.long / 2
+          currentLong += latLongDelta.dlong / 2
         output.push(new Location(currentLat, currentLong))
       offsetLong = not offsetLong
     return output

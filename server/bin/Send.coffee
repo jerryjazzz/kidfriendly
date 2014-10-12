@@ -51,10 +51,9 @@ send = (destinationName, msg, {andListen, log, ignoreError} = {}) ->
       # todo: cancel timeout
 
   socket.on 'error', (err) ->
-    log('error:', err)
     socket.close()
     socket = null
-    process.exit(1)
+    throw err
 
   timeoutMs = 1000
 
@@ -62,7 +61,6 @@ send = (destinationName, msg, {andListen, log, ignoreError} = {}) ->
     if socket?
       if not ignoreError
         log("Timed out waiting for a reply (#{timeoutMs}ms)")
-      process.exit(1)
     ), timeoutMs)
 
 main = ->

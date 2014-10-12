@@ -37,8 +37,8 @@ create table survey_answer (
 create table place (
   id INT unsigned not null primary key,
   name VARCHAR(255),
-  location VARCHAR(20),
-  google_id VARCHAR(20) unique key,
+  location VARCHAR(30),
+  google_id VARCHAR(41) unique key,
   created_at timestamp,
   updated_at timestamp,
   source_ver int
