@@ -10,26 +10,30 @@ class App
     @currentGitCommit = null
     @db = null
     @express = null
+    @startedAt = Date.now()
 
     @logs =
       debug: new Log("debug-#{config.appName}.log")
 
-    @inbox = new Inbox(this)
+    @inbox = null
+    @pub = null
 
   start: ->
     @fetchCurrentGitVersion()
       .then(@mysqlConnect)
-      #.then(@redisConnect)
+      .then(@redisConnect)
       .then(@initializeSourceVersion)
+      .then(@setupInbox)
+      .then(@setupPub)
       .then(@startExpress)
+      .then(@startTaskManager)
       .then(@finishStartup)
       .catch (err) ->
-        console.log(err.stack)
+        console.log(err?.stack)
 
   fetchCurrentGitVersion: =>
     SourceUtil.getCurrentGitCommit()
       .then (info) =>
-        console.log("Current git commit:", info)
         @currentGitCommit = info
 
   mysqlConnect: =>
@@ -43,81 +47,63 @@ class App
 
       @db.connect (err, conn) =>
         if err?
-          console.log("[error] from db.connect: ", err)
           reject(err)
           return
-        console.log("Connected to Mysql")
+        console.log("mysql: connected")
         resolve()
 
   redisConnect: =>
+    if not @config.appConfig.redis?
+      console.log("redis: not started (config)")
+      return
+
     new Promise (resolve, reject) =>
       @redis = require('redis').createClient()
+      connected = false
+
+      @redis.on 'ready', ->
+        console.log("redis: connected")
+        connected = true
+        resolve()
+
       @redis.on 'error', (err) =>
-        @logs.debug(msg: 'Redis error', caused_by: err)
-      resolve()
+        if not connected
+          @redis.end()
+          @redis = null
+          reject(err)
+          return
+
+        console.log('redis err: ', err)
+        @logs.debug.write(msg: 'Redis error', caused_by: err)
 
   initializeSourceVersion: =>
     Database.insertSourceVersion(this, @currentGitCommit)
       .then (id) =>
         @sourceVersion = id
-        console.log("Source version id is:", id)
+        console.log("current source version is:", id)
+
+  setupInbox: =>
+    Inbox.setup(this)
+
+  setupPub: =>
+    PubChannel.setup(this)
 
   startExpress: =>
     if not @config.appConfig.express?
       return
 
-    if not @config.appConfig.express.port?
-      throw new Error("missing required express config: port")
+    @expressServer = new ExpressServer(this, @config.appConfig.express)
+    @expressServer.start()
 
-    expressLib = require('express')
-    @express = expressLib()
+  startTaskManager: =>
+    if not @config.appConfig.taskManager?
+      return
 
-    @express.use(@expressHelpers)
-
-    # Middleware
-    @express.use(require('express-domain-middleware'))
-    @express.use(require('cookie-parser')())
-    @express.use(require('body-parser').json())
-
-    morgan = require('morgan')
-    morgan.token('timestamp', (req, res) -> DateUtil.timestamp())
-    logFormat = '[:timestamp] :method :url :status :res[content-length] - :response-time ms'
-    @express.use(require('morgan')(logFormat, {stream: @logs.debug}))
-
-    @express.use(@cors)
-
-    # Routes
-    staticFile = (filename) -> ((req,res) -> res.sendFile(path.resolve(filename)))
-    staticDir = (dir) -> expressLib.static(path.resolve(dir))
-    redirect = (to) -> ((req,res) -> res.redirect(301, to))
-
-    @express.get("/", staticFile('web/dist/index.html'))
-    @express.get("/index.html", redirect('/'))
-    @express.use(staticDir('web/dist'))
-
-    @handlers =
-      submit: new SubmitEndpoint(this)
-
-    port = @config.appConfig.express.port
-    console.log("launching Express server on port #{port}")
-    @express.listen(port)
-    return
-
-  expressHelpers: (req, res, next) =>
-    req.get_ip = ->
-      this.headers['x-real-ip'] or this.connection.remoteAddress
-
-    next()
-
-  cors: (req, res, next) =>
-    res.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
-    res.set('Access-Control-Allow-Headers', 'Content-Type')
-    res.set('Access-Control-Allow-Origin', '*')
-    #res.set('Access-Control-Expose-Headers', ...)
-    next()
+    @taskManager = new TaskManager(this)
+    @taskManager.start()
 
   finishStartup: =>
-    console.log("finished starting up")
+    console.log("finished startup in #{Date.now() - @startedAt} ms")
 
 startApp = (appName = 'web') ->
   console.log('launching app: '+appName)

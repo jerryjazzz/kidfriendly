@@ -1,40 +1,9 @@
 #!/usr/bin/env coffee
 # vi: ft=coffee
 
-config = require('./../config')
-nano = require('nanomsg')
+{main} = require('./Send.coffee')
 
-destination = process.argv[2]
-message = process.argv[3]
-
-service = config.services[destination]
-
-if not service?
-  console.log("Service not found: "+destination)
-  process.exit(1)
-
-if not service.inbox?
-  console.log("Service has no inbox: "+destination)
-  process.exit(1)
-
-socket = nano.socket('req')
-socket.connect(service.inbox)
-socket.send(message)
-
-socket.on 'message', (buf) ->
-  console.log(buf.toString())
-  socket.close()
-  process.exit(1)
-socket.on 'error', (err) ->
-  console.log('error:', err)
-  socket.close()
-  process.exit(1)
-
-timeoutMs = 1000
-
-setTimeout((->
-  if socket?
-    console.log("Timed out waiting for a reply (#{timeoutMs}ms)")
-    process.exit(1)
-  ), timeoutMs)
-
+try
+  main()
+catch e
+  console.log(e)

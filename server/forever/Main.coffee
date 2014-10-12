@@ -4,33 +4,46 @@ config = require('./../config')
 
 process.chdir(__dirname+'/../..')
 
-listenStdout = (service, handler) ->
-  service.on 'stdout', (data) ->
-    handler(data.toString().trim())
-  service.on 'stderr', (data) ->
-    handler(data.toString().trim())
-
 log = ->
   args = Array.prototype.slice.call(arguments, 0)
   console.log.apply(null, args)
 
-web = new (forever.Monitor) 'server',
-  command: 'node'
-  silent: true
-  options: []
-  warn: log
+startApp = (appName) ->
+  app = new (forever.Monitor) 'server',
+    command: 'node'
+    silent: true
+    options: [appName]
+    warn: log
 
-web.on 'restart', ->
-  log('Restarting web')
+  app.on 'restart', ->
+    log("[forever] Restarting "+ appName)
 
-listenStdout web, (line) ->
-  log("[web] #{line}")
+  app.on 'stdout', (data) ->
+    log("[#{appName}] #{data.toString().trim()}")
+  app.on 'stderr', (data) ->
+    log("[#{appName}] #{data.toString().trim()}")
 
-web.start()
+  app.start()
+  return app
+
+args = process.argv.slice(2)
+appNames = []
+
+if args.length > 0
+  appNames = args
+  console.log("[forever] Launching apps (command args): "+appNames)
+else
+  # default is to launch all apps in config.
+  appNames = Object.keys(config.apps)
+  console.log("[forever] Launching apps (default): "+appNames)
+
+apps = for appName in appNames
+  startApp(appName)
 
 shutdown = ->
   log("Shutting down..")
-  web.kill(true)
+  for app in apps
+    app.kill(true)
   setTimeout((-> process.exit(0)), 500)
 
 process.on 'shutdown', shutdown
@@ -43,12 +56,14 @@ inbox = require('nanomsg').socket('rep')
 inbox.bind(config.services.forever.inbox)
 inbox.on 'message', (buf) ->
   msg = buf.toString()
-  log('received message: '+ msg)
+  log('[forever] Received message: '+ msg)
   switch msg
     when 'restart'
-      web.restart()
+      for app in apps
+        app.restart()
       inbox.send('ok')
     when 'simulate_exception'
       throw new Error('simulated_exception')
     else
       inbox.send('command not recognized')
+
