@@ -1,9 +1,9 @@
 mcapi = require('mailchimp-api');
 
 class SubmitEndpoint
-  constructor: (@app) ->
-
-    express = @app.express
+  constructor: (@expressServer) ->
+    server = @expressServer.server
+    @app = @expressServer.app
     @debug = @app.logs.debug
     @emailSignupLog = new Log('email_signup.json')
     @surveyAnswerLog = new Log('survey_answer.json')
@@ -18,7 +18,7 @@ class SubmitEndpoint
 
         next(req, res)
 
-    express.post '/submit/email', withRequiredFields ['email'], (req, res) =>
+    server.post '/submit/email', withRequiredFields ['email'], (req, res) =>
 
       data =
         email: req.body.email
@@ -44,7 +44,7 @@ class SubmitEndpoint
           else
             res.status(200).send(id: write.id)
 
-    express.post '/submit/survey_answer', withRequiredFields ['signup_id', 'survey_version', 'answer'], (req, res) =>
+    server.post '/submit/survey_answer', withRequiredFields ['signup_id', 'survey_version', 'answer'], (req, res) =>
 
       row =
         signup_id: parseInt(req.body.signup_id)

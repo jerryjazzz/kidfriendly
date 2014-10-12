@@ -1,0 +1,22 @@
+#!/usr/bin/env coffee
+# vi: ft=coffee
+
+config = require('./../config')
+nano = require('nanomsg')
+
+appName = process.argv[2]
+appConfig = config.apps[appName]
+
+if not appConfig?
+  console.log("App not found: "+appName)
+  process.exit(1)
+
+if not appConfig.pub?
+  console.log("App has no pub channel: "+appName)
+  process.exit(1)
+
+socket = nano.socket('sub')
+socket.connect(appConfig.pub)
+
+socket.on 'message', (buf) ->
+  console.log(buf.toString())
