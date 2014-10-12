@@ -1,6 +1,7 @@
 
 class PlaceScraper
   apiKey: '***REMOVED***'
+  nearbySearchUrl: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
   constructor: (@app, @taskManager) ->
     @redis = @app.redis
@@ -15,24 +16,44 @@ class PlaceScraper
     if not area?
       return reply('area not recognized: '+areaName)
 
-    radiusMiles = args[1]
+    radiusMiles = parseFloat(args[1])
     locations = LatLongUtil.latticePointsForAreaSimpler(area, radiusMiles)
 
     tasks = for location in locations
       {name: 'GooglePlaceSearch', location, radius:radiusMiles}
+
     console.log("created tasks: ", tasks)
     @taskManager.queueTasks(tasks)
     reply('ok')
 
-  placeSearch: (task) ->
-    console.log("Triggered placeSearch task..")
-    setTimeout((-> console.log('Triggering placeSearch finish'); task.emit('finish')), 100)
+  placeSearch: (task) =>
+    url = @nearbySearchUrl
+    url += "?key=#{@apiKey}"
+    url += "&location=#{task.location.lat},#{task.location.long}"
 
-  handleCommand: (args, reply) ->
-    switch args[0]
-      when 'start'
-        startCommand(args.slice(1))
-      else
-        reply('unrecognized command')
+    radiusMeters = GeomUtil.milesToMeters(task.radius)
+    url += "&radius=#{radiusMeters}"
+
+    request = require('request')
+    request {url, json:true}, (error, response, body) =>
+      if error?
+        @app.logs.debug.write('nearby search failed: ', error)
+        return
+
+      for place in body.results
+        @savePlaceToMysql(place)
+      task.emit('done')
+
+  savePlaceToMysql: (googlePlace) =>
+    row =
+      name: googlePlace.name
+      location: "#{googlePlace.geometry.location.lat},#{googlePlace.geometry.location.lng}"
+      google_id: googlePlace.id
+      created_at: DateUtil.timestamp()
+
+    Database.writeRow(@app, 'place', row, {generateId: true})
+      .then (result) =>
+        if result.error?
+          console.log("error saving google place to DB: ", result.error)
 
 exports.PlaceScraper = PlaceScraper

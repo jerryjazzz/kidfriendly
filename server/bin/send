@@ -2,4 +2,8 @@
 # vi: ft=coffee
 
 {main} = require('./Send.coffee')
-main()
+
+try
+  main()
+catch e
+  console.log(e)

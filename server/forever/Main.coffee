@@ -31,10 +31,11 @@ appNames = []
 
 if args.length > 0
   appNames = args
-  console.log("[forever] Launching specific apps: "+appNames)
+  console.log("[forever] Launching apps (command args): "+appNames)
 else
   # default is to launch all apps in config.
   appNames = Object.keys(config.apps)
+  console.log("[forever] Launching apps (default): "+appNames)
 
 apps = for appName in appNames
   startApp(appName)

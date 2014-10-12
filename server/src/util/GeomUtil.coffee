@@ -1,7 +1,10 @@
 
 
-#GeomUtil =
-  ###
+GeomUtil =
+  milesToMeters: (miles) ->
+    return 1609.34 * miles
+
+    ###
   latticePointsForArea: (area, circleRadius) ->
     # Returns a list of points with the goal of completely covering the 'area' with circles.
     # Each point in the list is the center of a circle with the given radius.
@@ -35,7 +38,3 @@
 
     return output
   ###
-
-
-
-

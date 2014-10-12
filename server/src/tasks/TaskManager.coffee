@@ -27,31 +27,38 @@ class TaskManager
   queueTasks: (tasks) ->
     new Promise (resolve, reject) =>
       console.log("tasks: ", tasks)
+      for task in tasks
+        task.source_ver = @app.sourceVersion
+
       tasks = tasks.map(JSON.stringify)
-      console.log('pushing tasks: ', tasks)
-      @app.redis.rpush "tasks", tasks, (err, reply) =>
+      rpushArgs = ["tasks"].concat(tasks)
+      rpushArgs.push (err, reply) =>
         if err?
           return reject(err)
         @app.pub.send("queued #{tasks.length} tasks")
         resolve()
 
-  peekNextTask: =>
+      @app.redis.rpush.apply(@app.redis, rpushArgs)
+
+  popNextTask: =>
     new Promise (resolve, reject) =>
-      @app.redis.lrange "tasks", 0,0, (err, reply) =>
-        console.log('peek tasks: ', reply)
+      @app.redis.lpop "tasks", (err, reply) =>
         if err?
           return reject(err)
-        resolve(reply?[0])
+
+        if not reply? or reply is ''
+          resolve(null)
+
+        resolve(new Task(JSON.parse(reply)))
 
   tick: =>
-    @peekNextTask().then (task) =>
+    @popNextTask().then (task) =>
       if not task?
         setTimeout(@tick, @taskIntervalMs)
         return
 
-      console.log('next task is: ', JSON.stringify(task))
+      task.on 'done', @tick
       @startTask(task)
-        .on 'finish', @tick
 
   startTask: (task) =>
     handler = @taskHandlers[task.name]
