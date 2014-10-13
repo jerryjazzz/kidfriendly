@@ -1,0 +1,19 @@
+<ion-view title='<img class="title-image" src="img/kf_logo_v3-two-tone.png">'>
+    <ion-content class="has-header">
+        <ion-list>
+            <ion-item class="item item-thumbnail-left" href="#" ng-repeat="result in results">
+                <img src="{{result.thumb}}">
+                <div class="row">
+                    <div class="col-90"><h2>{{result.name}}</h2></div>
+                    <div class="col-10"><p class="distance-text">{{result.distance}}</p></div>
+                </div>
+                <div class="row">
+                    <div class="col-90"><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span></div>
+                </div>
+                <div class="row">
+                    <div class="col-90"><p>{{result.addr}}</p></div>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

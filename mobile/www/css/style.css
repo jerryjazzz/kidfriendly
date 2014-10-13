@@ -1,0 +1,11 @@
+/* Empty. Add your own CSS if you like */
+
+.distance-text {
+    font-size: 10px !important;
+}
+
+
+/* Ionic Overrides*/
+.item-content {
+    padding-right: 8px !important;
+}

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules
 .tmp
 .sass-cache
@@ -10,5 +11,11 @@ plugins
 *.swo
 *.log
 *.DS_Store
+=======
+# Specifies intentionally untracked files to ignore when using Git
+# http://git-scm.com/docs/gitignore
+>>>>>>> update ionic version and work on search results
 
-app/scripts/config.js
+node_modules/
+platforms/
+plugins/
