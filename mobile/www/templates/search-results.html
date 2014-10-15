@@ -1,4 +1,4 @@
-<ion-view title='<img class="title-image" src="img/kf_logo_v3-two-tone.png">'>
+<ion-view title='<img class="title-image" src="img/logo.png">'>
     <ion-content class="has-header">
         <ion-list>
             <ion-item class="item item-thumbnail-left" href="#" ng-repeat="result in results">
@@ -8,7 +8,9 @@
                     <div class="col-20"><p class="distance-text">{{result.distance}}</p></div>
                 </div>
                 <div class="row">
-                    <div class="col-90"><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span><span class="ion-ios7-star" style="color:#ff8800"></span></div>
+                    <div class="col-90">
+                        <span ng-repeat="star in result.stars" ng-class="star.value" style="color:#ff8800"></span>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-90"><p>{{result.addr}}</p></div>
