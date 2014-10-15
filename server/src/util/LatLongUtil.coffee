@@ -41,8 +41,6 @@ LatLongUtil =
     return {dlat: toDegrees(dlat), dlong: toDegrees(dlong)}
 
   latticePointsForAreaSimpler: (area, radiusMiles) ->
-    console.log('latticePointsForAreaSimpler')
-
     if not area.isSquare
       throw new Error("only works on squares")
 
@@ -54,12 +52,8 @@ LatLongUtil =
     [latStart, latEnd] = sort2(area.topLeft.lat, area.bottomRight.lat)
     [longStart, longEnd] = sort2(area.topLeft.long, area.bottomRight.long)
 
-    console.log({latStart,latEnd,longStart,longEnd,latLongDelta})
-
     for currentLat in [latStart..latEnd] by latLongDelta.dlat
-      console.log('check1: ', currentLat)
       for currentLong in [longStart..longEnd] by latLongDelta.dlong
-        console.log('check2: ', currentLong)
         if offsetLong
           currentLong += latLongDelta.dlong / 2
         output.push(new Location(currentLat, currentLong))

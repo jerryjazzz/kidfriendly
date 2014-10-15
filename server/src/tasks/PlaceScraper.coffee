@@ -22,7 +22,6 @@ class PlaceScraper
     tasks = for location in locations
       {name: 'GooglePlaceSearch', location, radius:radiusMiles}
 
-    console.log("created tasks: ", tasks)
     @taskManager.queueTasks(tasks)
     reply('ok')
 
@@ -37,7 +36,7 @@ class PlaceScraper
     request = require('request')
     request {url, json:true}, (error, response, body) =>
       if error?
-        @app.logs.debug.write('nearby search failed: ', error)
+        @app.log('nearby search failed: ', error)
         return
 
       for place in body.results
@@ -50,10 +49,12 @@ class PlaceScraper
       location: "#{googlePlace.geometry.location.lat},#{googlePlace.geometry.location.lng}"
       google_id: googlePlace.id
       created_at: DateUtil.timestamp()
+      source_ver: @app.sourceVersion
 
     Database.writeRow(@app, 'place', row, {generateId: true})
       .then (result) =>
         if result.error?
-          console.log("error saving google place to DB: ", result.error)
+          @app.log(msg: "error saving google place to DB", google_id: googlePlace.id, \
+            caused_by: result.error)
 
 exports.PlaceScraper = PlaceScraper

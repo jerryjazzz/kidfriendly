@@ -37,7 +37,7 @@ class ExpressServer
       submit: new SubmitEndpoint(this)
 
     port = @expressConfig.port
-    console.log("launching Express server on port #{port}")
+    @app.log("launching Express server on port #{port}")
     @server.listen(port)
     return
 

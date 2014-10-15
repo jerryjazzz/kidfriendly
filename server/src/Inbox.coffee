@@ -36,7 +36,7 @@ class Inbox
     try
       handler(args.slice(1), reply)
     catch e
-      console.log(e.stack)
+      @app.log(e.stack)
 
     # Reply must be sent synchronously (this is a restriction of nanomsg)
     if not replySent
@@ -45,9 +45,9 @@ class Inbox
   @setup: (app) ->
     appConfig = app.config.appConfig
     if not appConfig.inbox?
-      console.log("nanomsg inbox: not started (config)")
+      app.log("nanomsg inbox: not started (config)")
       return
 
     app.inbox = new Inbox(app, appConfig.inbox)
-    console.log("nanomsg inbox: listening on "+appConfig.inbox)
+    app.log("nanomsg inbox: listening on "+appConfig.inbox)
     return

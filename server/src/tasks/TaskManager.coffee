@@ -1,7 +1,7 @@
 
 Promise = require('bluebird')
 
-class TaskManager
+class TaskRunner
   taskIntervalMs: 1000
 
   constructor: (@app) ->
@@ -16,7 +16,7 @@ class TaskManager
 
     @tick()
 
-    console.log("task manager: started")
+    @app.log("task manager: started")
     return
 
   register: (taskName, handler) ->
@@ -26,7 +26,6 @@ class TaskManager
 
   queueTasks: (tasks) ->
     new Promise (resolve, reject) =>
-      console.log("tasks: ", tasks)
       for task in tasks
         task.source_ver = @app.sourceVersion
 
