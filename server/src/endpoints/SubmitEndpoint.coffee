@@ -1,12 +1,11 @@
-mcapi = require('mailchimp-api');
+mcapi = require('mailchimp-api')
 
 class SubmitEndpoint
   constructor: (@expressServer) ->
     server = @expressServer.server
     @app = @expressServer.app
-    @debug = @app.logs.debug
-    @emailSignupLog = new Log('email_signup.json')
-    @surveyAnswerLog = new Log('survey_answer.json')
+    @emailSignupLog = new Log(@app, 'email_signup.json')
+    @surveyAnswerLog = new Log(@app, 'survey_answer.json')
     mc = new mcapi.Mailchimp('7c0352fbb770ec2a76b0d631df95d473-us9')
 
     withRequiredFields = (fields, next) ->
@@ -32,9 +31,9 @@ class SubmitEndpoint
         #do nothing
         (error) =>
           if error.error?
-            @debug.write("MailChimp Error: #{error.error}")
+            @app.log("MailChimp Error: #{error.error}")
           else
-            @debug.write("MailChimp Error: unspecified error")
+            @app.log("MailChimp Error: unspecified error")
       )
 
       Database.writeRow(@app, 'email_signup', data, {generateId: true})
@@ -58,7 +57,7 @@ class SubmitEndpoint
       Database.writeRow(@app, 'survey_answer', row)
         .then (write) =>
           if write.error?
-            @debug.write(msg: 'SQL error', caused_by: write.error, row: row)
+            @app.log(msg: 'SQL error', caused_by: write.error, row: row)
             res.status(400).send(msg: 'SQL error', caused_by: write.error)
             return
           res.status(200).end()

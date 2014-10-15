@@ -5,6 +5,11 @@ Promise = require('bluebird')
 class App
 
   constructor: (@config) ->
+
+    # During startup we log to stdout, so that any problems are captured in Forever logs.
+    # After startup is finished, we switch to the app log file.
+    @log = console.log
+
     @handlers = null
     @sourceVersion = null
     @currentGitCommit = null
@@ -13,10 +18,13 @@ class App
     @startedAt = Date.now()
 
     @logs =
-      debug: new Log("debug-#{config.appName}.log")
+      debug: new Log(this, "#{config.appName}.log")
+
+    console.log('opened logfile: ', config.appName)
 
     @inbox = null
     @pub = null
+
 
   start: ->
     @fetchCurrentGitVersion()
@@ -28,8 +36,8 @@ class App
       .then(@startExpress)
       .then(@startTaskManager)
       .then(@finishStartup)
-      .catch (err) ->
-        console.log(err?.stack)
+      .catch (err) =>
+        @log(err?.stack)
 
   fetchCurrentGitVersion: =>
     SourceUtil.getCurrentGitCommit()
@@ -49,20 +57,20 @@ class App
         if err?
           reject(err)
           return
-        console.log("mysql: connected")
+        @log("mysql: connected")
         resolve()
 
   redisConnect: =>
     if not @config.appConfig.redis?
-      console.log("redis: not started (config)")
+      @log("redis: not started (config)")
       return
 
     new Promise (resolve, reject) =>
       @redis = require('redis').createClient()
       connected = false
 
-      @redis.on 'ready', ->
-        console.log("redis: connected")
+      @redis.on 'ready', =>
+        @log("redis: connected")
         connected = true
         resolve()
 
@@ -73,14 +81,13 @@ class App
           reject(err)
           return
 
-        console.log('redis err: ', err)
-        @logs.debug.write(msg: 'Redis error', caused_by: err)
+        @log('redis error: ', err)
 
   initializeSourceVersion: =>
     Database.insertSourceVersion(this, @currentGitCommit)
       .then (id) =>
         @sourceVersion = id
-        console.log("current source version is:", id)
+        @log("current source version is:", id)
 
   setupInbox: =>
     Inbox.setup(this)
@@ -96,14 +103,26 @@ class App
     @expressServer.start()
 
   startTaskManager: =>
-    if not @config.appConfig.taskManager?
+    if not @config.appConfig.taskRunner?
       return
 
-    @taskManager = new TaskManager(this)
-    @taskManager.start()
+    @taskRunner = new TaskRunner(this)
+    @taskRunner.start()
 
   finishStartup: =>
-    console.log("finished startup in #{Date.now() - @startedAt} ms")
+    msg = "finished startup in #{Date.now() - @startedAt} ms"
+    @log(msg)
+    @log = @_logToFile
+    @log(msg)
+
+  _logToFile: =>
+    args = for arg in arguments
+      if typeof arg is 'string'
+        arg
+      else
+        JSON.stringify(arg)
+
+    @logs.debug.write("[#{DateUtil.timestamp()}] #{args.join(' ')}")
 
 startApp = (appName = 'web') ->
   console.log('launching app: '+appName)

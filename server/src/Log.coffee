@@ -2,7 +2,10 @@
 fs = require('fs')
 
 class Log
-  constructor: (config, @name) ->
+  constructor: (app, @name) ->
+    if not name?
+      throw new Error("log name is required")
+
     @filename = "data/log/#{name}"
     @fileStream = fs.createWriteStream(@filename, {flags: 'a'})
     @fileStream.on 'error', (err) =>

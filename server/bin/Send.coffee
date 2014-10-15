@@ -61,6 +61,8 @@ send = (destinationName, msg, {andListen, log, ignoreError} = {}) ->
     if socket?
       if not ignoreError
         log("Timed out waiting for a reply (#{timeoutMs}ms)")
+      socket.close()
+      socket = null
     ), timeoutMs)
 
 main = ->
