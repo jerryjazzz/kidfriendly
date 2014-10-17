@@ -32,6 +32,7 @@ class ExpressServer
     @server.get("/", staticFile('web/dist/index.html'))
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('web/dist'))
+    @server.use("/mobile", staticDir('mobile/www'))
 
     @handlers =
       submit: new SubmitEndpoint(this)
