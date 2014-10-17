@@ -15,7 +15,7 @@
       "inbox": "tcp://127.0.0.1:3502",
       "pub": "tcp://127.0.0.1:3503",
       "redis": {},
-      "taskManager": {}
+      "taskRunner": {}
     }
   }
 }
