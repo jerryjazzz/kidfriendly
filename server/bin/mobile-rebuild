@@ -1,6 +1,7 @@
+
 #!/usr/bin/env bash
 
-echo -- cd kfly/web
+echo -- cd kfly/mobile
 cd $KFLY_HOME/mobile
 
 echo -- npm install
