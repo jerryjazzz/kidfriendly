@@ -9,4 +9,5 @@ git reset --hard HEAD
 git checkout $1
 
 web-rebuild
+mobile-rebuild
 server-rebuild
