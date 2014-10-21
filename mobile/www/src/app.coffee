@@ -30,6 +30,9 @@ angular.module('Mobile', ['ionic', 'config', 'Mobile.controllers', 'Mobile.servi
     url: '/search'
     templateUrl: 'templates/search.html'
     controller: 'SearchCtrl'
+  .state 'review',
+    url: '/review'
+    templateUrl: 'templates/review.html'
 
   .state 'results',
     url:'/results'
