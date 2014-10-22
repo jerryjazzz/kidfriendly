@@ -5,6 +5,22 @@
     text-align: right;
 }
 
+.button-star {
+    font-size: 32px;
+    color:#ff8800
+}
+
+.text-area-border {
+    border-color: #b2b2b2 ;
+    border-width: 1px;
+    color: #333333  ;
+    border-style: solid;
+    padding: 5px;
+}
+
+h6 {
+ color:#555555;
+}
 
 /* Ionic Overrides*/
 .item-content {
