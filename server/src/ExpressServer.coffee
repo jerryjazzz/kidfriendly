@@ -33,8 +33,8 @@ class ExpressServer
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('web/dist'))
 
-    @handlers =
-      submit: new SubmitEndpoint(this)
+    @server.use('/submit', (new SubmitEndpoint(@app)).endpoint)
+    @server.use('/dev', (new DevEndpoint(@app)).endpoint)
 
     port = @expressConfig.port
     @app.log("launching Express server on port #{port}")

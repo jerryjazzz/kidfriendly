@@ -20,11 +20,11 @@ class App
     @logs =
       debug: new Log(this, "#{config.appName}.log")
 
-    console.log('opened logfile: ', config.appName)
+    @libs =
+      googlePlaces: new GooglePlaces(this)
 
     @inbox = null
     @pub = null
-
 
   start: ->
     @fetchCurrentGitVersion()
@@ -110,10 +110,13 @@ class App
     @taskRunner.start()
 
   finishStartup: =>
-    msg = "finished startup in #{Date.now() - @startedAt} ms"
-    @log(msg)
+    duration = Date.now() - @startedAt
+    @log("finished startup in #{duration} ms")
+
+    @log("logs are now being written to: #{@logs.debug.filename}")
     @log = @_logToFile
-    @log(msg)
+
+    @log("finished startup in #{duration} ms")
 
   _logToFile: =>
     args = for arg in arguments
