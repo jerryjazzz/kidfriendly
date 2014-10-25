@@ -33,6 +33,10 @@ LatLongUtil =
   areas:
     phoenix: new Square(new Location(33.90, -112.53), new Location(33.19, -111.50))
 
+  parse: (latLongString) ->
+    items = latLongString.split(',')
+    return new Location(parseFloat(items[0]), parseFloat(items[1]))
+
   latLongDeltaFromDistance: (latLong, distanceMiles) ->
     # Returns a delta (x,y) where, if you start at latLong and travel distanceMiles,
     # the location will be within +/- the delta.
