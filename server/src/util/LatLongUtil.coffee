@@ -11,12 +11,6 @@ class Vec2
   addY: (y) ->
     new Vec2(@x, @y + y)
 
-class Location
-  constructor: (@lat, @long) ->
-  addLat: (lat) ->
-    new Location(@lat + lat, @long)
-  addLong: (long) ->
-    new Location(@lat, @long + long)
 
 class Square
   isSquare: true

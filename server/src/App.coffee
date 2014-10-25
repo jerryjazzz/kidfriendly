@@ -17,8 +17,10 @@ class App
     @express = null
     @startedAt = Date.now()
 
-    @logs =
-      debug: new Log(this, "#{config.appName}.log")
+    @logs = {}
+
+    if @shouldWriteToLogFile()
+      @logs.debug = new Log(this, "#{config.appName}.log")
 
     @libs =
       googlePlaces: new GooglePlaces(this)
@@ -109,14 +111,17 @@ class App
     @taskRunner = new TaskRunner(this)
     @taskRunner.start()
 
+  shouldWriteToLogFile: ->
+    return process.env.KFLY_DEV_MODE?
+
   finishStartup: =>
     duration = Date.now() - @startedAt
     @log("finished startup in #{duration} ms")
 
-    @log("logs are now being written to: #{@logs.debug.filename}")
-    @log = @_logToFile
-
-    @log("finished startup in #{duration} ms")
+    if @shouldWriteToLogFile()
+      @log("logs are now being written to: #{@logs.debug.filename}")
+      @log = @_logToFile
+      @log("finished startup in #{duration} ms")
 
   _logToFile: =>
     args = for arg in arguments
