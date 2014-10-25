@@ -22,7 +22,7 @@ class GooglePlaces
 
       radius = radius ? @defaultRadius
 
-      url = "#{@nearbySearchUrl}?key=#{apiKey}&type=#{searchType.typeString}"
+      url = "#{@nearbySearchUrl}?key=#{@apiKey}&type=#{searchType.typeString}"
       url += "&location=#{location.lat},#{location.long}&radius=#{radius}"
       request = require('request')
       request {url, json:true}, (error, response, body) =>

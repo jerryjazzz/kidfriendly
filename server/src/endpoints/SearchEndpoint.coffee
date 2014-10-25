@@ -1,5 +1,5 @@
 
-class SubmitEndpoint
+class SearchEndpoint
   constructor: (@app) ->
     @endpoint = require('express')()
 
@@ -12,11 +12,12 @@ class SubmitEndpoint
 
         next(req, res)
 
-    @endpoint.get '/location', withRequredParams ['loc'], (req, res) =>
+    @endpoint.get '/location', withRequiredParams ['loc'], (req, res) =>
       location = LatLongUtil.parse(req.query.loc)
 
       @app.libs.googlePlaces.nearby({searchType: 'restaurant', location})
-        .catch (err) ->
-          res.status(400).send(err)
-        .then (places)
+        .then (places) ->
           res.status(200).send(places)
+        .catch (err) =>
+          @app.log(err.stack)
+          res.status(500).end()
