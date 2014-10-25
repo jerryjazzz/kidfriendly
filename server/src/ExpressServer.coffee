@@ -35,6 +35,7 @@ class ExpressServer
     @server.use("/mobile", staticDir('client/mobile/www'))
 
     @server.use('/submit', (new SubmitEndpoint(@app)).endpoint)
+    @server.use('/search', (new SearchEndpoint(@app)).endpoint)
     @server.use('/dev', (new DevEndpoint(@app)).endpoint)
 
     port = @expressConfig.port
