@@ -11,4 +11,4 @@ echo -- bower install
 node_modules/bower/bin/bower install
 
 echo -- gulp coffee
-node node_modules/gulp/bin/gulp.js coffee
+node node_modules/gulp/bin/gulp.js

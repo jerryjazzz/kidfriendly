@@ -11,10 +11,11 @@ var sourcemaps = require('gulp-sourcemaps');
 
 var paths = {
   sass: ['./scss/**/*.scss'],
-  coffee: ['./www/src/**/*.coffee']
+  coffee: ['./src/**/*.coffee'],
+  assets: ['./img/**/*', './templates/**/*', 'index.html']
 };
 
-gulp.task('default', ['sass']);
+gulp.task('default', ['copy', 'sass', 'coffee']);
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')
@@ -26,6 +27,11 @@ gulp.task('sass', function(done) {
     .pipe(rename({ extname: '.min.css' }))
     .pipe(gulp.dest('./www/css/'))
     .on('end', done);
+});
+
+gulp.task('copy', function(done) {
+    gulp.src(paths.assets, {base:'.'})
+    .pipe(gulp.dest("./www"));
 });
 
 gulp.task('coffee', function(done) {
@@ -40,6 +46,7 @@ gulp.task('coffee', function(done) {
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
   gulp.watch(paths.coffee, ['coffee']);
+  gulp.watch(paths.assets, ['copy']);
 });
 
 
