@@ -21,3 +21,35 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+.distance-text {
+  font-size: 10px !important;
+  text-align: right;
+}
+
+.button-star {
+  font-size: 32px;
+  color:#ff8800
+}
+
+.text-area-border {
+  border-color: #b2b2b2 ;
+  border-width: 1px;
+  color: #444444  ;
+  border-style: solid;
+  padding: 5px;
+  resize: none;
+  width: 100%;
+}
+
+textarea::-webkit-input-placeholder {
+  color: #444444
+}
+
+h6, h5 {
+  color:#444444;
+}
+
+/* Ionic Overrides*/
+.item-content {
+  padding-right: 8px !important;
+}
