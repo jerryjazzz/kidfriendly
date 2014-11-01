@@ -29,10 +29,10 @@ class ExpressServer
     staticDir = (dir) -> express.static(path.resolve(dir))
     redirect = (to) -> ((req,res) -> res.redirect(301, to))
 
-    @server.get("/", staticFile('web/dist/index.html'))
+    @server.get("/", staticFile('client/web/dist/index.html'))
     @server.get("/index.html", redirect('/'))
-    @server.use(staticDir('web/dist'))
-    @server.use("/mobile", staticDir('mobile/www'))
+    @server.use(staticDir('client/web/dist'))
+    @server.use("/mobile", staticDir('client/mobile/www'))
 
     @handlers =
       submit: new SubmitEndpoint(this)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-echo -- cd kfly/web
-cd $KFLY_HOME/web
+echo -- cd kfly/client/web
+cd $KFLY_HOME/client/web
 
 echo -- npm install
 npm install --production
