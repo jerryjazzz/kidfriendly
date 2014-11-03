@@ -1,15 +1,15 @@
 
 Promise = require('bluebird')
 
-class Schema
+class SchemaMigration
   constructor: (@app) ->
 
   apply: ->
-    Promise.all(for tableName, latestFields of @getLatestDefinitions()
-      @applyTable(tableName, latestFields)
+    Promise.all(for tableName, latestFields of @app.config.schema
+      @updateTable(tableName, latestFields)
     )
 
-  applyTable: (tableName, latestFields) ->
+  updateTable: (tableName, latestFields) ->
     @getExistingFields(tableName)
       .then (existingFields) =>
         if not existingFields?
@@ -19,13 +19,11 @@ class Schema
 
   createTable: (tableName, latestFields) ->
     fieldStrs = for field in latestFields
-      "#{field.name} #{field.type} #{field.options}"
+      "#{field.name} #{field.type} #{field.options ? ''}"
 
     return @app.query "create table #{tableName} (#{fieldStrs.join(', ')})"
 
   upgradeExistingTable: (tableName, latestFields, existingFields) ->
-    console.log('existing fields = ', existingFields)
-
     existingIndex = 0
     toAdd = []
 
@@ -41,18 +39,16 @@ class Schema
 
       if nextExisting? and latestField.name == nextExisting.name
         if latestField.type != nextExisting.type
-          console.log('type error')
-          throw "SQL field type change not supported. Field #{latestField.name} "\
-            +"currently has type #{nextExisting.type} and the latest type is #{latestField.type}"
+          throw "Field '#{latestField.name}' on table '#{tableName}' currently has type "\
+            +"#{nextExisting.type} and the latest type is #{latestField.type}. (type change "\
+            +"is not supported)"
 
         existingIndex += 1
 
       else
         if (foundIndex = existingNameIndex(latestField.name))?
-          console.log('existing name error')
-          return Promise.reject("Tried to add field #{latestField.name} at index #{existingIndex}, "\
-            +"but the field already exists at index #{foundIndex}")
-        
+          throw "Tried to add field '#{latestField.name}' to table '#{tableName}' at index "\
+            +"#{existingIndex}, but the field already exists at index #{foundIndex}"
 
         where = if latestFieldIndex == 0
           'first'
@@ -61,11 +57,14 @@ class Schema
 
         toAdd.push({field: latestField, where})
 
-    console.log('toAdd list = ', toAdd)
+    if existingIndex < existingFields.length
+      throw "Not all existing fields found in table #{tableName}, such as field "\
+        +"'#{existingFields[existingIndex].name}'. (field deletion is not supported.)"
 
     # If we made it here successfully, then commit the toAdd list.
     queries = for {field, where} in toAdd
-      @app.query("alter table #{tableName} add column #{field.name} #{field.type} #{field.options} #{where}")
+      @app.log("SchemaMigration: adding field #{field.name} to table #{tableName}")
+      @app.query("alter table #{tableName} add column #{field.name} #{field.type} #{field.options ? ''} #{where}")
 
     Promise.all(queries)
 
@@ -76,16 +75,8 @@ class Schema
         null
       .then (existingFields) ->
         if existingFields?
-          # convert Sql's names. Not currently using: 'Null', 'Key', 'Default', 'Extra'
+          # rename the field names provided by SQL. Other fields we aren't currently using:
+          # 'Null', 'Key', 'Default', 'Extra'
           for field in existingFields
             name: field.Field
             type: field.Type
-
-  getLatestDefinitions: ->
-    return tables =
-      test: [
-        {name: 'id', type: 'int(11)', options: 'not null primary key'}
-        {name: 'id2', type: 'int(11)', options: 'not null'}
-      ]
-
-
