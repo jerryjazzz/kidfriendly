@@ -6,6 +6,8 @@ class App
 
   constructor: (@config) ->
 
+    @appConfig = @config.appConfig
+
     # During startup we log to stdout, so that any problems are captured in Forever logs.
     # After startup is finished, we switch to the app log file.
     @log = console.log
@@ -67,8 +69,9 @@ class App
         resolve()
 
   mysqlMigrate: =>
-    schema = new Schema(this)
-    schema.apply()
+    if @appConfig.roles?.dbMigration?
+      migration = new SchemaMigration(this)
+      migration.apply()
 
   redisConnect: =>
     if not @config.appConfig.redis?
@@ -135,7 +138,7 @@ class App
     # query() wraps around mysql.query and turns it into a promise.
 
     if process.env.KFLY_DEV_MODE
-      console.log('sql: ', sql)
+      @log('sql:', sql)
 
     new Promise (resolve, reject) =>
       @db.query sql, values, (err, result) ->
