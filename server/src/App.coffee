@@ -31,6 +31,7 @@ class App
   start: ->
     @fetchCurrentGitVersion()
       .then(@mysqlConnect)
+      .then(@mysqlMigrate)
       .then(@redisConnect)
       .then(@initializeSourceVersion)
       .then(@setupInbox)
@@ -39,7 +40,10 @@ class App
       .then(@startTaskManager)
       .then(@finishStartup)
       .catch (err) =>
-        @log(err?.stack)
+        if err?.stack?
+          @log(err?.stack)
+        else
+          @log(err)
 
   fetchCurrentGitVersion: =>
     SourceUtil.getCurrentGitCommit()
@@ -61,6 +65,10 @@ class App
           return
         @log("mysql: connected")
         resolve()
+
+  mysqlMigrate: =>
+    schema = new Schema(this)
+    schema.apply()
 
   redisConnect: =>
     if not @config.appConfig.redis?
@@ -112,7 +120,7 @@ class App
     @taskRunner.start()
 
   shouldWriteToLogFile: ->
-    return process.env.KFLY_DEV_MODE?
+    return process.env.KFLY_DEV_MODE
 
   finishStartup: =>
     duration = Date.now() - @startedAt
@@ -122,6 +130,19 @@ class App
       @log("logs are now being written to: #{@logs.debug.filename}")
       @log = @_logToFile
       @log("finished startup in #{duration} ms")
+
+  query: (sql, values = []) ->
+    # query() wraps around mysql.query and turns it into a promise.
+
+    if process.env.KFLY_DEV_MODE
+      console.log('sql: ', sql)
+
+    new Promise (resolve, reject) =>
+      @db.query sql, values, (err, result) ->
+        if err?
+          reject(err)
+        else
+          resolve(result)
 
   _logToFile: =>
     args = for arg in arguments
