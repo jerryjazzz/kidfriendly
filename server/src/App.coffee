@@ -6,6 +6,8 @@ class App
 
   constructor: (@config) ->
 
+    @appConfig = @config.appConfig
+
     # During startup we log to stdout, so that any problems are captured in Forever logs.
     # After startup is finished, we switch to the app log file.
     @log = console.log
@@ -17,18 +19,21 @@ class App
     @express = null
     @startedAt = Date.now()
 
-    @logs =
-      debug: new Log(this, "#{config.appName}.log")
+    @logs = {}
 
-    console.log('opened logfile: ', config.appName)
+    if @shouldWriteToLogFile()
+      @logs.debug = new Log(this, "#{config.appName}.log")
+
+    @libs =
+      googlePlaces: new GooglePlaces(this)
 
     @inbox = null
     @pub = null
 
-
   start: ->
     @fetchCurrentGitVersion()
       .then(@mysqlConnect)
+      .then(@mysqlMigrate)
       .then(@redisConnect)
       .then(@initializeSourceVersion)
       .then(@setupInbox)
@@ -37,7 +42,10 @@ class App
       .then(@startTaskManager)
       .then(@finishStartup)
       .catch (err) =>
-        @log(err?.stack)
+        if err?.stack?
+          @log(err?.stack)
+        else
+          @log(err)
 
   fetchCurrentGitVersion: =>
     SourceUtil.getCurrentGitCommit()
@@ -59,6 +67,11 @@ class App
           return
         @log("mysql: connected")
         resolve()
+
+  mysqlMigrate: =>
+    if @appConfig.roles?.dbMigration?
+      migration = new SchemaMigration(this)
+      migration.apply()
 
   redisConnect: =>
     if not @config.appConfig.redis?
@@ -109,11 +122,30 @@ class App
     @taskRunner = new TaskRunner(this)
     @taskRunner.start()
 
+  shouldWriteToLogFile: ->
+    return process.env.KFLY_DEV_MODE
+
   finishStartup: =>
-    msg = "finished startup in #{Date.now() - @startedAt} ms"
-    @log(msg)
-    @log = @_logToFile
-    @log(msg)
+    duration = Date.now() - @startedAt
+    @log("finished startup in #{duration} ms")
+
+    if @shouldWriteToLogFile()
+      @log("logs are now being written to: #{@logs.debug.filename}")
+      @log = @_logToFile
+      @log("finished startup in #{duration} ms")
+
+  query: (sql, values = []) ->
+    # query() wraps around mysql.query and turns it into a promise.
+
+    if process.env.KFLY_DEV_MODE
+      @log('sql:', sql)
+
+    new Promise (resolve, reject) =>
+      @db.query sql, values, (err, result) ->
+        if err?
+          reject(err)
+        else
+          resolve(result)
 
   _logToFile: =>
     args = for arg in arguments
