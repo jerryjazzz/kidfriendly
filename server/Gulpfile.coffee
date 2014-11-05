@@ -1,5 +1,4 @@
 
-
 gulp = require('gulp')
 gutil = require('gulp-util')
 tar = require('gulp-tar')
@@ -9,6 +8,7 @@ concat = require('gulp-concat')
 watch = require('gulp-watch')
 
 coffeeFiles = ['src/**/*.coffee']
+watchFiles = coffeeFiles.concat(['config/*'])
 
 gulp.task 'coffee', ->
   gulp.src(coffeeFiles)
@@ -17,7 +17,7 @@ gulp.task 'coffee', ->
     .pipe(gulp.dest('build'))
 
 gulp.task 'watch', ->
-  gulp.watch(coffeeFiles, ['build', 'reload-server'])
+  gulp.watch(watchFiles, ['build', 'reload-server'])
 
 gulp.task 'reload-server', ['coffee'], ->
   {send} = require('./bin/Send.coffee')
