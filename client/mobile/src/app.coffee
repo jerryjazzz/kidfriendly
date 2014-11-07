@@ -6,7 +6,7 @@
 # the 2nd parameter is an array of 'requires'
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
-angular.module('Mobile', ['ionic', 'config', 'Mobile.controllers', 'Mobile.services'])
+angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
 .run ($ionicPlatform) ->
   $ionicPlatform.ready ->
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -37,7 +37,7 @@ angular.module('Mobile', ['ionic', 'config', 'Mobile.controllers', 'Mobile.servi
   .state 'results',
     url:'/results'
     templateUrl: 'templates/search-results.html'
-    controller:'SearchResultsCtrl'
+    controller:'ResultsCtrl'
 
   # Each tab has its own nav history stack:
 #  .state 'tab.dash',
