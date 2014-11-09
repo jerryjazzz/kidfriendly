@@ -25,8 +25,8 @@ module.exports = (config) ->
       'www/lib/angular-ui-router/release/angular-ui-router.js',
       'www/lib/ionic/js/ionic.js',
       'www/lib/ionic/js/ionic-angular.min.js',
-      'test/**/*.spec.coffee',
       'src/**/*.coffee'
+      'test/**/*.spec.coffee',
     ]
 
 

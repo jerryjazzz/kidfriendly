@@ -13,10 +13,10 @@ var karma = require('karma').server;
 var paths = {
     sass: ['./scss/**/*.scss'],
     coffee: ['./src/**/*.coffee'],
-    assets: ['./img/**/*', './templates/**/*', 'index.html']
+    assets: ['./img/**/*.{png, jpg}', './templates/**/*.html', './index.html'],
 };
 
-gulp.task('default', ['copy', 'sass', 'coffee']);
+gulp.task('default', ['assets', 'sass', 'coffee']);
 
 gulp.task('sass', function(done) {
     gulp.src('./scss/ionic.app.scss')
@@ -30,9 +30,9 @@ gulp.task('sass', function(done) {
         .on('end', done);
 });
 
-gulp.task('copy', function(done) {
-    gulp.src(paths.assets, {base:'.'})
-        .pipe(gulp.dest("./www"));
+gulp.task('assets', function(done) {
+  gulp.src(paths.assets, {base:'.'})
+    .pipe(gulp.dest("./www")).on('end', done);
 });
 
 gulp.task('coffee', ['test'], function(done) {
@@ -45,9 +45,7 @@ gulp.task('coffee', ['test'], function(done) {
 });
 
 gulp.task('watch', function() {
-    gulp.watch(paths.sass, ['sass']);
-    gulp.watch(paths.coffee, ['coffee']);
-    gulp.watch(paths.assets, ['copy']);
+    gulp.watch(paths.sass.concat(paths.coffee.concat(paths.assets)), ['default']);
 });
 
 
