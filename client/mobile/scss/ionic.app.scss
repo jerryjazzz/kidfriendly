@@ -21,9 +21,22 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
-.distance-text {
-  font-size: 10px !important;
-  text-align: right;
+$kid-green: #33DD33;
+
+@mixin vertical-align {
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.small-text {
+  font-size: 12px !important;
+  color:#666;
+  right {
+    text-align: right;
+  }
 }
 
 .button-star {
@@ -49,7 +62,35 @@ h6, h5 {
   color:#444444;
 }
 
+.detail-name {
+  color:#666;
+  margin-top: 0px;
+  margin-bottom: 0px
+}
+
 /* Ionic Overrides*/
 .item-content {
   padding-right: 8px !important;
+}
+
+.cash-icon {
+  color:#009900;
+  padding-left: 5px;
+  font-size:14px;
+}
+
+.rating-text {
+  font-size:22px;
+  margin-bottom: 8px;
+  @include vertical-align;
+}
+
+.rating-text-small {
+  font-size:10px;
+  margin-bottom: 10px;
+  vertical-align: bottom;
+}
+
+.compact-card {
+  margin-top:4px;
 }
