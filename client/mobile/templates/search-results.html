@@ -1,7 +1,7 @@
 <ion-view title='<img class="title-image" src="img/logo.png">'>
     <ion-content class="has-header">
         <ion-list>
-            <ion-item class="item item-thumbnail-left" href="#" ng-repeat="result in results">
+            <ion-item class="item item-thumbnail-left" href="#details/{{result.id}}" ng-repeat="result in results">
                 <img src="{{result.thumb}}">
                 <div class="row">
                     <div class="col-80"><h2>{{result.name}}</h2></div>
@@ -9,7 +9,7 @@
                 </div>
                 <div class="row">
                     <div class="col-90">
-                        <span ng-repeat="star in result.stars" ng-class="star.value" style="color:#ff8800"></span>
+                      <span>{{result.rating}}</span>
                     </div>
                 </div>
                 <div class="row">
