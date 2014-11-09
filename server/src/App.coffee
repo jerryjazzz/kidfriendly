@@ -123,7 +123,7 @@ class App
     @taskRunner.start()
 
   shouldWriteToLogFile: ->
-    return process.env.KFLY_DEV_MODE
+    return not process.env.KFLY_DEV_MODE
 
   finishStartup: =>
     duration = Date.now() - @startedAt
@@ -146,6 +146,30 @@ class App
           reject(err)
         else
           resolve(result)
+
+  insert: (tableName, row) ->
+
+    if not row.id?
+      row.id = Database.randomId()
+
+    attemptInsert = (retryCount) =>
+      dupeEntry = (err) -> err.code == 'ER_DUP_ENTRY' and retryCount < 5
+
+      @query("insert into #{tableName} set ?", [row])
+        .catch dupeEntry, (err) =>
+
+          # Check if this is a duplicated ID, or if the error was from something else.
+          @query("select 1 from #{tableName} where id = ?", [row.id]).then (response) ->
+            if response.length == 0
+              # The generated ID was fine, pass the original error back to the caller.
+              return Promise.reject(err)
+
+            # Generated ID was in use, retry with a different ID.
+            row.id = Database.randomId()
+            attemptInsert(retryCount + 1)
+
+    attemptInsert(0).then ->
+      return {id: row.id}
 
   _logToFile: =>
     args = for arg in arguments
