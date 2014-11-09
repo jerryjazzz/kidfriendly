@@ -37,6 +37,7 @@ class ExpressServer
     @server.use('/submit', (new SubmitEndpoint(@app)).endpoint)
     @server.use('/search', (new SearchEndpoint(@app)).endpoint)
     @server.use('/dev', (new DevEndpoint(@app)).endpoint)
+    @server.use('/user', (new UserEndpoint(@app)).endpoint)
 
     port = @expressConfig.port
     @app.log("launching Express server on port #{port}")

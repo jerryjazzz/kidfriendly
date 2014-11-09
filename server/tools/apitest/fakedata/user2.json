@@ -1,0 +1,6 @@
+{
+    "path": "/user/new",
+    "body": {
+        "email": "user2@fake.com"
+    }
+}

@@ -14,22 +14,34 @@ runTest = (test, report) -> new Promise (resolve, reject) ->
   url = getUrl(test)
   headers =
     'content-type': 'application/json'
-  body = JSON.stringify(test.body)
+
+  if test.body?
+    method = 'post'
+    body = JSON.stringify(test.body)
+  else
+    method = 'get'
+    body = null
 
   report.debug("requesting url = #{url}")
 
-  require('request').get {url, headers, body}, (error, response, responseBody) ->
+  require('request') {method, url, headers, body}, (error, response, responseBody) ->
     if error?
       report.error(''+error)
       report.error('Response: ' + responseBody)
-      return
+      return resolve(report)
 
     if response? and response.statusCode != 200
       report.debug('Non-200 status code: ' + response.statusCode)
       report.debug('Response: ' + responseBody)
-      return
+      return resolve(report)
 
-    response = JSON.parse(responseBody)
+    try
+      response = JSON.parse(responseBody)
+    catch e
+      report.error("Response didn't parse as JSON: ", responseBody)
+      return resolve(report)
+
+    console.log('Response: ', response)
 
     if test.save
       path = "response.json"
