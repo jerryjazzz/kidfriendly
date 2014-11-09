@@ -9,6 +9,12 @@ class SchemaMigration
       @updateTable(tableName, latestFields)
     )
 
+  getFieldDefinitionStr: (field) ->
+    if field.foreign_key?
+      return "foreign key (#{field.name}) references #{field.foreign_key}"
+    else
+      return "#{field.name} #{field.type} #{field.options ? ''}"
+
   updateTable: (tableName, latestFields) ->
     @getExistingFields(tableName)
       .then (existingFields) =>
@@ -19,8 +25,9 @@ class SchemaMigration
 
   createTable: (tableName, latestFields) ->
     fieldStrs = for field in latestFields
-      "#{field.name} #{field.type} #{field.options ? ''}"
+      @getFieldDefinitionStr(field)
 
+    @app.log("SchemaMigration: creating table #{tableName}")
     return @app.query "create table #{tableName} (#{fieldStrs.join(', ')})"
 
   upgradeExistingTable: (tableName, latestFields, existingFields) ->
@@ -64,7 +71,7 @@ class SchemaMigration
     # If we made it here successfully, then commit the toAdd list.
     queries = for {field, where} in toAdd
       @app.log("SchemaMigration: adding field #{field.name} to table #{tableName}")
-      @app.query("alter table #{tableName} add column #{field.name} #{field.type} #{field.options ? ''} #{where}")
+      @app.query("alter table #{tableName} add column #{@getFieldDefinitionStr(field)} #{where}")
 
     Promise.all(queries)
 

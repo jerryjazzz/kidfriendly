@@ -1,17 +1,61 @@
+###
+
+How to modify this file
+
+This file is used by SchemaMigration.coffee to automatically perform *non destructive*
+migrations to the DB schema.
+
+The following changes ARE supported by automatic migration:
+
+ - Insertion of a new column
+ - Addition of a new table
+
+Changes that are NOT supported by automatic migration:
+
+ - Column rename or removal
+ - Column reorder
+ - Type or 'options' change
+
+###
 
 module.exports = schema = []
 
-# some common row definitions:
+id_type = 'int(10) unsigned'
+ip_address_type = 'varchar(15)'
+
+# Some common row definitions
 standard_id =
   name: 'id'
-  type: 'int(10) unsigned'
+  type: id_type
   options: 'not null primary key'
+
+created_at =
+  name: 'created_at'
+  type: 'datetime'
+  options: 'not null'
 
 source_ver =
   name: 'source_ver'
   type: 'int(11)'
 
-# email_signup #
+# User table #
+
+schema.user = [standard_id]
+
+schema.user.push
+  name: 'email'
+  type: 'varchar(255)'
+  options: 'not null unique key'
+
+schema.user.push(created_at)
+
+schema.user.push
+  name: 'created_by_ip'
+  type: ip_address_type
+
+schema.user.push(source_ver)
+
+# Email_signup table #
 
 schema.email_signup = [standard_id]
 
@@ -22,7 +66,7 @@ schema.email_signup.push
 
 schema.email_signup.push
   name: 'ip'
-  type: 'varchar(15)'
+  type: ip_address_type
 
 schema.email_signup.push
   name: 'created_at'
@@ -31,7 +75,7 @@ schema.email_signup.push
 
 schema.email_signup.push(source_ver)
 
-# place #
+# Place table #
 
 schema.place = [standard_id]
 schema.place.push
@@ -59,7 +103,23 @@ schema.place.push
   
 schema.place.push(source_ver)
 
-# source_version #
+# Review table #
+
+schema.review = [standard_id]
+
+schema.review.push
+  name: 'user_id'
+  type: id_type
+  options: 'not null'
+
+schema.review.push
+  name: 'place_id'
+  type: id_type
+  options: 'not null'
+
+schema.review.push(source_ver)
+
+# Source_version table #
 
 schema.source_version = []
 
