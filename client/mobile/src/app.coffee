@@ -31,14 +31,19 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
     templateUrl: 'templates/search.html'
     controller: 'SearchCtrl'
   .state 'review',
-    url: '/review'
+    url: '/review/:placeId'
     templateUrl: 'templates/review.html'
+    controller:'ReviewCtrl'
 
   .state 'results',
     url:'/results'
     templateUrl: 'templates/search-results.html'
     controller:'ResultsCtrl'
 
+  .state 'details',
+    url:'/details/:placeId'
+    templateUrl: 'templates/details.html'
+    controller:'DetailsCtrl'
   # Each tab has its own nav history stack:
 #  .state 'tab.dash',
 #    url: '/dash'
