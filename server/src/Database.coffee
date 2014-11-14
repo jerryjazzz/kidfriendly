@@ -3,24 +3,9 @@ Promise = require('bluebird')
 
 Database =
   randomId: (range = 100000000) ->
-    Math.floor(Math.random() * range)
+    '' + Math.floor(Math.random() * range)
 
-  insertSourceVersion: (app, gitCommit) ->
-    new Promise (resolve, reject) =>
-      data =
-        sha1: gitCommit.sha1
-        commit_date: gitCommit.timestamp
-        first_deployed_at: DateUtil.timestamp()
-
-      app.db.query 'select id from source_version where sha1=?', [data.sha1], (err, result) ->
-        if result.length > 0
-          resolve(result[0].id)
-          return
-
-        app.db.query 'insert ignore into source_version set ?; select id from source_version where sha1=?', \
-          [data, data.sha1], (err, result) ->
-            resolve(result[1][0].id)
-
+  # Deprecated:
   writeRow: (app, table, data, {generateId} = {}) ->
     new Promise (resolve, reject) ->
       send = (attempts) ->

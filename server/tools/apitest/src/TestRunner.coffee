@@ -1,58 +1,63 @@
 
 Promise = require('bluebird')
 fs = require('fs')
+TestReport = require('./TestReport')
 
-getUrl = (test) ->
-  url = "http://#{test.host}#{test.path}"
-  if test.params?
-    url += "?" + ("#{k}=#{v}" for k,v of test.params).join(',')
+getUrl = (requestDetails) ->
+  url = "http://#{process.host}#{requestDetails.path}"
+  if requestDetails.params?
+    url += "?" + ("#{k}=#{v}" for k,v of requestDetails.params).join(',')
   return url
 
-runTest = (test, report) -> new Promise (resolve, reject) ->
-  existingProject = null
+runOneRequest = (requestDetails) -> new Promise (resolve, reject) ->
+  report = new TestReport(requestDetails)
 
-  url = getUrl(test)
+  url = getUrl(requestDetails)
   headers =
     'content-type': 'application/json'
 
-  if test.body?
+  if requestDetails.body?
     method = 'post'
-    body = JSON.stringify(test.body)
+    body = JSON.stringify(requestDetails.body)
   else
     method = 'get'
     body = null
 
   report.debug("requesting url = #{url}")
 
-  require('request') {method, url, headers, body}, (error, response, responseBody) ->
+  require('request') {method, url, headers, body}, (error, response) ->
     if error?
       report.error(''+error)
-      report.error('Response: ' + responseBody)
-      return resolve(report)
-
-    if response? and response.statusCode != 200
-      report.debug('Non-200 status code: ' + response.statusCode)
-      report.debug('Response: ' + responseBody)
-      return resolve(report)
+      report.error('Response:', response.body)
+      return reject(report)
 
     try
-      response = JSON.parse(responseBody)
+      body = JSON.parse(response.body)
     catch e
-      report.error("Response didn't parse as JSON: ", responseBody)
-      return resolve(report)
+      report.error("Response didn't parse as JSON: ", response.body)
+      return reject(report)
 
-    console.log('Response: ', response)
+    if response.statusCode != 200
+      report.debug('Non-200 status code: ' + response.statusCode)
+      report.debug('Response:', body)
+      return reject(report)
 
-    if test.save
+    report.debug('Response: ', body)
+
+    if process.saveResult
       path = "response.json"
-      fs.writeFileSync(path, JSON.stringify(response, null, '\t'))
+      fs.writeFileSync(path, JSON.stringify(body, null, '\t'))
       report.debug("Saved response to #{path}")
 
-    validateResponse(test, response, report)
+    #validateResponse(test, body, report)
 
     resolve(report)
 
 validateResponse = (req, response, report) ->
   require('./Postconditions').check(req, response, report)
 
-module.exports = {runTest}
+runRequestList = (requestList) ->
+  Promise.map requestList, (requestDetails) ->
+    runOneRequest(requestDetails)
+
+module.exports = {runOneRequest, runRequestList}

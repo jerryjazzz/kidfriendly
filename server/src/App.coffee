@@ -15,6 +15,7 @@ class App
     @handlers = null
     @sourceVersion = null
     @currentGitCommit = null
+    @sourceUtil = null
     @db = null
     @express = null
     @startedAt = Date.now()
@@ -31,7 +32,7 @@ class App
     @pub = null
 
   start: ->
-    @fetchCurrentGitVersion()
+    Promise.resolve()
       .then(@mysqlConnect)
       .then(@mysqlMigrate)
       .then(@redisConnect)
@@ -97,7 +98,8 @@ class App
         @log('redis error: ', err)
 
   initializeSourceVersion: =>
-    Database.insertSourceVersion(this, @currentGitCommit)
+    @sourceUtil = new SourceUtil(this)
+    @sourceUtil.insertSourceVersion()
       .then (id) =>
         @sourceVersion = id
         @log("current source version is:", id)
@@ -134,39 +136,56 @@ class App
       @log = @_logToFile
       @log("finished startup in #{duration} ms")
 
+
   query: (sql, values = []) ->
     # query() wraps around mysql.query and turns it into a promise.
 
+    isBadFieldError = (err) -> err.code == 'ER_BAD_FIELD_ERROR'
+
+    sql = @db.format(sql, values)
     if process.env.KFLY_DEV_MODE
       @log('sql:', sql)
 
     new Promise (resolve, reject) =>
-      @db.query sql, values, (err, result) ->
+      @db.query sql, (err, result) ->
         if err?
           reject(err)
         else
           resolve(result)
+    .catch isBadFieldError, (err) =>
+      @log('bad sql = ', sql)
+      {error: 'SQL bad field error', sql: sql, statusCode: 500}
+
+  sqlFormat: (sql, values = []) ->
+    @db.format(sql, values)
 
   insert: (tableName, row) ->
 
-    if not row.id?
-      row.id = Database.randomId()
+    generatedId = false
+    primaryKey = @config.schema[tableName].primary_key
+
+    # Generate an ID if needed
+    if primaryKey? and not row[primaryKey]?
+      generatedId = true
+      row[primaryKey] = Database.randomId()
+      console.log('generated primary key for: ', primaryKey)
 
     attemptInsert = (retryCount) =>
-      dupeEntry = (err) -> err.code == 'ER_DUP_ENTRY' and retryCount < 5
+      isDupeEntry = (err) -> err.code == 'ER_DUP_ENTRY' and retryCount < 5
 
       @query("insert into #{tableName} set ?", [row])
-        .catch dupeEntry, (err) =>
+        .catch isDupeEntry, (err) =>
 
           # Check if this is a duplicated ID, or if the error was from something else.
-          @query("select 1 from #{tableName} where id = ?", [row.id]).then (response) ->
-            if response.length == 0
-              # The generated ID was fine, pass the original error back to the caller.
-              return Promise.reject(err)
+          if generatedId
+            @query("select 1 from #{tableName} where #{primaryKey} = ?", [row[primaryKey]]).then (response) ->
+              if response.length == 0
+                # The generated ID was fine, pass the original error back to the caller.
+                return Promise.reject(err)
 
-            # Generated ID was in use, retry with a different ID.
-            row.id = Database.randomId()
-            attemptInsert(retryCount + 1)
+              # Generated ID was in use, retry with a different ID.
+              row[primaryKey] = Database.randomId()
+              attemptInsert(retryCount + 1)
 
     attemptInsert(0).then ->
       return {id: row.id}

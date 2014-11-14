@@ -1,13 +1,23 @@
 
 class TestReport
-  constructor: (@name) ->
+  constructor: (@requestDetails) ->
     @errors = []
 
-  error: (msg) ->
+  _stringify: (args) ->
+    args = for arg in args
+      if typeof arg is 'string'
+        arg
+      else
+        JSON.stringify(arg)
+    args.join(' ')
+
+  error: ->
+    msg = @_stringify(arguments)
     console.log('[error] ', msg)
     @errors.push(msg)
 
-  debug: (msg) ->
+  debug: ->
+    msg = @_stringify(arguments)
     console.log('[debug] ', msg)
 
   hasErrors: ->
@@ -19,7 +29,7 @@ class TestReport
       console.log(" ", error)
 
   @printReportList: (reports) ->
-    console.log("Finished #{reports.length} test(s).")
+    console.log("Finished #{reports.length} request(s).")
 
     anyErrors = false
     for report in reports
