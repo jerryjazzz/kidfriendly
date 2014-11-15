@@ -18,21 +18,29 @@ Changes that are NOT supported by automatic migration:
 
 ###
 
-module.exports = schema = []
+module.exports = schema = {}
 
-id_type = 'int(10) unsigned'
+# Common types
+id_type = 'varchar(10)'
 ip_address_type = 'varchar(15)'
 
-# Some common row definitions
-standard_id =
-  name: 'id'
+# Common row definitions
+standard_id = (name) ->
+  name: name
   type: id_type
+  change_type_from: ['int(10) unsigned']
   options: 'not null primary key'
 
 created_at =
   name: 'created_at'
   type: 'datetime'
   options: 'not null'
+  change_type_from: ['timestamp']
+
+updated_at =
+  name: 'updated_at'
+  type: 'datetime'
+  change_type_from: ['timestamp']
 
 source_ver =
   name: 'source_ver'
@@ -40,103 +48,59 @@ source_ver =
 
 # User table #
 
-schema.user = [standard_id]
-
-schema.user.push
-  name: 'email'
-  type: 'varchar(255)'
-  options: 'not null unique key'
-
-schema.user.push(created_at)
-
-schema.user.push
-  name: 'created_by_ip'
-  type: ip_address_type
-
-schema.user.push(source_ver)
+schema.user = {primary_key: 'user_id'}
+schema.user.columns = [
+  standard_id('user_id')
+  {name: 'email', type: 'varchar(255)', options: 'not null unique key'}
+  created_at
+  {name: 'created_by_ip', type: ip_address_type}
+  updated_at
+  source_ver
+]
 
 # Email_signup table #
 
-schema.email_signup = [standard_id]
-
-schema.email_signup.push
-  name: 'email'
-  type: 'varchar(255)'
-  options: 'not null'
-
-schema.email_signup.push
-  name: 'ip'
-  type: ip_address_type
-
-schema.email_signup.push
-  name: 'created_at'
-  type: 'datetime'
-  options: 'not null'
-
-schema.email_signup.push(source_ver)
+schema.email_signup = {primary_key: 'id'}
+schema.email_signup.columns = [
+  standard_id('id')
+  {name: 'email', type: 'varchar(255)', options: 'not null'}
+  {name: 'ip', type: ip_address_type}
+  {name: 'created_at', type: 'datetime', options: 'not null'}
+  source_ver
+]
 
 # Place table #
 
-schema.place = [standard_id]
-schema.place.push
-  name: 'name'
-  type: 'varchar(255)'
-
-schema.place.push
-  name: 'location'
-  type: 'varchar(30)'
-
-schema.place.push
-  name: 'google_id'
-  type: 'varchar(41)'
-  options: 'unique key'
-
-schema.place.push
-  name: 'created_at'
-  type: 'timestamp'
-  options: 'not null'
-
-schema.place.push
-  name: 'updated_at'
-  type: 'timestamp'
-  options: 'not null'
-  
-schema.place.push(source_ver)
+schema.place = {primary_key: 'place_id'}
+schema.place.columns = [
+  standard_id('place_id')
+  {name: 'name', type: 'varchar(255)'}
+  {name: 'location', type: 'varchar(30)'}
+  {name: 'google_id', type: 'varchar(41)', options: 'unique key'}
+  created_at
+  updated_at
+  source_ver
+]
 
 # Review table #
 
-schema.review = [standard_id]
-
-schema.review.push
-  name: 'user_id'
-  type: id_type
-  options: 'not null'
-
-schema.review.push
-  name: 'place_id'
-  type: id_type
-  options: 'not null'
-
-schema.review.push(source_ver)
+schema.review = {primary_key: 'review_id'}
+schema.review.columns = [
+  standard_id('review_id')
+  {name: 'user_id', type: id_type, change_type_from: ['int(10) unsigned'], options: 'not null'}
+  {name: 'place_id', type: id_type, change_type_from: ['int(10) unsigned'], options: 'not null'}
+  {name: 'json', type: 'blob'}
+  created_at
+  updated_at
+  source_ver
+]
 
 # Source_version table #
 
-schema.source_version = []
-
-schema.source_version.push
-  name: 'id'
-  type: 'int(10) unsigned'
-  options: 'not null primary key auto_increment'
-
-schema.source_version.push
-  name: 'sha1'
-  type: 'varchar(40)'
-  options: 'not null unique key'
-
-schema.source_version.push
-  name: 'commit_date'
-  type: 'timestamp'
-
-schema.source_version.push
-  name: 'first_deployed_at'
-  type: 'timestamp'
+schema.source_version = {primary_key: 'id'}
+schema.source_version.columns = [
+  {name: 'id', type: 'int(10) unsigned', options: 'not null primary key auto_increment'}
+  {name: 'sha1', type: 'varchar(40)', options: 'not null unique key'}
+  {name: 'commit_date', type: 'datetime', change_type_from: ['timestamp']}
+  {name: 'first_deployed_at', type: 'datetime', change_type_from: ['timestamp']}
+]

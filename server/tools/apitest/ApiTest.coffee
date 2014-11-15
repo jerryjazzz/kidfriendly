@@ -5,7 +5,9 @@ argv = require('yargs').argv
 TestReport = require('./src/TestReport')
 TestRunner = require('./src/TestRunner')
 
-host =
+process.saveResponse = argv.save?
+
+process.host =
   switch argv.env
     when 'local'
       'localhost:3000'
@@ -21,16 +23,25 @@ runTestFile = (filename) ->
   testDetails.host = host
   testDetails.save = argv.save?
   TestRunner.runTest(testDetails, report)
-      
+
 args = argv._
 
 if args.length == 0
   console.log("no command or test?")
   process.exit(1)
 
-tests = for filename in args
-  runTestFile(filename)
+requests = for filename in args
+  details = require("./#{filename}")
+  if details.requestList?
+    TestRunner.runRequestList(details.requestList)
+  else
+    runTestFile(filename)
 
-Promise.all(tests)
+flatten = (list) ->
+  return [].concat.apply([], list)
+
+Promise.all(requests)
   .then (reports) ->
+    reports = flatten(reports)
     TestReport.printReportList(reports)
+  .catch(console.log)
