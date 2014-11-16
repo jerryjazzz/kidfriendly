@@ -75,6 +75,10 @@ class GoogleSearch
       # TEMP: Hide results with no photo
       if not photoUrl?
         continue
+
+      rating = 70
+      if googlePlace.rating?
+        rating = parseFloat(googlePlace.rating) * 20
       
       {
         place_id: googlePlace.kfly_id
@@ -82,7 +86,7 @@ class GoogleSearch
         location: googlePlace.location
         thumbnail_url: photoUrl
         open_now: googlePlace?.opening_hours?.open_now ? false
-        rating: parseFloat(googlePlace.rating) * 20
+        rating: rating
         price_level: googlePlace.price_level
       }
 
