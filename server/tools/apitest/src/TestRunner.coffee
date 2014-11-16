@@ -42,11 +42,11 @@ runOneRequest = (requestDetails) -> new Promise (resolve, reject) ->
       report.debug('Response:', body)
       return reject(report)
 
-    report.debug('Response: ', body)
+    report.debug('Response: ', response.body)
 
     if process.saveResult
       path = "response.json"
-      fs.writeFileSync(path, JSON.stringify(body, null, '\t'))
+      fs.writeFileSync(path, response.body)
       report.debug("Saved response to #{path}")
 
     #validateResponse(test, body, report)

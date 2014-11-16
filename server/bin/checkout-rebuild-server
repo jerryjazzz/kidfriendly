@@ -1,0 +1,3 @@
+
+checkout $1
+server-rebuild

@@ -61,10 +61,10 @@ class App
     mysql = require('mysql')
     new Promise (resolve, reject) =>
       @db = mysql.createConnection
-        host: 'localhost'
-        user: 'web'
+        host: @config.services.mysql.hostname
+        user: @config.services.mysql.user
         database: 'kidfriendly'
-        multipleStatements: true
+        multipleStatements: true # TODO: turn this off
 
       @db.connect (err, conn) =>
         if err?
@@ -192,11 +192,14 @@ class App
     attemptInsert(0).then ->
       return {id: row.id}
 
-    ###
   request: (args) ->
+    @debugLog("url request: " + args.url)
     new Promise (resolve, reject) =>
-    ###
-      
+      Request args, (error, message, body) =>
+        if error?
+          reject(error)
+        else
+          resolve(body)
 
   _logToFile: =>
     args = for arg in arguments
