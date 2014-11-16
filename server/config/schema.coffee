@@ -9,12 +9,12 @@ The following changes ARE supported by automatic migration:
 
  - Insertion of a new column
  - Addition of a new table
+ - Type change (using the 'change_type_from' field)
 
 Changes that are NOT supported by automatic migration:
 
- - Column rename or removal
- - Column reorder
- - Type or 'options' change
+ - Column rename, removal or reordering
+ - Any change to constraints (such as 'not null', 'unique key', 'foreign key', etc)
 
 ###
 
@@ -77,6 +77,9 @@ schema.place.columns = [
   {name: 'name', type: 'varchar(255)'}
   {name: 'location', type: 'varchar(30)'}
   {name: 'google_id', type: 'varchar(41)', options: 'unique key'}
+  {name: 'google_search_result', type: 'blob'}
+  {name: 'google_details_result', type: 'blob'}
+  {name: 'derived_summary', type: 'blob'}
   created_at
   updated_at
   source_ver

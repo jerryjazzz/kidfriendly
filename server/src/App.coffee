@@ -12,6 +12,11 @@ class App
     # After startup is finished, we switch to the app log file.
     @log = console.log
 
+    if process.env.KFLY_DEV_MODE
+      @debugLog = console.log
+    else
+      @debugLog = ->
+
     @handlers = null
     @sourceVersion = null
     @currentGitCommit = null
@@ -24,9 +29,6 @@ class App
 
     if @shouldWriteToLogFile()
       @logs.debug = new Log(this, "#{config.appName}.log")
-
-    @libs =
-      googlePlaces: new GooglePlaces(this)
 
     @inbox = null
     @pub = null
@@ -136,15 +138,13 @@ class App
       @log = @_logToFile
       @log("finished startup in #{duration} ms")
 
-
   query: (sql, values = []) ->
     # query() wraps around mysql.query and turns it into a promise.
 
     isBadFieldError = (err) -> err.code == 'ER_BAD_FIELD_ERROR'
 
     sql = @db.format(sql, values)
-    if process.env.KFLY_DEV_MODE
-      @log('sql:', sql)
+    @debugLog('sql:', sql)
 
     new Promise (resolve, reject) =>
       @db.query sql, (err, result) ->
@@ -153,7 +153,7 @@ class App
         else
           resolve(result)
     .catch isBadFieldError, (err) =>
-      @log('bad sql = ', sql)
+      @log('SQL had bad_fied_error: ', sql)
       {error: 'SQL bad field error', sql: sql, statusCode: 500}
 
   sqlFormat: (sql, values = []) ->
