@@ -5,6 +5,7 @@ Promise = require('bluebird')
 class App
 
   constructor: (@config) ->
+    @devMode = process.env.KFLY_DEV_MODE
 
     @appConfig = @config.appConfig
 
@@ -12,7 +13,7 @@ class App
     # After startup is finished, we switch to the app log file.
     @log = console.log
 
-    if process.env.KFLY_DEV_MODE
+    if devMode
       @debugLog = console.log
     else
       @debugLog = ->
@@ -127,7 +128,7 @@ class App
     @taskRunner.start()
 
   shouldWriteToLogFile: ->
-    return not process.env.KFLY_DEV_MODE
+    return not @devMode
 
   finishStartup: =>
     duration = Date.now() - @startedAt
