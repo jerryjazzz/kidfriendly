@@ -73,7 +73,7 @@ class GoogleSearch
     for id, googlePlace of @googleResults
       photoUrl = null
       if (googlePhoto = googlePlace.photos?[0])?
-        photoUrl = "#{GoogleApi.photoUrl}?maxwidth=400&photoreference=#{googlePhoto.photo_reference}&key=#{GoogleApi.browserApiKey}"
+        photoUrl = "#{GoogleApi.photoUrl}?maxwidth=88&photoreference=#{googlePhoto.photo_reference}&key=#{GoogleApi.browserApiKey}"
 
       {
         place_id: googlePlace.kfly_id
