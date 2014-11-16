@@ -1,7 +1,5 @@
 
 class GoogleSearch
-  apiKey: '***REMOVED***'
-  nearbySearchUrl: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
   defaultRadius: 15000 # meters
 
@@ -32,7 +30,7 @@ class GoogleSearch
 
       radius = radius ? @defaultRadius
 
-      url = "#{@nearbySearchUrl}?key=#{@apiKey}&types=#{type}"
+      url = "#{GoogleApi.nearbySearchUrl}?key=#{GoogleApi.apiKey}&types=#{type}"
       url += "&location=#{location}&radius=#{radius}"
       if keyword?
         url += "&keyword=#{keyword}"
@@ -55,8 +53,6 @@ class GoogleSearch
     
     @app.query("select place_id,google_id from place where #{whereStrs.join(' or ')}")
     .then (results) =>
-      console.log("existing result search = ", results)
-
       for {place_id, google_id} in results
         @googleResults[google_id].kfly_id = place_id
 
@@ -75,12 +71,20 @@ class GoogleSearch
 
   formatResults: ->
     for id, googlePlace of @googleResults
-      place_id: googlePlace.kfly_id
-      name: googlePlace.name
-      location: googlePlace.location
-      icon: googlePlace.icon
-      open_now: googlePlace?.opening_hours?.open_now ? false
-      rating: parseFloat(googlePlace.rating) * 20
+      photoUrl = null
+      if (googlePhoto = googlePlace.photos?[0])?
+        photoUrl = "#{GoogleApi.photoUrl}?maxwidth=400&photoreference=#{googlePhoto.photo_reference}&key=#{GoogleApi.browserApiKey}"
+
+      {
+        place_id: googlePlace.kfly_id
+        name: googlePlace.name
+        location: googlePlace.location
+        thumbnail_url: photoUrl
+        open_now: googlePlace?.opening_hours?.open_now ? false
+        rating: parseFloat(googlePlace.rating) * 20
+        price_level: googlePlace.price_level
+      }
+
 
 # Stuff to store:
 # thumbnail_url
