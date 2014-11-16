@@ -1,0 +1,3 @@
+
+class GoogleSearch
+  constructor: (@app) ->

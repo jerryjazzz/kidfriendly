@@ -80,6 +80,7 @@ class GoogleSearch
       location: googlePlace.location
       icon: googlePlace.icon
       open_now: googlePlace?.opening_hours?.open_now ? false
+      rating: parseFloat(googlePlace.rating) * 20
 
 # Stuff to store:
 # thumbnail_url
