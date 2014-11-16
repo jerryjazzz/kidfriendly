@@ -23,33 +23,30 @@ class GoogleSearch
       @formatResults()
 
   requestNearby: ({type, location, keyword, radius}) ->
-    new Promise (resolve, reject) =>
+    if not type? then throw new Error("missing type")
+    if not location? then throw new Error("missing location")
 
-      if not type? then throw new Error("missing type")
-      if not location? then throw new Error("missing location")
+    if not keyword? and not radius?
+      radius = @defaultRadius
 
-      radius = radius ? @defaultRadius
+    url = "#{GoogleApi.nearbySearchUrl}?key=#{GoogleApi.apiKey}&types=#{type}"
+    url += "&location=#{location}"
+    if radius?
+      url += "&radius=#{radius}"
+    if keyword?
+      url += "&keyword=#{keyword}&rankby=distance"
 
-      url = "#{GoogleApi.nearbySearchUrl}?key=#{GoogleApi.apiKey}&types=#{type}"
-      url += "&location=#{location}&radius=#{radius}"
-      if keyword?
-        url += "&keyword=#{keyword}"
-
-      request = require('request')
-      @app.debugLog("url request: " + url)
-
-      request {url, json:true}, (error, response, body) =>
-        if error?
-          return reject(error)
-
-        resolve(body.results)
+    @app.request(url: url, json: true)
+    .then (body) -> body.results
 
   findExistingIdsAndSaveNew: ->
-    if @googleResults.length == 0
-      return []
+    console.log('googleResults = ', @googleResults)
 
     whereStrs = for id, place of @googleResults
       @app.sqlFormat("google_id = ?", [place.place_id])
+
+    if whereStrs.length == 0
+      return []
     
     @app.query("select place_id,google_id from place where #{whereStrs.join(' or ')}")
     .then (results) =>
