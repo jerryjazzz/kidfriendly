@@ -57,7 +57,15 @@ validateResponse = (req, response, report) ->
   require('./Postconditions').check(req, response, report)
 
 runRequestList = (requestList) ->
-  Promise.map requestList, (requestDetails) ->
-    runOneRequest(requestDetails)
+  tests = for request in requestList
+    {request}
+
+  Promise.each tests, (test) ->
+    runOneRequest(test.request)
+    .then (report) ->
+      test.report = report
+
+  .then ->
+    (test.report for test in tests)
 
 module.exports = {runOneRequest, runRequestList}

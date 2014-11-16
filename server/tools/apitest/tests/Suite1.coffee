@@ -13,7 +13,6 @@ requestList.push
   path: "/place/from_google_id/place1/delete"
   body: {}
 
-
 requestList.push
   path: "/place/new"
   body:
