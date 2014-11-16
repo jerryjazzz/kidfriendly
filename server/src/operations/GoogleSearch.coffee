@@ -16,6 +16,7 @@ class GoogleSearch
     googleRequest.then (results) =>
       @googleResults = {}
       for place in results
+        place.location = "#{place.geometry.location.lat},#{place.geometry.location.lng}"
         @googleResults[place.place_id] = place
 
     .then =>
