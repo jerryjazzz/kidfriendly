@@ -77,9 +77,9 @@ schema.place.columns = [
   {name: 'name', type: 'varchar(255)'}
   {name: 'location', type: 'varchar(30)'}
   {name: 'google_id', type: 'varchar(41)', options: 'unique key'}
-  {name: 'google_search_result', type: 'blob'}
-  {name: 'google_details_result', type: 'blob'}
-  {name: 'derived_summary', type: 'blob'}
+  {name: 'google_search_result', type: 'blob'} # todo: delete
+  {name: 'google_details_result', type: 'blob'} # todo: delete
+  {name: 'derived_summary', type: 'blob'} # todo: delete
   created_at
   updated_at
   source_ver

@@ -1,5 +1,6 @@
 
 path = require('path')
+Request = require('request')
 Promise = require('bluebird')
 
 class App
@@ -13,7 +14,7 @@ class App
     # After startup is finished, we switch to the app log file.
     @log = console.log
 
-    if devMode
+    if @devMode
       @debugLog = console.log
     else
       @debugLog = ->
@@ -190,6 +191,12 @@ class App
 
     attemptInsert(0).then ->
       return {id: row.id}
+
+    ###
+  request: (args) ->
+    new Promise (resolve, reject) =>
+    ###
+      
 
   _logToFile: =>
     args = for arg in arguments
