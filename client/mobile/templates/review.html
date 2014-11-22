@@ -1,11 +1,11 @@
 <ion-view title='<img class="title-image" src="img/logo.png">'>
     <ion-content class="has-header padding search-background">
-      <div class="row"><div class="col col-100"><h4><i class="ion-compose"></i> {{place.name}}</h4></div></div>
+      <div class="row"><div class="col col-100"><h4><i class="ion-compose"></i> {{place.name}} Review</h4></div></div>
       <div class="card compact-card">
         <div class="item">
         <div class="row">
             <div class="col col-100">
-                <h5>Family friendliness atmosphere</h5>
+                <h4>Kids Menu</h4>
             </div>
         </div>
         <div class="row">
@@ -15,7 +15,17 @@
         </div>
         <div class="row">
             <div class="col col-100">
-                <h5>Food (tasty, promptness, quality)</h5>
+                <h4>Healthy Options</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <kf-stars ng-model="foodQuality" value="0" max="5"></kf-stars>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-100">
+                <h4>Service / Speed</h4>
             </div>
         </div>
         <div class="row">
@@ -26,7 +36,7 @@
         <div class="row">
             <div class="col">
                 <div class="row">
-                    <h5>Accommodations (high chairs, table activities)</h5>
+                    <h4>Table Activities</h4>
                 </div>
             </div>
         </div>
@@ -36,35 +46,11 @@
             </div>
         </div>
         <div class="row">
-            <div class="col">
-                <h5>Overall Kid Friendliness</h5>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <kf-stars ng-model="overall" value="0" max="5"></kf-stars>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <h6>Would you recommend this place to a friend with children?</h6>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="button-bar">
-                    <a class="button">No</a>
-                    <a class="button">Maybe</a>
-                    <a class="button">Yes</a>
-                </div>
-            </div>
-        </div>
-        <div class="row">
              <div class="col">
                 <textarea class="text-area-border" rows="3" placeholder="Advice for other parents..."></textarea>
              </div>
         </div>
-        <button class="button button-block button-positive">Leave Opinion</button>
+        <a class="button button-block button-positive" href="#/review-thankyou">Leave Opinion</a>
         </div>
       </div>
     </ion-content>

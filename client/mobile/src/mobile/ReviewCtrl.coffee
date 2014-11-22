@@ -1,9 +1,8 @@
 'use strict'
 class ReviewCtrl
-  constructor:($scope, placesService, $stateParams)->
-    console.log 'review', $stateParams.placeId
+  constructor:($scope, placesService, reviewService, $stateParams)->
     $scope.place = placesService.getPlace($stateParams.placeId)
 
-ReviewCtrl.$inject = ['$scope', 'placesService', '$stateParams']
+ReviewCtrl.$inject = ['$scope', 'placesService','reviewService', '$stateParams']
 
 angular.module('Mobile').controller('ReviewCtrl', ReviewCtrl)
