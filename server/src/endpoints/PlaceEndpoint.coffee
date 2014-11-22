@@ -11,12 +11,14 @@ class PlaceEndpoint
     @endpoint.post '/:place_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"
-      @app.query("delete from place where place_id = ?", [req.params.place_id]).then -> {}
+      @app.db('place').where({place_id:req.params.place_id}).delete()
+      .then -> {}
 
     @endpoint.post '/from_google_id/:google_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"
-      @app.query("delete from place where google_id = ?", [req.params.google_id]).then -> {}
+      @app.db('place').where({google_id:req.params.google_id}).delete()
+      .then -> {}
 
     @endpoint.post '/new', wrap (req) =>
       manualId = req.body.place_id # usually null
@@ -28,5 +30,4 @@ class PlaceEndpoint
         created_at: DateUtil.timestamp()
         source_ver: @app.sourceVersion
 
-      @app.insert("place", place)
-        .then (row) -> {place_id} = row
+      @app.insert('place',place)

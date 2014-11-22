@@ -37,9 +37,9 @@ class App
 
   start: ->
     Promise.resolve()
-      .then(@mysqlConnect)
-      .then(@mysqlMigrate)
-      .then(@redisConnect)
+      #.then(@mysqlConnect)
+      .then(@postgresConnect)
+      .then(@sqlMigrate)
       .then(@initializeSourceVersion)
       .then(@setupInbox)
       .then(@setupPub)
@@ -57,49 +57,46 @@ class App
       .then (info) =>
         @currentGitCommit = info
 
-  mysqlConnect: =>
-    mysql = require('mysql')
-    new Promise (resolve, reject) =>
-      @db = mysql.createConnection
-        host: @config.services.mysql.hostname
-        user: @config.services.mysql.user
-        database: 'kidfriendly'
-        multipleStatements: true # TODO: turn this off
+  postgresConnect: =>
+    {hostname, user, password} = @config.services.postgres
 
-      @db.connect (err, conn) =>
-        if err?
-          reject(err)
-          return
-        @log("mysql: connected")
-        resolve()
+    userPrefix = ""
+    if user?
+      userPrefix = "#{user}:#{password}@"
+    address = "postgres://#{userPrefix}#{hostname}/kidfriendly"
+    @log("attempting to connect to: #{address}")
 
-  mysqlMigrate: =>
+    PromiseUtil.retry (retry) =>
+      @db = require('knex')({
+        client: 'pg'
+        connection: address
+      })
+
+      # connection test
+      @db.raw('select 1')
+        .catch Database.missingDatabaseError, =>
+          @db.destroy()
+          @db = null
+          @createDatabase().then -> retry
+    .then =>
+      @log("postgres: connected")
+
+  createDatabase: ->
+    @log("creating database 'kidfriendly'")
+    host = @config.services.postgres.hostname
+
+    connection = require('knex')({
+      client: 'pg'
+      connection: "postgres://#{host}/postgres"
+    })
+    connection.raw('create database kidfriendly')
+    .then =>
+      connection.destroy()
+
+  sqlMigrate: =>
     if @appConfig.roles?.dbMigration?
       migration = new SchemaMigration(this)
-      migration.apply()
-
-  redisConnect: =>
-    if not @config.appConfig.redis?
-      @log("redis: not started (config)")
-      return
-
-    new Promise (resolve, reject) =>
-      @redis = require('redis').createClient()
-      connected = false
-
-      @redis.on 'ready', =>
-        @log("redis: connected")
-        connected = true
-        resolve()
-
-      @redis.on 'error', (err) =>
-        if not connected
-          @redis.end()
-          @redis = null
-          reject(err)
-          return
-
-        @log('redis error: ', err)
+      migration.start()
 
   initializeSourceVersion: =>
     @sourceUtil = new SourceUtil(this)
@@ -140,57 +137,32 @@ class App
       @log = @_logToFile
       @log("finished startup in #{duration} ms")
 
-  query: (sql, values = []) ->
-    # query() wraps around mysql.query and turns it into a promise.
+  insert: (tableName, row) ->
+    idColumn = @config.schema[tableName].primary_key
 
-    isBadFieldError = (err) -> err.code == 'ER_BAD_FIELD_ERROR'
-
-    sql = @db.format(sql, values)
-    @debugLog('sql:', sql)
+    if row[idColumn]?
+      # new row already has an ID
+      successResult = {}
+      successResult[idColumn] = row[idColumn]
+      return @db(tableName).insert(row).then(-> successResult)
 
     new Promise (resolve, reject) =>
-      @db.query sql, (err, result) ->
-        if err?
-          reject(err)
-        else
+      attempt = (numAttempts) =>
+        if numAttempts > 5
+          return reject(msg: "failed to generate ID after 5 attempts")
+
+        row[idColumn] = Database.randomId()
+        @db(tableName).insert(row)
+        .then ->
+          result = {}
+          result[idColumn] = row[idColumn]
           resolve(result)
-    .catch isBadFieldError, (err) =>
-      @log('SQL had bad_fied_error: ', sql)
-      {error: 'SQL bad field error', sql: sql, statusCode: 500}
+        .catch Database.existingKeyError(idColumn), (err) ->
+          attempt(numAttempts + 1)
+        .catch (otherErr) ->
+          reject(otherErr)
 
-  sqlFormat: (sql, values = []) ->
-    @db.format(sql, values)
-
-  insert: (tableName, row) ->
-
-    generatedId = false
-    primaryKey = @config.schema[tableName].primary_key
-
-    # Generate an ID if needed
-    if primaryKey? and not row[primaryKey]?
-      generatedId = true
-      row[primaryKey] = Database.randomId()
-      console.log('generated primary key for: ', primaryKey)
-
-    attemptInsert = (retryCount) =>
-      isDupeEntry = (err) -> err.code == 'ER_DUP_ENTRY' and retryCount < 5
-
-      @query("insert into #{tableName} set ?", [row])
-        .catch isDupeEntry, (err) =>
-
-          # Check if this is a duplicated ID, or if the error was from something else.
-          if generatedId
-            @query("select 1 from #{tableName} where #{primaryKey} = ?", [row[primaryKey]]).then (response) ->
-              if response.length == 0
-                # The generated ID was fine, pass the original error back to the caller.
-                return Promise.reject(err)
-
-              # Generated ID was in use, retry with a different ID.
-              row[primaryKey] = Database.randomId()
-              attemptInsert(retryCount + 1)
-
-    attemptInsert(0).then ->
-      return {id: row.id}
+      attempt(0)
 
   request: (args) ->
     @debugLog("url request: " + args.url)

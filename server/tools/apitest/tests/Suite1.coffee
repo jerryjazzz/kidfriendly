@@ -16,7 +16,7 @@ requestList.push
 requestList.push
   path: "/api/place/new"
   body:
-    id: "place1"
+    place_id: "place1"
     name: "Fake Place 1"
     location: "30,102"
     google_id: "place1"
@@ -24,7 +24,7 @@ requestList.push
 requestList.push
   path: "/api/user/new"
   body:
-    id: "user1"
+    user_id: "user1"
     email: "user1@fake.com"
 
 requestList.push
