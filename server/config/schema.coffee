@@ -14,7 +14,7 @@ The following changes ARE supported by automatic migration:
 Changes that are NOT supported by automatic migration:
 
  - Column rename, removal or reordering
- - Any change to constraints (such as 'not null', 'unique key', 'foreign key', etc)
+ - Any change to constraints (such as 'not null', 'unique', 'foreign key', etc)
 
 ###
 
@@ -25,85 +25,75 @@ id_type = 'varchar(10)'
 ip_address_type = 'varchar(15)'
 
 # Common row definitions
-standard_id = (name) ->
-  name: name
+standard_id =
   type: id_type
-  change_type_from: ['int(10) unsigned']
   options: 'not null primary key'
 
 created_at =
-  name: 'created_at'
-  type: 'datetime'
+  type: 'timestamp'
   options: 'not null'
-  change_type_from: ['timestamp']
 
 updated_at =
-  name: 'updated_at'
-  type: 'datetime'
-  change_type_from: ['timestamp']
+  type: 'timestamp'
 
 source_ver =
-  name: 'source_ver'
-  type: 'int(11)'
+  type: 'integer'
 
 # User table #
 
-schema.user = {primary_key: 'user_id'}
-schema.user.columns = [
-  standard_id('user_id')
-  {name: 'email', type: 'varchar(255)', options: 'not null unique key'}
+schema.users = {primary_key: 'user_id'}
+schema.users.columns = {
+  user_id: standard_id
+  email: {type: 'varchar(255)', options: 'not null unique'}
   created_at
-  {name: 'created_by_ip', type: ip_address_type}
+  created_by_ip: {type: ip_address_type}
   updated_at
   source_ver
-]
+}
 
 # Email_signup table #
 
 schema.email_signup = {primary_key: 'id'}
-schema.email_signup.columns = [
-  standard_id('id')
-  {name: 'email', type: 'varchar(255)', options: 'not null'}
-  {name: 'ip', type: ip_address_type}
-  {name: 'created_at', type: 'datetime', options: 'not null'}
+schema.email_signup.columns = {
+  id: standard_id
+  email: {type: 'varchar(255)', options: 'not null'}
+  ip: {type: ip_address_type}
+  created_at
   source_ver
-]
+}
 
 # Place table #
 
 schema.place = {primary_key: 'place_id'}
-schema.place.columns = [
-  standard_id('place_id')
-  {name: 'name', type: 'varchar(255)'}
-  {name: 'location', type: 'varchar(30)'}
-  {name: 'google_id', type: 'varchar(41)', options: 'unique key'}
-  {name: 'google_search_result', type: 'blob'} # todo: delete
-  {name: 'google_details_result', type: 'blob'} # todo: delete
-  {name: 'derived_summary', type: 'blob'} # todo: delete
+schema.place.columns = {
+  place_id: standard_id
+  name: {type: 'varchar(255)'}
+  location: {type: 'varchar(30)'}
+  google_id: {type: 'varchar(41)', options: 'unique'}
   created_at
   updated_at
   source_ver
-]
+}
 
 # Review table #
 
 schema.review = {primary_key: 'review_id'}
-schema.review.columns = [
-  standard_id('review_id')
-  {name: 'user_id', type: id_type, change_type_from: ['int(10) unsigned'], options: 'not null'}
-  {name: 'place_id', type: id_type, change_type_from: ['int(10) unsigned'], options: 'not null'}
-  {name: 'json', type: 'blob'}
+schema.review.columns = {
+  review_id: standard_id
+  user_id: {type: id_type, options: 'not null'}
+  place_id: {type: id_type, options: 'not null'}
+  body: {type: 'json'}
   created_at
   updated_at
   source_ver
-]
+}
 
 # Source_version table #
 
 schema.source_version = {primary_key: 'id'}
-schema.source_version.columns = [
-  {name: 'id', type: 'int(10) unsigned', options: 'not null primary key auto_increment'}
-  {name: 'sha1', type: 'varchar(40)', options: 'not null unique key'}
-  {name: 'commit_date', type: 'datetime', change_type_from: ['timestamp']}
-  {name: 'first_deployed_at', type: 'datetime', change_type_from: ['timestamp']}
-]
+schema.source_version.columns = {
+  id: {type: 'serial', options: 'primary key'}
+  sha1: {type: 'varchar(40)', options: 'not null unique'}
+  commit_date: {type: 'timestamp', change_type_from: ['timestamp']}
+  first_deployed_at: {type: 'timestamp', change_type_from: ['timestamp']}
+}
