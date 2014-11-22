@@ -1,0 +1,63 @@
+<ion-view title='<img class="title-image" src="img/logo.png">'>
+    <ion-content class="has-header padding search-background">
+        <div class="row"><div class="col col-100"><h4><i class="ion-compose"></i> {{place.name}} Amenities</h4></div></div>
+        <div class="card compact-card">
+            <div class="item">
+                <div class="row">
+                    <div class="col col-100">
+                        <h4>Kids Menu</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <kf-stars ng-model="kidsMenu" value="0" max="5"></kf-stars>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-100">
+                        <h4>Highchairs/Booster</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <kf-stars ng-model="highchairs" value="0" max="5"></kf-stars>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h4>Bathroom Cleanliness</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <kf-stars ng-model="cleanBathrooms" value="0" max="5"></kf-stars>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <h4>Changing tables</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <kf-stars ng-model="changingTables" value="0" max="5"></kf-stars>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h4>Table activities</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <kf-stars ng-model="tableActivities" value="0" max="5"></kf-stars>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <a class="button button-block button-positive" href="#/review2/{{place.id}}">Next...</a>
+                </div>
+    </ion-content>
+</ion-view>

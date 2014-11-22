@@ -2,7 +2,6 @@
 class ResultsCtrl
   constructor:(@$scope, @placesService)->
     @$scope.results = @placesService.results
-    console.log @placesService.results
 
   _getStarSequence: (stars) ->
     sequence = []

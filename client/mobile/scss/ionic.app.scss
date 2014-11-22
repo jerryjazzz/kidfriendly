@@ -34,9 +34,6 @@ $kid-green: #33DD33;
 .small-text {
   font-size: 12px !important;
   color:#666;
-  right {
-    text-align: right;
-  }
 }
 
 .button-star {
@@ -58,8 +55,17 @@ textarea::-webkit-input-placeholder {
   color: #444444
 }
 
-h6, h5 {
-  color:#444444;
+.tile-button-wide {
+  width: 305px;
+}
+
+.tile-button {
+ width:150px;
+ height:150px;
+}
+
+h6, h5, h1, h2, h4 {
+  color:#555555;
 }
 
 .detail-name {
