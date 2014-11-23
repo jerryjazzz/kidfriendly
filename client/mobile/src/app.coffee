@@ -30,9 +30,25 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
     url: '/search'
     templateUrl: 'templates/search.html'
     controller: 'SearchCtrl'
+
+  .state 'start',
+    url: '/start'
+    templateUrl: 'templates/start.html'
+    controller: 'SearchCtrl'
+
   .state 'review',
     url: '/review/:placeId'
     templateUrl: 'templates/review.html'
+    controller:'ReviewCtrl'
+
+  .state 'review2',
+    url: '/review2/:placeId'
+    templateUrl: 'templates/review-service.html'
+    controller:'ReviewCtrl'
+
+  .state 'review3',
+    url: '/review3/:placeId'
+    templateUrl: 'templates/review-atmosphere.html'
     controller:'ReviewCtrl'
 
   .state 'results',
@@ -45,5 +61,10 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
     templateUrl: 'templates/details.html'
     controller:'DetailsCtrl'
 
-  $urlRouterProvider.otherwise('/search')
+  .state 'thankyou',
+    url:'/thankyou'
+    templateUrl: 'templates/review-thankyou.html'
+    controller:'DetailsCtrl'
+
+  $urlRouterProvider.otherwise('/start')
 
