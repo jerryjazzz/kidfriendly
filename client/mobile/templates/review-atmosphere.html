@@ -1,0 +1,68 @@
+<ion-view title='<img class="title-image" src="img/logo.png">'>
+    <ion-content class="has-header padding search-background">
+        <div class="row"><div class="col col-100"><h4><i class="ion-compose"></i> {{place.name}} Atmosphere</h4></div></div>
+        <div class="card compact-card">
+            <div class="item">
+                <div class="row">
+                    <div class="col col-100">
+                        <h4>Noise Level</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="range range-positive">
+                            <i class="icon ion-volume-low"></i>
+                            <input type="range" ng-model="volume" name="volume">
+                            <i class="icon ion-volume-high"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-100">
+                        <h4>Lighting</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="range range-positive">
+                            <i class="icon ion-ios7-lightbulb"></i>
+                            <input type="range" ng-model="lighting" name="lighting">
+                            <i class="icon ion-ios7-lightbulb-outline"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <h4>Crowd</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="range range-positive">
+                            <i class="icon ion-android-contact"></i>
+                            <input type="range" ng-model="crowd" name="crowd">
+                            <i class="icon ion-android-friends"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h4>Other Families</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="range range-positive">
+                            <i class="icon ion-android-contact"></i>
+                            <input type="range" ng-model="otherFamilies" name="otherFamilies">
+                            <i class="icon ion-android-friends"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <a class="button button-block button-positive" href="#/thankyou">Done</a>
+                </div>
+    </ion-content>
+</ion-view>
