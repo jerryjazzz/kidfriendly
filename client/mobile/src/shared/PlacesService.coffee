@@ -21,7 +21,7 @@ class PlacesService
 #    deferred.promise
 #
     console.log 'keyword', keyword
-    @$http.get("http://kidfriendlyreviews.com/search/nearby?type=restaurant&location=33.4941700,-111.9260520&keyword=#{keyword}").success (data) =>
+    @$http.get("http://kidfriendlyreviews.com/api/search/nearby?type=restaurant&location=33.4941700,-111.9260520&keyword=#{keyword}").success (data) =>
       @results = data
       console.log data
       deferred.resolve(@results)
