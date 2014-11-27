@@ -1,10 +1,9 @@
-configs =
+module.exports = configs =
   services:
     forever:
       inbox: "tcp://127.0.0.1:3500"
-    mysql:
+    postgres:
       hostname: 'localhost'
-      user: 'web'
 
   apps:
     web:
@@ -21,10 +20,13 @@ configs =
       redis: {}
       taskRunner: {}
 
-# AWS settings
-###
-if process.env.AWS_PATH?
-  configs.services.mysql.hostname = "***REMOVED***"
-###
+# Machine-specific config (intended for AWS boxes)
+machineConfig = {}
+try
+  machineConfig = require('/kfly/machineConfig.json')
 
-module.exports = configs
+if machineConfig?.profile == 'aws-1'
+  configs.services.postgres =
+    hostname: "***REMOVED***"
+    user: 'dev'
+    password: '***REMOVED***'

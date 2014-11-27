@@ -29,13 +29,13 @@ class SourceUtil
         commit_date: gitCommit.timestamp
         first_deployed_at: DateUtil.timestamp()
 
-      @app.query('select id from source_version where sha1=?', [data.sha1])
+      @app.db.select('id').from('source_version').where(sha1:data.sha1)
       .then (existing) =>
         if existing.length > 0
           return existing[0].id
 
-        @app.query('insert ignore into source_version set ?', [data])
+        @app.db('source_version').insert(data)
         .then =>
-          @app.query('select id from source_version where sha1=?', [data.sha1])
+          @app.db.select('id').from('source_version').where(sha1:data.sha1)
         .then (existing) ->
           return existing[0].id
