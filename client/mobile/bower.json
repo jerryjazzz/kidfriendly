@@ -8,7 +8,9 @@
     "angular-sanitize": "~1.2.20",
     "angular-mocks": "~1.2.20",
     "angular-ui-router": "*",
-    "angular-cookies": "~1.2.20"
+    "angular-cookies": "~1.2.20",
+    "userapp-angular": "~2.0.4",
+    "userapp-phonegap": "~1.2.0"
   },
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.0.0-beta.13",
