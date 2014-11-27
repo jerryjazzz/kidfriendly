@@ -14,11 +14,7 @@ module.exports = configs =
       roles:
         dbMigration: {}
 
-    worker:
-      inbox: "tcp://127.0.0.1:3502"
-      pub: "tcp://127.0.0.1:3503"
-      redis: {}
-      taskRunner: {}
+configs.schema = require('./schema')
 
 # Machine-specific config (intended for AWS boxes)
 machineConfig = {}

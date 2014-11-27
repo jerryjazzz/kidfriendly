@@ -28,7 +28,7 @@ class UserEndpoint
             updated_at: DateUtil.timestamp()
           .then -> {review_id: existing[0].review_id}
         else
-          @app.db('review').insert
+          @app.insert 'review',
             review_id: manualId
             user_id: user_id
             place_id: place_id
@@ -55,12 +55,6 @@ class UserEndpoint
         created_at: DateUtil.timestamp()
         created_by_ip: req.get_ip()
         source_ver: @app.sourceVersion
-
-      # Check for existing email.
-      ###
-      @app.select("select 1 from user where email = ?", [row.email]).then (existingEmail) =>
-        if existingEmail.length > 0
-      ###
 
       @app.insert('users', row)
       .catch Database.existingKeyError('email'), ->
