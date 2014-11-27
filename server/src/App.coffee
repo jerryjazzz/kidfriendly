@@ -37,7 +37,6 @@ class App
 
   start: ->
     Promise.resolve()
-      #.then(@mysqlConnect)
       .then(@postgresConnect)
       .then(@sqlMigrate)
       .then(@initializeSourceVersion)
