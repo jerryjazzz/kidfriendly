@@ -40,16 +40,17 @@ class GoogleSearch
     .then (body) -> body.results
 
   findExistingIdsAndSaveNew: ->
-    console.log('googleResults = ', @googleResults)
+    googleIds = (place.place_id for id, place of @googleResults)
 
-    whereStrs = for id, place of @googleResults
-      @app.sqlFormat("google_id = ?", [place.place_id])
-
-    if whereStrs.length == 0
+    if googleIds.length == 0
       return []
+
+    query = @app.db.select('place_id','google_id').from('place')
+
+    for google_id in googleIds
+      query.orWhere({google_id})
     
-    @app.query("select place_id,google_id from place where #{whereStrs.join(' or ')}")
-    .then (results) =>
+    query.then (results) =>
       for {place_id, google_id} in results
         @googleResults[google_id].kfly_id = place_id
 
