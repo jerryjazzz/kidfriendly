@@ -2,23 +2,21 @@
 Promise = require('bluebird')
 
 Database =
-  randomId: (range = 100000000) ->
-    '' + Math.floor(Math.random() * range)
+  UNIQUE_VIOLATION: '23505'
+  INVALID_CATALOG_NAME: '3D000'
 
-  # Deprecated:
-  writeRow: (app, table, data, {generateId} = {}) ->
-    new Promise (resolve, reject) ->
-      send = (attempts) ->
-        if generateId
-          data.id = Database.randomId()
+  randomId: (length = 10) ->
+    digits = '0123456789'
+    chars = for i in [0...(length-1)]
+      digits[Math.floor(Math.random() * digits.length)]
+    return '1' + chars.join('')
 
-        app.db.query "INSERT INTO #{table} SET ?", data, (err, result) =>
+  existingKeyError: (key) ->
+    return (err) ->
+      console.log("checking #{err} for #{key}")
+      (err.code == Database.UNIQUE_VIOLATION)\
+        and err.detail.indexOf("Key (#{key})") != -1
 
-          if generateId and err? and err.code == 'ER_DUP_ENTRY' and attempts < 5
-            send(attempts + 1)
-          else if err?
-            resolve(error: err)
-          else
-            resolve(id: data.id)
+  missingDatabaseError: (err) ->
+    return err.code == Database.INVALID_CATALOG_NAME
 
-      send(0)
