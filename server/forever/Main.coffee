@@ -9,10 +9,19 @@ log = ->
   console.log.apply(null, args)
 
 startApp = (appName) ->
-  app = new (forever.Monitor) 'server',
+  appConfig = config.apps[appName]
+
+  if appConfig.thirdPartyApp
+    nodeRoot = appConfig.nodeRoot
+    options = []
+  else
+    nodeRoot = 'server'
+    options = [appName]
+
+  app = new (forever.Monitor) nodeRoot,
     command: 'node'
     silent: true
-    options: [appName]
+    options: options
     warn: log
 
   app.on 'restart', ->

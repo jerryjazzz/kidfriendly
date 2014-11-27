@@ -14,6 +14,10 @@ module.exports = configs =
       roles:
         dbMigration: {}
 
+    ghost:
+      thirdPartyApp: true
+      nodeRoot: '/ghost/index.js'
+
 configs.schema = require('./schema')
 
 # Machine-specific config (intended for AWS boxes)
