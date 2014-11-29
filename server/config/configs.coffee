@@ -15,8 +15,13 @@ module.exports = configs =
         dbMigration: {}
 
     ghost:
-      thirdPartyApp: true
-      nodeRoot: '/ghost/index.js'
+      main: 'index.js'
+      foreverOptions:
+        cwd: '/ghost'
+        options: ['--production']
+        env:
+          NODE_ENV: 'production'
+
 
 configs.schema = require('./schema')
 

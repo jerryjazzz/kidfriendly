@@ -11,18 +11,18 @@ log = ->
 startApp = (appName) ->
   appConfig = config.apps[appName]
 
-  if appConfig.thirdPartyApp
-    nodeRoot = appConfig.nodeRoot
-    options = []
-  else
-    nodeRoot = 'server'
-    options = [appName]
-
-  app = new (forever.Monitor) nodeRoot,
+  foreverOptions =
     command: 'node'
     silent: true
-    options: options
     warn: log
+
+  if appConfig.foreverOptions?
+    for k,v of appConfig.foreverOptions
+      foreverOptions[k] = v
+
+  mainScript = appConfig.main or 'server'
+
+  app = new (forever.Monitor)(mainScript, foreverOptions)
 
   app.on 'restart', ->
     log("[forever] Restarting "+ appName)
