@@ -71,11 +71,15 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp'])
     url:'/results'
     templateUrl: 'templates/search-results.html'
     controller:'ResultsCtrl'
+    data:
+      public: true
 
   .state 'details',
     url:'/details/:placeId'
     templateUrl: 'templates/details.html'
     controller:'DetailsCtrl'
+    data:
+      public: true
 
   .state 'thankyou',
     url:'/thankyou'
