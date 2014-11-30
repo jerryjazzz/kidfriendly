@@ -9,7 +9,7 @@ class UserEndpoint
 
       {user_id, place_id} = req.params
 
-      @app.db.select('*').from('review').where({user_id,place_id})
+      @app.db.select('review_id','place_id','body').from('review').where({user_id,place_id})
         .then (response) ->
           response[0] ? null
 
@@ -24,7 +24,7 @@ class UserEndpoint
       .then (existing) =>
         if existing[0]?
           @app.db('review').update
-            contents: blob
+            body: blob
             updated_at: DateUtil.timestamp()
           .then -> {review_id: existing[0].review_id}
         else
@@ -37,6 +37,7 @@ class UserEndpoint
             source_ver: @app.sourceVersion
           .then (row) -> {review_id} = row
 
+    ###
     @endpoint.post '/:user_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
       @app.db('users').where(user_id:req.params.user_id).delete()
@@ -59,3 +60,4 @@ class UserEndpoint
       @app.insert('users', row)
       .catch Database.existingKeyError('email'), ->
         {statusCode: 400, error: type: 'email_already_exists'}
+    ###

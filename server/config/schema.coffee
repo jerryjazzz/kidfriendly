@@ -29,6 +29,11 @@ standard_id =
   type: id_type
   options: 'not null primary key'
 
+user_id =
+  type: 'varchar(30)'
+  options: 'not null'
+  change_type_from: [id_type]
+
 created_at =
   type: 'timestamp'
   options: 'not null'
@@ -41,15 +46,17 @@ source_ver =
 
 # User table #
 
+###
 schema.users = {primary_key: 'user_id'}
 schema.users.columns = {
-  user_id: standard_id
+  user_id
   email: {type: 'varchar(255)', options: 'not null unique'}
   created_at
   created_by_ip: {type: ip_address_type}
   updated_at
   source_ver
 }
+###
 
 # Email_signup table #
 
@@ -80,7 +87,7 @@ schema.place.columns = {
 schema.review = {primary_key: 'review_id'}
 schema.review.columns = {
   review_id: standard_id
-  user_id: {type: id_type, options: 'not null'}
+  user_id
   place_id: {type: id_type, options: 'not null'}
   body: {type: 'json'}
   created_at
