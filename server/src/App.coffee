@@ -26,6 +26,7 @@ class App
     @db = null
     @express = null
     @startedAt = Date.now()
+    @cache = new LocalCache(this)
 
     @logs = {}
 
@@ -69,6 +70,7 @@ class App
       @db = require('knex')({
         client: 'pg'
         connection: address
+        debug: @config.services.postgres.debugConnection
       })
 
       # connection test

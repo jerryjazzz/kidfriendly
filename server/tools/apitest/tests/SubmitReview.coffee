@@ -2,10 +2,6 @@
 requestList = exports.requestList = []
 
 requestList.push
-  path: "/api/user/user1/delete"
-  body: {}
-
-requestList.push
   path: "/api/place/place1/delete"
   body: {}
 
@@ -22,13 +18,23 @@ requestList.push
     google_id: "place1"
 
 requestList.push
-  path: "/api/user/new"
+  path: "/api/user/user1/place/place1/review"
   body:
-    user_id: "user1"
-    email: "user1@fake.com"
+    review:
+      description: "It was OK"
+
+requestList.push
+  path: "/api/user/user1/place/place1/review"
 
 requestList.push
   path: "/api/user/user1/place/place1/review"
   body:
     review:
-      description: "It was OK"
+      description: "Actually it was great"
+
+requestList.push
+  path: "/api/user/user1/place/place1/review"
+
+requestList.push
+  path: "/api/place/place1/delete"
+  body: {}

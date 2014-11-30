@@ -13,31 +13,27 @@ class ColumnDefinition
       return "#{@name} #{@type} #{@options ? ''}"
 
   getMigrationAction: (tableName, existingColumn) ->
-    if @type != existingColumn.type and @getCanonicalTypeName() != existingColumn.type
-      if @change_type_from and (existingColumn.type in @change_type_from)
-        return {type: 'change_type', to: this}
-      else
-        throw "Type mismatch: Field '#{@name}' on table '#{tableName}' currently has type "\
-          +"'#{existingColumn.type}' and the defined type is '#{@type}'."
+    if existingColumn.definitionMatches(@type)
+      return null
 
-    return null
-
-  getCanonicalTypeName: ->
-    # Converts a user-specified type name (such as "timestamp") into the actual type name that
-    # Postgres uses internally (such as "timestamp without time zone")
-    switch
-      when /varchar.*/.test(@type)
-        'character varying'
-      when @type == 'timestamp'
-        'timestamp without time zone'
-      when @type == 'serial'
-        'integer'
-      else
-        @type
+    if @change_type_from and (existingColumn.type in @change_type_from)
+      return {type: 'change_type', to: this}
+    else
+      throw "Type mismatch: Field '#{@name}' on table '#{tableName}' currently has type "\
+        +"'#{existingColumn.type}' and the defined type is '#{@type}'."
 
 class ExistingColumn
   # State of a column as it exists now in the database.
   constructor: ({@name, @type}) ->
+
+  definitionMatches: (typeDef) ->
+    if typeDef == @type
+      return true
+
+    if typeDef == 'serial' and @type == 'integer'
+      return true
+
+    return false
 
 class SchemaMigration
   constructor: (@app) ->
@@ -107,22 +103,27 @@ class SchemaMigration
           @app.log("SchemaMigration: changing type of column #{change.to.name} to #{change.to.type} on "\
             +"table #{tableName}")
 
-          definitionStr = change.to.definitionStr()
-
-          # SQL doesn't like if you mention 'primary key' in the alter table statement.
-          definitionStr = definitionStr.replace('primary key', '')
-
-          @app.db.raw("alter table #{tableName} modify column #{definitionStr}")
+          @app.db.raw("alter table #{tableName} alter column #{change.to.name} type #{change.to.type}")
 
     Promise.all(queries)
 
   getExistingFields: (tableName) ->
-    @app.db.select('column_name','data_type').from('information_schema.columns').where(table_name:tableName)
-      .then (rows) ->
+    @app.db.select('column_name','data_type','character_maximum_length').from('information_schema.columns').where(table_name:tableName)
+      .then (rows) =>
         #console.log('result from information_schema = ', rows)
         result = {}
         for row in rows
           name = row.column_name
-          result[name] = new ExistingColumn(name: name, type: row.data_type)
+          result[name] = new ExistingColumn(name: name, type: @columnInfoToDefinition(row))
 
         return result
+
+  columnInfoToDefinition: (info) ->
+    switch
+      when info.data_type == 'character varying'
+        "varchar(#{info.character_maximum_length})"
+      when info.data_type == 'timestamp without time zone'
+        "timestamp"
+      else
+        info.data_type
+

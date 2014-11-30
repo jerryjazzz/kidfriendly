@@ -4,6 +4,7 @@ module.exports = configs =
       inbox: "tcp://127.0.0.1:3500"
     postgres:
       hostname: 'localhost'
+      debugConnection: false
 
   apps:
     web:
