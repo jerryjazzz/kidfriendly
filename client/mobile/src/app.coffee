@@ -6,8 +6,11 @@
 # the 2nd parameter is an array of 'requires'
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
-angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
-.run ($ionicPlatform) ->
+angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp'])
+.run ($ionicPlatform, user) ->
+  #userApp user object
+  user.init({ appId: '***REMOVED***' })
+
   $ionicPlatform.ready ->
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     # for form inputs)
@@ -30,11 +33,24 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
     url: '/search'
     templateUrl: 'templates/search.html'
     controller: 'SearchCtrl'
+  .state 'login',
+    url: '/login'
+    templateUrl: 'templates/login.html'
+    data:
+      login: true
+
+  .state 'signup',
+    url: '/signup'
+    templateUrl: 'templates/signup.html'
+    data:
+      public: true
 
   .state 'start',
     url: '/start'
     templateUrl: 'templates/start.html'
     controller: 'SearchCtrl'
+    data:
+      public: true
 
   .state 'review',
     url: '/review/:placeId'
@@ -55,11 +71,15 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared'])
     url:'/results'
     templateUrl: 'templates/search-results.html'
     controller:'ResultsCtrl'
+    data:
+      public: true
 
   .state 'details',
     url:'/details/:placeId'
     templateUrl: 'templates/details.html'
     controller:'DetailsCtrl'
+    data:
+      public: true
 
   .state 'thankyou',
     url:'/thankyou'
