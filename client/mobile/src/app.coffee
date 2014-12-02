@@ -6,7 +6,7 @@
 # the 2nd parameter is an array of 'requires'
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
-angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp'])
+angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'])
 .run ($ionicPlatform, user) ->
   #userApp user object
   user.init({ appId: '***REMOVED***' })
@@ -20,6 +20,8 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp'])
     if(window.StatusBar)
       # org.apache.cordova.statusbar required
       StatusBar.styleDefault()
+
+
 
 .config ($stateProvider, $urlRouterProvider) ->
   # Ionic uses AngularUI Router which uses the concept of states
