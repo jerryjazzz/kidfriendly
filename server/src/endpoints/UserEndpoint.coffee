@@ -7,14 +7,22 @@ class UserEndpoint
 
     @endpoint.get '/:user_id/place/:place_id/review', wrap (req) =>
 
-      {user_id, place_id} = req.params
+      {user_id, place_id, token} = req.params
+
+      ###
+      if not token?
+        {statusCode: 400, error: message: 'Token is required'}
+
+      check = new UserAppCheckToken(@app)
+      check.start(token)
+      ###
 
       @app.db.select('review_id','place_id','body').from('review').where({user_id,place_id})
         .then (response) ->
           response[0] ? null
 
     @endpoint.post '/:user_id/place/:place_id/review', wrap (req) =>
-      {user_id, place_id} = req.params
+      {user_id, place_id, token} = req.params
 
       manualId = req.body.review_id # usually null
 
