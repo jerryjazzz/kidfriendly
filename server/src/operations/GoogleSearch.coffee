@@ -69,7 +69,7 @@ class GoogleSearch
 
   formatResults: ->
     for id, googlePlace of @googleResults
-      GoogleApi.convertPlaceResult(id, googlePlace)
+      GoogleApi.convertPlaceResult(googlePlace.kfly_id, googlePlace)
 
 # Stuff to store:
 # thumbnail_url
