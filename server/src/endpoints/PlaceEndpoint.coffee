@@ -6,7 +6,8 @@ class PlaceEndpoint
     @endpoint = require('express')()
 
     @endpoint.get '/:place_id/details', wrap (req) =>
-      "todo"
+      operation = new GoogleDetails(@app)
+      operation.start(place_id: req.params.place_id)
 
     @endpoint.post '/:place_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
