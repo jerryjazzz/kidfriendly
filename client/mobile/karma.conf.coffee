@@ -23,6 +23,7 @@ module.exports = (config) ->
       'www/lib/angular-routes/angular-route.min.js',
       'www/lib/angular-touch/angular-touch.min.js',
       'www/lib/angular-ui-router/release/angular-ui-router.js',
+      'www/lib/ngCordova/dist/ng-cordova.js',
       'www/lib/ionic/js/ionic.js',
       'www/lib/ionic/js/ionic-angular.min.js',
       'test/BootstrapUserApp.coffee',
