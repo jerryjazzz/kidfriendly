@@ -14,4 +14,4 @@ class GoogleDetails
     url = GoogleApi.detailsUrl + "?key=#{GoogleApi.apiKey}&placeid=#{googleId}"
     @app.request(url: url)
     .then (googlePlace) =>
-      GoogleApi.convertPlaceResult(placeId, googlePlace)
+      GoogleApi.convertPlaceResult(placeId, googlePlace.result)
