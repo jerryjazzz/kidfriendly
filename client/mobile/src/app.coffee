@@ -6,7 +6,7 @@
 # the 2nd parameter is an array of 'requires'
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
-angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'])
+angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel'])
 .run ($ionicPlatform, user) ->
   #userApp user object
   user.init({ appId: '***REMOVED***' })
