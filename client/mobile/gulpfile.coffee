@@ -40,7 +40,7 @@ gulp.task "coffee", [], (done) ->
   return
 
 gulp.task "watch", ["assets", "sass", "coffee"], ->
-  gulp.watch paths.sass.concat(paths.coffee.concat(paths.assets)), ["default"]
+  gulp.watch paths.sass.concat(paths.coffee.concat(paths.assets)), ["assets", "sass", "coffee"]
   return
 
 gulp.task "install", ["git-check"], ->
