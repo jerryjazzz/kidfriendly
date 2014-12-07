@@ -10,7 +10,8 @@
       <div class="col col-80">
         <h4 class="detail-name">{{data.place.name}}</h4>
         <div class="small-text">{{data.place.vicinity}}</div>
-        <span class="small-text">{{data.place.distance}}</span><i class="ion-cash cash-icon"></i><i class="ion-cash cash-icon"></i>
+        <span class="small-text">{{data.place.distance}} mi</span>
+        <kf-price-level level="data.place.price_level"></kf-price-level>
       </div>
     </div>
     <div class="list card compact-card">
