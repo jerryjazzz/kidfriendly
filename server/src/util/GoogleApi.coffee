@@ -21,6 +21,8 @@ GoogleApi =
       name: googlePlace.name
       location: googlePlace.location
       thumbnail_url: photoUrl
+      vicinity: googlePlace.vicinity
+      phone:googlePlace.formatted_phone_number
       open_now: googlePlace?.opening_hours?.open_now ? null
       rating
       price_level: googlePlace.price_level
