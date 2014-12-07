@@ -3,21 +3,21 @@
     <div class="row">
       <div class="col col-20">
         <div style="width:60px;vertical-align: bottom; height:60px; padding:10px 10px 10px 10px; border-width: 1px; border: solid; background-color: #33DD33; text-align:center; color:#FFFFFF">
-          <p class="rating-text">{{place.rating}}</p>
+          <p class="rating-text">{{data.place.rating}}</p>
           <p class="rating-text-small">friendly</p>
         </div>
       </div>
       <div class="col col-80">
-        <h4 class="detail-name">{{place.name}}</h4>
-        <div class="small-text">123</div>
-        <span class="small-text">{{place.distance}}</span><i class="ion-cash cash-icon"></i><i class="ion-cash cash-icon"></i>
+        <h4 class="detail-name">{{data.place.name}}</h4>
+        <div class="small-text">{{data.place.vicinity}}</div>
+        <span class="small-text">{{data.place.distance}}</span><i class="ion-cash cash-icon"></i><i class="ion-cash cash-icon"></i>
       </div>
     </div>
     <div class="list card compact-card">
       <div class="item tabs tabs-secondary tabs-icon-left">
         <a class="tab-item" href="#">
           <i class="icon ion-ios7-telephone"></i>
-          911-555-9658
+          {{data.place.phone}}
         </a>
         <a class="tab-item" href="#">
           <i class="icon ion-compass"></i>
@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="list card compact-card">
-      <a class="tab-item" href="#/review/{{place.place_id}}">
+      <a class="tab-item" href="#/review/{{data.place.place_id}}">
         <i class="icon ion-compose"></i>
         Leave Opinion
       </a>
