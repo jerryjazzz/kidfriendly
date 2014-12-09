@@ -1,0 +1,39 @@
+<div class="intro-message" >
+    <h1>Thank You!</h1>
+    <hr class="intro-divider">
+    <h4>You will receive an email shortly</h4>
+    <h4>In the mean time tell us which feature you are most excited about.</h4>
+    <div>
+        <div class="form-box" ng-controller="SurveyCtrl as survey">
+            <form role="form">
+                <div class="form-group form-group-lg" style="text-align: left">
+                    <label class="radio">
+                        <input type="radio" data-toggle="radio" ng-model="surveyAnswer" value="a" class="custom-radio">
+                            <span class="icons">
+                                <span class="icon-unchecked"></span>
+                                <span class="icon-checked"></span>
+                            </span>
+                    <p>Browsing reviews of Kid Friendly restaurants and local businesses</p>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" data-toggle="radio" ng-model="surveyAnswer" value="b" class="custom-radio">
+                            <span class="icons">
+                                <span class="icon-unchecked"></span>
+                                <span class="icon-checked"></span>
+                            </span>
+                    <p>Notifications of kid friendly activities in my area</p>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" data-toggle="radio" ng-model="surveyAnswer" value="c" class="custom-radio">
+                            <span class="icons">
+                                <span class="icon-unchecked"></span>
+                                <span class="icon-checked"></span>
+                            </span>
+                        <p>Contributing reviews to the community</p>
+                    </label>
+                </div>
+                <button type="submit" ng-click="survey.submitAnswer()" ng-class="{disabled: !surveyAnswer}" class="btn btn-success btn-lg">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -3,9 +3,7 @@
 echo -- cd kfly
 cd $KFLY_HOME
 
-git fetch origin
-git reset --hard HEAD
-git checkout $1
-
+checkout $1
 web-rebuild
+mobile-rebuild
 server-rebuild

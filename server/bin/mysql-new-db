@@ -1,2 +1,0 @@
-sudo mkdir -p /data/mysql
-docker run -d -v /data/mysql:/var/lib/mysql tutum/mysql /bin/bash -c "/usr/bin/mysql_install_db"

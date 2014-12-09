@@ -1,0 +1,24 @@
+<ion-view title='<img class="title-image" src="img/logo.png">'>
+    <ion-content class="has-header">
+        <div class="item">
+            <form ua-signup ng-show="!verificationEmailSent">
+                <label class="item item-input">
+                    <input name="first_name" type="text" placeholder="First name">
+                </label>
+                <label class="item item-input">
+                    <input name="last_name" type="text" placeholder="Last name">
+                </label>
+                <label class="item item-input">
+                    <input name="login" ua-is-email type="text" placeholder="Email">
+                </label>
+                <label class="item item-input">
+                    <input name="password" placeholder="Password" type="password">
+                </label>
+                <button type="submit" style="margin-top: 15px;" class="button button-block button-positive">Sign Up</button>
+
+                <p ng-show="loading"><img src="https://app.userapp.io/img/ajax-loader-transparent.gif"></p>
+                <p ng-show="error">{{ error.message }}</p>
+            </form>
+        </div>
+    </ion-content>
+</ion-view>

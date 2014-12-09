@@ -1,0 +1,102 @@
+/*
+To customize the look and feel of Ionic, you can override the variables
+in ionic's _variables.scss file.
+
+For example, you might change some of the default colors:
+
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #4a87ee !default;
+$calm:                            #43cee6 !default;
+$balanced:                        #66cc33 !default;
+$energized:                       #f0b840 !default;
+$assertive:                       #ef4e3a !default;
+$royal:                           #8a6de9 !default;
+$dark:                            #444 !default;
+*/
+
+// The path for our ionicons font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default;
+
+// Include all of Ionic
+@import "www/lib/ionic/scss/ionic";
+
+$kid-green: #33DD33;
+
+@mixin vertical-align {
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.small-text {
+  font-size: 12px !important;
+  color:#666;
+}
+
+.button-star {
+  font-size: 30px;
+  color:#ff8800
+}
+
+.text-area-border {
+  border-color: #b2b2b2 ;
+  border-width: 1px;
+  color: #444444  ;
+  border-style: solid;
+  padding: 5px;
+  resize: none;
+  width: 100%;
+}
+
+textarea::-webkit-input-placeholder {
+  color: #444444
+}
+
+.tile-button-wide {
+  width: 305px;
+}
+
+.tile-button {
+ width:150px;
+ height:50px;
+}
+
+h6, h5, h1, h2, h4 {
+  color:#555555;
+}
+
+.detail-name {
+  color:#666;
+  margin-top: 0px;
+  margin-bottom: 0px
+}
+
+/* Ionic Overrides*/
+.item-content {
+  padding-right: 8px !important;
+}
+
+.cash-icon {
+  color:#009900;
+  padding-left: 5px;
+  font-size:14px;
+}
+
+.rating-text {
+  font-size:22px;
+  margin-bottom: 8px;
+  @include vertical-align;
+}
+
+.rating-text-small {
+  font-size:10px;
+  margin-bottom: 10px;
+  vertical-align: bottom;
+}
+
+.compact-card {
+  margin-top:4px;
+}

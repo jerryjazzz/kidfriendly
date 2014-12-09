@@ -1,4 +1,3 @@
 
-var configs = require('./defaults.json');
-
-module.exports = configs;
+require('coffee-script/register')
+module.exports = require('./configs');
