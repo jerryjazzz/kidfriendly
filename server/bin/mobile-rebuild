@@ -1,0 +1,14 @@
+
+#!/usr/bin/env bash
+
+echo -- cd kfly/client/mobile
+cd $KFLY_HOME/client/mobile
+
+echo -- npm install
+npm install
+
+echo -- bower install
+node_modules/bower/bin/bower install
+
+echo -- gulp
+node node_modules/gulp/bin/gulp.js

@@ -2,7 +2,7 @@
 # Yum install #
 yum -y update
 yum -y groupinstall "Development Tools"
-yum -y install git nginx mysql
+yum -y install git nginx
 
 # Top level dirs #
 
@@ -59,26 +59,5 @@ or just: ~/bin/init-reload
 # Starting forever #
 sudo start forever
 
-# Docker #
-
-(Found instructions at: http://www.liquidweb.com/kb/how-to-install-docker-on-centos-6/ )
-
-sudo rpm -iUvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-yum update -y
-yum -y install docker-io
-service docker start
-chkconfig docker on
-sudo groupadd docker
-sudo gpasswd -a dev docker
-(now logout & login)
-sudo service docker restart
-
-# Mysql from docker #
-
-# Useful links:
-#   https://github.com/tutumcloud/tutum-docker-mysql
-cd /kfly/3rdparty
-git clone https://github.com/tutumcloud/tutum-docker-mysql
-docker build -t tutum/mysql 5.5
-scripts/mysql-run.sh
-docker ps
+# Postgres #
+yum localinstall http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
