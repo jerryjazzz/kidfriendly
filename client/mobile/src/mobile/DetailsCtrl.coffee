@@ -3,7 +3,6 @@ class DetailsCtrl
   constructor:($scope, @$stateParams, placesService)->
     $scope.data = {}
     placesService.getPlaceDetail($stateParams.placeId).then (place) =>
-      console.log place
       $scope.data.place = place
 
 
