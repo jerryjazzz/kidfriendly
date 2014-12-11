@@ -7,7 +7,6 @@ class PlacesService
     @$http.get("http://kidfriendlyreviews.com/api/search/nearby?type=restaurant&location=#{position.coords.latitude},#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
       @results = data
       for result in @results
-        console.log 'name, location', result.name, result.location, result
         result.distance = @locationService.calculateDistance position.coords,
           latitude:parseFloat(result.location.split(',')[0], 10)
           longitude:parseFloat(result.location.split(',')[1], 10)
@@ -23,7 +22,6 @@ class PlacesService
   getPlaceDetail:(id) ->
     deferred = @$q.defer()
     @$http.get("http://kidfriendlyreviews.com/api/place/#{id}/details").success (data) =>
-      console.log 'data', data
       deferred.resolve(data)
     deferred.promise
 
