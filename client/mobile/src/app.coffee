@@ -7,9 +7,22 @@
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
 angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel'])
-.run ($ionicPlatform, user) ->
+.run ($ionicPlatform, user, $state, $rootScope) ->
+  attemptedRoute = undefined
   #userApp user object
   user.init({ appId: '***REMOVED***' })
+
+  user.onAuthenticationRequired (route, stateParams) =>
+    attemptedRoute =
+      route: route
+      params: stateParams
+    $state.go 'login'
+
+
+  user.onAuthenticationSuccess =>
+    if attemptedRoute?
+      $state.go attemptedRoute.route.name, attemptedRoute.params
+      attemptedRoute = undefined
 
   $ionicPlatform.ready ->
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -32,9 +45,12 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
 
     # setup an abstract state for the tabs directive
   .state 'search',
-    url: '/search'
-    templateUrl: 'templates/search.html'
+    url: '/search/:keyword'
+    templateUrl: 'templates/search-results.html'
     controller: 'SearchCtrl'
+    data:
+      public:true
+
   .state 'login',
     url: '/login'
     templateUrl: 'templates/login.html'
@@ -50,7 +66,7 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
   .state 'start',
     url: '/start'
     templateUrl: 'templates/start.html'
-    controller: 'SearchCtrl'
+    controller: 'StartCtrl'
     data:
       public: true
 
@@ -69,13 +85,6 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     templateUrl: 'templates/review-atmosphere.html'
     controller:'ReviewCtrl'
 
-  .state 'results',
-    url:'/results'
-    templateUrl: 'templates/search-results.html'
-    controller:'ResultsCtrl'
-    data:
-      public: true
-
   .state 'details',
     url:'/details/:placeId'
     templateUrl: 'templates/details.html'
@@ -89,4 +98,3 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     controller:'DetailsCtrl'
 
   $urlRouterProvider.otherwise('/start')
-
