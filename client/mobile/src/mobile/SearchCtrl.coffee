@@ -1,12 +1,11 @@
 'use strict'
 class SearchCtrl
-  constructor:($scope, $state, placesService, @locationService)->
+  constructor:($scope, $state, placesService, @locationService, $stateParams)->
+    if @locationService.cachedPosition?
+      placesService.search($stateParams.keyword, @locationService.cachedPosition).then (results) => $scope.results = results
+    else
+      @locationService.fetchPosition().then (position) =>
+        placesService.search($stateParams.keyword, position).then (results) => $scope.results = results
 
-
-    $scope.performSearch = (keyword)=>
-      @locationService.getPosition(false).then (position) =>
-        placesService.search(keyword, position).then ->
-          $state.go('results')
-
-SearchCtrl.$inject = ['$scope', '$state', 'placesService', 'locationService']
+SearchCtrl.$inject = ['$scope', '$state', 'placesService', 'locationService', '$stateParams']
 angular.module('Mobile').controller 'SearchCtrl', SearchCtrl
