@@ -1,10 +1,14 @@
 'use strict'
 class LocationService
-  constructor:(@$cordovaGeolocation)->
+  constructor:(@$cordovaGeolocation, @$q)->
+    @cachedPosition
 
-  getPosition: (useCachedLocation=true)->
-    @position = @$cordovaGeolocation.getCurrentPosition() unless @position? or useCachedLocation
-    @position
+  fetchPosition: ->
+    deferred = @$q.defer()
+    @$cordovaGeolocation.getCurrentPosition().then (position) =>
+      @cachedPosition = position
+      deferred.resolve(position)
+    deferred.promise
 
 
   calculateDistance:(from, to) ->
@@ -21,5 +25,5 @@ class LocationService
   _deg2rad:(deg) ->
     deg * (Math.PI/180)
 
-LocationService.$inject = ['$cordovaGeolocation']
+LocationService.$inject = ['$cordovaGeolocation', '$q']
 angular.module('kf.shared').service 'locationService', LocationService
