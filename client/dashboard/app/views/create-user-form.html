@@ -1,0 +1,8 @@
+<h3>Create User</h3>
+
+<form ng-submit="submit()">
+	<input ng-model="username" placeholder="Username"><br>
+	<input ng-model="password" placeholder="Password" type="password"><br>
+  <p><button type="submit">Create</button></p>
+	<p ng-show="error">{{ error.message }}</p>
+</form>
