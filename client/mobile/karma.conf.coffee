@@ -26,6 +26,7 @@ module.exports = (config) ->
       'www/lib/ngCordova/dist/ng-cordova.js',
       'www/lib/ionic/js/ionic.js',
       'www/lib/ionic/js/ionic-angular.min.js',
+      'www/lib/angular-carousel/dist/angular-carousel.js',
       'test/BootstrapUserApp.coffee',
       'www/lib/userapp/userapp.client.js',
       'www/lib/userapp-angular/angularjs.userapp.js',

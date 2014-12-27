@@ -1,7 +1,7 @@
 'use strict'
 class ResultsCtrl
   constructor:(@$scope, @placesService)->
-    @$scope.results = @placesService.results
+    @$scope.searchResults = @placesService.searchResults
 
   _getStarSequence: (stars) ->
     sequence = []
