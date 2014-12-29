@@ -1,7 +1,5 @@
 'use strict'
 class StartCtrl
-  constructor: (@locationService) ->
-    @locationService.fetchPosition()
 
-StartCtrl.$inject = ['locationService']
+StartCtrl.$inject = ['position']
 angular.module('Mobile').controller 'StartCtrl', StartCtrl
