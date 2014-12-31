@@ -9,9 +9,9 @@ StarsDirective = ->
   """
   require:"ngModel"
   link:(scope,elem,attr)->
-    scope.ngModel=attr.value if(attr.value) #set default value
-    scope.readonly=true if(attr.readonly?)
+    scope.ngModel=parseInt(attr.value, 10) if(attr.value) #set default value
   controller:($scope)->
+    console.log 'controller', $scope
     $scope.stars=[1..$scope.max]#coffee shortcut for make an array
     $scope.setVal=(index)->
       if($scope.readonly)
