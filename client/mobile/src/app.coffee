@@ -7,7 +7,7 @@
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
 angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel'])
-.run ($ionicPlatform, user, $state, $rootScope) ->
+.run ($ionicPlatform, user, $state, $ionicHistory) ->
   attemptedRoute = undefined
   #userApp user object
   user.init({ appId: '***REMOVED***' })
@@ -21,7 +21,9 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
 
   user.onAuthenticationSuccess =>
     if attemptedRoute?
-      $state.go attemptedRoute.route.name, attemptedRoute.params
+      console.log $state.current.name, attemptedRoute.route.name
+      $ionicHistory.currentView($ionicHistory.backView());
+      $state.transitionTo  attemptedRoute.route.name, attemptedRoute.params
       attemptedRoute = undefined
 
   $ionicPlatform.ready ->
@@ -36,11 +38,12 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
 
 
 
-.config ($stateProvider, $urlRouterProvider) ->
+.config ($stateProvider, $urlRouterProvider, resolvers) ->
   # Ionic uses AngularUI Router which uses the concept of states
   # Learn more here: https:#github.com/angular-ui/ui-router
   # Set up the various states which the app can be in.
   # Each state's controller can be found in controllers.js
+
   $stateProvider
 
     # setup an abstract state for the tabs directive
@@ -48,8 +51,11 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     url: '/search/:keyword'
     templateUrl: 'templates/search-results.html'
     controller: 'SearchCtrl'
+    resolve:
+      position: resolvers.position
     data:
-      public:true
+      public: true
+    public:true
 
   .state 'login',
     url: '/login'
@@ -67,30 +73,26 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     url: '/start'
     templateUrl: 'templates/start.html'
     controller: 'StartCtrl'
+    resolve:
+      position: resolvers.position
     data:
       public: true
+    public: true
 
   .state 'review',
     url: '/review/:placeId'
     templateUrl: 'templates/review.html'
     controller:'ReviewCtrl'
 
-  .state 'review2',
-    url: '/review2/:placeId'
-    templateUrl: 'templates/review-service.html'
-    controller:'ReviewCtrl'
-
-  .state 'review3',
-    url: '/review3/:placeId'
-    templateUrl: 'templates/review-atmosphere.html'
-    controller:'ReviewCtrl'
-
   .state 'details',
     url:'/details/:placeId'
     templateUrl: 'templates/details.html'
+    resolve:
+      place: resolvers.place
     controller:'DetailsCtrl'
     data:
       public: true
+    public: true
 
   .state 'thankyou',
     url:'/thankyou'

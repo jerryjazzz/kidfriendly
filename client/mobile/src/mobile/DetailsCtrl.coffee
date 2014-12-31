@@ -1,10 +1,8 @@
 'use strict'
 class DetailsCtrl
-  constructor:($scope, @$stateParams, placesService)->
+  constructor:($scope, place)->
     $scope.data = {}
-    placesService.getPlaceDetail($stateParams.placeId).then (place) =>
-      $scope.data.place = place
+    $scope.data.place = place
 
-
-DetailsCtrl.$inject = ['$scope', '$stateParams', 'placesService']
+DetailsCtrl.$inject = ['$scope', 'place']
 angular.module('Mobile').controller 'DetailsCtrl', DetailsCtrl
