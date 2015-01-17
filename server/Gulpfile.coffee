@@ -17,7 +17,7 @@ gulp.task 'coffee', ->
     .pipe(gulp.dest('build'))
 
 gulp.task 'watch', ->
-  gulp.watch(watchFiles, ['build', 'reload-server'])
+  gulp.watch(watchFiles, ['build'])
 
 gulp.task 'reload-server', ['coffee'], ->
   {send} = require('./bin/Send.coffee')
@@ -26,4 +26,4 @@ gulp.task 'reload-server', ['coffee'], ->
     log: (msg) -> console.log("[forever restart] "+msg)
 
 gulp.task('default', ['build', 'watch'])
-gulp.task('build', ['coffee'])
+gulp.task('build', ['coffee', 'reload-server'])

@@ -60,3 +60,6 @@ class SubmitEndpoint
             res.status(400).send(msg: 'SQL error', caused_by: write.error)
             return
           res.status(200).end()
+
+  @create: (app) ->
+    (new SubmitEndpoint(app)).endpoint

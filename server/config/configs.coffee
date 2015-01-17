@@ -3,8 +3,9 @@ module.exports = configs =
     forever:
       inbox: "tcp://127.0.0.1:3500"
     postgres:
-      hostname: 'localhost'
+      host: '/tmp'
       debugConnection: false
+      database: 'kidfriendly'
 
   apps:
     web:
@@ -27,12 +28,7 @@ module.exports = configs =
 configs.schema = require('./schema')
 
 # Machine-specific config (intended for AWS boxes)
-machineConfig = {}
-try
-  machineConfig = require('/kfly/machineConfig.json')
+#machineConfig = {}
+#try
+#  machineConfig = require('/kfly/machineConfig.json')
 
-if machineConfig?.profile == 'aws-1'
-  configs.services.postgres =
-    hostname: "***REMOVED***"
-    user: 'dev'
-    password: '***REMOVED***'
