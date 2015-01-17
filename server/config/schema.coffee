@@ -77,6 +77,8 @@ schema.place.columns = {
   name: {type: 'varchar(255)'}
   location: {type: 'varchar(30)'}
   google_id: {type: 'varchar(41)', options: 'unique'}
+  factual_id: {type: 'varchar(61)', options: 'unique'}
+  details: {type: 'json'}
   created_at
   updated_at
   source_ver
@@ -96,6 +98,9 @@ schema.review.columns = {
 }
 
 # Source_version table #
+#
+#   Maps git sha1 strings to an increasing version number. Server will find (or initialize)
+#   the current source version on startup.
 
 schema.source_version = {primary_key: 'id'}
 schema.source_version.columns = {

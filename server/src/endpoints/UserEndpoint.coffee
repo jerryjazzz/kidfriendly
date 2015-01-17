@@ -69,3 +69,6 @@ class UserEndpoint
       .catch Database.existingKeyError('email'), ->
         {statusCode: 400, error: type: 'email_already_exists'}
     ###
+
+  @create: (app) ->
+    (new UserEndpoint(app)).endpoint

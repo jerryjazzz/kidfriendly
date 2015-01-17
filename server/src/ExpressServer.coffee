@@ -33,12 +33,12 @@ class ExpressServer
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
-
-    @server.use('/api/submit', (new SubmitEndpoint(@app)).endpoint)
-    @server.use('/api/search', (new SearchEndpoint(@app)).endpoint)
-    @server.use('/api/dev', (new DevEndpoint(@app)).endpoint)
-    @server.use('/api/user', (new UserEndpoint(@app)).endpoint)
-    @server.use('/api/place', (new PlaceEndpoint(@app)).endpoint)
+    @server.use('/api/submit', SubmitEndpoint.create(@app))
+    @server.use('/api/search', SearchEndpoint.create(@app))
+    @server.use('/api/dev', DevEndpoint.create(@app))
+    @server.use('/api/user', UserEndpoint.create(@app))
+    @server.use('/api/place', PlaceEndpoint.create(@app))
+    @server.use('/api/factual', FactualEndpoint.create(@app))
 
     port = @expressConfig.port
     @app.log("launching Express server on port #{port}")
