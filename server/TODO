@@ -1,0 +1,18 @@
+
+1/10/15
+
+Needed for MVP:
+
+    Search endpoint
+      Takes lat/long or zipcode as input
+      Sorted by combination of KF rank and distance
+
+    Details endpoint
+      Includes a few user reviews
+        Each with username & avatar
+
+    Update user profile
+
+    Submit review
+
+    Factual scraping
