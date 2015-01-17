@@ -60,4 +60,18 @@ or just: ~/bin/init-reload
 sudo start forever
 
 # Postgres #
-yum localinstall http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
+sudo yum install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
+sudo service postgresql initdb
+sudo chkconfig postgres on
+
+# Add 'dev' user
+sudo su - postgres
+createuser dev
+exit
+
+# Also, modify sshd config to block 'postgres' user
+sudo vim /etc/ssh/sshd_config
+
+add a line that says:
+
+DenyUsers postgres

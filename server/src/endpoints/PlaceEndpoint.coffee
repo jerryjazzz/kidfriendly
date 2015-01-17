@@ -1,4 +1,6 @@
 
+Factual = require('factual-api')
+
 class PlaceEndpoint
   constructor: (@app) ->
     wrap = (f) -> ExpressUtil.wrap({}, f)
@@ -32,3 +34,6 @@ class PlaceEndpoint
         source_ver: @app.sourceVersion
 
       @app.insert('place',place)
+
+  @create: (app) ->
+    (new PlaceEndpoint(app)).endpoint

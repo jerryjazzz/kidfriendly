@@ -43,8 +43,8 @@ class App
       .then(@initializeSourceVersion)
       .then(@setupInbox)
       .then(@setupPub)
+      .then(@initModules)
       .then(@startExpress)
-      .then(@startTaskManager)
       .then(@finishStartup)
       .catch (err) =>
         if err?.stack?
@@ -57,49 +57,60 @@ class App
       .then (info) =>
         @currentGitCommit = info
 
-  postgresConnect: =>
-    {hostname, user, password} = @config.services.postgres
+  getKnexOptions: =>
+    client: 'pg'
+    debug: @config.services.postgres.debugConnection
+    connection:
+      host: @config.services.postgres.host
+      database: @config.services.postgres.database
 
-    userPrefix = ""
-    if user?
-      userPrefix = "#{user}:#{password}@"
-    address = "postgres://#{userPrefix}#{hostname}/kidfriendly"
-    @log("attempting to connect to: #{address}")
+  postgresConnect: =>
 
     PromiseUtil.retry (retry) =>
-      @db = require('knex')({
-        client: 'pg'
-        connection: address
-        debug: @config.services.postgres.debugConnection
-      })
+      @db = require('knex')(@getKnexOptions())
 
       # connection test
       @db.raw('select 1')
         .catch Database.missingDatabaseError, =>
+
+          # Create database and retry
           @db.destroy()
           @db = null
           @createDatabase().then -> retry
+          
     .then =>
-      @log("postgres: connected")
+      @log("postgres connected")
+    .catch (e) =>
+      @log("[ERROR] postgres connection: " + e)
+      @db = null
 
   createDatabase: ->
     @log("creating database 'kidfriendly'")
     host = @config.services.postgres.hostname
 
-    connection = require('knex')({
-      client: 'pg'
-      connection: "postgres://#{host}/postgres"
-    })
+    knexOptions = @getKnexOptions()
+    knexOptions.connection.database = 'postgres'
+
+    connection = require('knex')(knexOptions)
     connection.raw('create database kidfriendly')
     .then =>
       connection.destroy()
 
   sqlMigrate: =>
     if @appConfig.roles?.dbMigration?
+
+      if not @db?
+        @log("skipping migration (no DB)")
+        return
+
       migration = new SchemaMigration(this)
       migration.start()
 
   initializeSourceVersion: =>
+    if not @db?
+      @log("skipping source version init (no DB)")
+      return
+
     @sourceUtil = new SourceUtil(this)
     @sourceUtil.insertSourceVersion()
       .then (id) =>
@@ -112,6 +123,10 @@ class App
   setupPub: =>
     PubChannel.setup(this)
 
+  initModules: =>
+    @modules =
+      factual: new Factual(this)
+
   startExpress: =>
     if not @config.appConfig.express?
       return
@@ -119,27 +134,28 @@ class App
     @expressServer = new ExpressServer(this, @config.appConfig.express)
     @expressServer.start()
 
-  startTaskManager: =>
-    if not @config.appConfig.taskRunner?
-      return
-
-    @taskRunner = new TaskRunner(this)
-    @taskRunner.start()
 
   shouldWriteToLogFile: ->
     return not @devMode
 
   finishStartup: =>
     duration = Date.now() - @startedAt
-    @log("finished startup in #{duration} ms")
+    @log("Server startup completed (in #{duration} ms)")
 
     if @shouldWriteToLogFile()
       @log("logs are now being written to: #{@logs.debug.filename}")
       @log = @_logToFile
-      @log("finished startup in #{duration} ms")
+      @log("Server startup completed (in #{duration} ms)")
 
   insert: (tableName, row) ->
-    idColumn = @config.schema[tableName].primary_key
+    tableSchema = @config.schema[tableName]
+    idColumn = tableSchema.primary_key
+
+    if not row.created_at? and tableSchema.columns.created_at?
+      row.created_at = DateUtil.timestamp()
+
+    if not row.source_ver? and tableSchema.columns.source_ver?
+      row.source_ver = @sourceVersion
 
     if row[idColumn]?
       # new row already has an ID
@@ -185,13 +201,13 @@ class App
     @logs.debug.write("[#{DateUtil.timestamp()}] #{args.join(' ')}")
 
 startApp = (appName = 'web') ->
-  console.log('launching app: '+appName)
+  console.log('Launching app: '+appName)
 
   # Change directory to top-level, one above the 'server' dir. (such as /kfly)
   dir = path.resolve(path.join(__dirname, '../..'))
 
-  console.log('changing current dir to: ' + dir)
   process.chdir(dir)
+  console.log('current directory is now: ' + dir)
 
   config = require('./../config')
 
