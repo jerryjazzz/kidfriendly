@@ -2,28 +2,34 @@
 Factual = require('factual-api')
 
 class PlaceEndpoint
-  constructor: (@app) ->
+  constructor: ->
+    @app = depend('App')
+    @placeDao = depend('PlaceDAO')
+
     wrap = (f) -> ExpressUtil.wrap({}, f)
 
-    @endpoint = require('express')()
+    @route = require('express')()
 
-    @endpoint.get '/:place_id/details', wrap (req) =>
+    @route.get '/:place_id/details', wrap (req) =>
       operation = new GoogleDetails(@app)
       operation.start(place_id: req.params.place_id)
 
-    @endpoint.post '/:place_id/delete', wrap (req) =>
+    @route.post '/:place_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"
       @app.db('place').where({place_id:req.params.place_id}).delete()
       .then -> {}
 
-    @endpoint.post '/from_google_id/:google_id/delete', wrap (req) =>
+    @route.post '/from_google_id/:google_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"
       @app.db('place').where({google_id:req.params.google_id}).delete()
       .then -> {}
 
-    @endpoint.post '/new', wrap (req) =>
+    @route.get '/any', wrap (req) =>
+      @placeDao.get((query) -> query.limit(1))
+
+    @route.post '/new', wrap (req) =>
       manualId = req.body.place_id # usually null
       place =
         place_id: manualId
@@ -35,5 +41,22 @@ class PlaceEndpoint
 
       @app.insert('place',place)
 
+    Get @route, '/:place_id/rerank', {}, (req) =>
+      @app.db.select('*').from('place').where({place_id: req.params.place_id})
+      .then (rows) ->
+        place = rows[0]
+        console.log('place = ', rows[0])
+
+        log = []
+
+        depend('FactualConsumer').recalculateFactualBasedRanking
+          place: place
+          trace: (label, arg) ->
+            log += "#{label}: #{arg}"
+
+        @app.db('place').where({place_id}).update(place)
+        .then ->
+          return log
+
   @create: (app) ->
-    (new PlaceEndpoint(app)).endpoint
+    (new PlaceEndpoint(app)).route
