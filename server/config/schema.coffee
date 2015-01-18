@@ -81,6 +81,7 @@ schema.place.columns = {
   details: {type: 'json'}
   lat: {type: 'real'}
   long: {type: 'real'}
+  rating: {type: 'integer'}
   created_at
   updated_at
   source_ver

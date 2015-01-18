@@ -1,6 +1,6 @@
 
 {GeomUtil} = require('./../build/kfly_server.js')
-assert = require('assert')
+{assert} = require('chai')
 
 describe 'GeomUtil', ->
   describe 'getBounds', ->
