@@ -15,13 +15,23 @@ $royal:                           #8a6de9 !default;
 $dark:                            #444 !default;
 */
 
+$positive:  #4A90E2 !default;
+$balanced: #86DB4E !default;
+$energized: #D98D14;
+$assertive:#DB4E4E;
+$stable:#444 !default;
+$content-padding:4px !default;
+$dark:                            #777 !default;
+$grid-padding-width: 0px !default;
+$padding-base-vertical:           3px !default;
+$padding-base-horizontal:         12px !default;
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
-$kid-green: #33DD33;
 
 @mixin vertical-align {
   position: relative;
@@ -31,9 +41,20 @@ $kid-green: #33DD33;
   transform: translateY(-50%);
 }
 
+.title {
+  font-family: 'Cookie', cursive;
+  font-size: 25px !important;
+  font-color: white;
+  text-shadow: 0px 1px 2px #4372A8;
+}
+
+.drop-shadow {
+  box-shadow: 0px 1px 4px #333333 !important;
+  margin-bottom: 0px;
+}
+
 .small-text {
   font-size: 12px !important;
-  color:#666;
 }
 
 .button-star {
@@ -51,12 +72,6 @@ $kid-green: #33DD33;
   width: 100%;
 }
 
-.center-cropped {
-  object-fit: none; /* Do not scale the image */
-  object-position: center; /* Center the image within the element */
-  width: 300px;
-  height: 225px;
-}
 textarea::-webkit-input-placeholder {
   color: #444444
 }
@@ -74,15 +89,35 @@ h6, h5, h1, h2, h4 {
   color:#555555;
 }
 
+.overview-text {
+  color:#FFF;
+  position: absolute;
+  margin:0 0 0 0
+}
+
 .detail-name {
-  color:#666;
-  margin-top: 0px;
-  margin-bottom: 0px
+  @extend .overview-text;
+  font-size:18px;
+  left: 70px;
+  top: 162px;
+  text-shadow: 0px 2px 4px #000000;
+}
+
+.detail-address {
+  @extend .overview-text;
+  font-size:14px;
+  left: 70px;
+  top: 180px;
+  text-shadow: 0px 2px 4px #000000;
+}
+
+.remove-margin {
+  top:-6px;
 }
 
 /* Ionic Overrides*/
 .item-content {
-  padding-right: 8px !important;
+  padding: 0px !important;
 }
 
 .cash-icon {
@@ -91,16 +126,53 @@ h6, h5, h1, h2, h4 {
   font-size:14px;
 }
 
+.center-cropped {
+  object-fit: none; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  width: 100%;
+  height: 200px;
+}
+
+.tab-item-large {
+  font-size: 14px !important;
+}
+
+.col-center {
+ text-align:center;
+}
+.photo-container {
+//  min-width: 260px;
+//  max-width:500%;
+  left:60px;
+  width:100%;
+  margin: 0px;
+  align:left;
+  height: 200px;
+  display:inline-block;
+  position:relative;
+}
+
+.rating-banner {
+  width: 60px;
+  height: 200px;
+  padding: 15px 0px 10px 0px;
+  background-color: $balanced;
+  text-align: center;
+  color: #FFFFFF;
+  position: absolute;
+  box-shadow: 1px -1px 4px #333333 !important;
+  z-index:1
+}
+
 .rating-text {
-  font-size:22px;
+  font-size:36px;
+  vertical-align: top;
   margin-bottom: 8px;
-  @include vertical-align;
 }
 
 .rating-text-small {
-  font-size:10px;
-  margin-bottom: 10px;
-  vertical-align: bottom;
+  font-size:14px;
+  position: relative;
 }
 
 .compact-card {
