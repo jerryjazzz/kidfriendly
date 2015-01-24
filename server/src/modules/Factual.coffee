@@ -17,40 +17,51 @@ class Factual
         else
           resolve(res)
 
-  geoSearch: ({lat, long, range}) ->
+  geoSearch: ({lat, long, meters}) ->
+    Assert.notNull(lat)
+    Assert.notNull(long)
+    Assert.notNull(meters)
+
     options =
       filters:
         category_ids: {'$includes': 347} # restaurants
       geo:
         $circle:
           $center: [lat, long]
-          $meters: range
+          $meters: meters
 
     @_getPlaces(options)
       .then (results) =>
         @correlateFactualPlaces(results.data)
 
   handleExistingFactualPlace: (factualPlace, ourPlace) ->
-    @app.log("found existing factual place: #{factualPlace.factual_id}")
     # TODO: Check if ourPlace data is out-of-date and needs updating.
+    return ourPlace
 
   handleMissingFactualPlace: (factualPlace) ->
     @app.log("adding missing factual place: #{factualPlace.factual_id}")
+    
+    lat = factualPlace.latitude
+    long = factualPlace.longitude
+
     placeData =
       name: factualPlace.name
       factual_id: factualPlace.factual_id
+      lat: factualPlace.latitude
+      long: factualPlace.longitude
       details: JSON.stringify
         address: factualPlace.address
         hours: factualPlace.hours
-        lat: factualPlace.latitude
-        long: factualPlace.longitude
         tel: factualPlace.tel
         website: factualPlace.website
 
     @app.insert('place', placeData)
+      .then (res) =>
+        @app.log("inserted new place: #{JSON.stringify(res)}")
+        placeData
 
   correlateFactualPlaces: (factualPlaces) ->
-    Expect.type(factualPlaces, Array)
+    Assert.type(factualPlaces, Array)
     
     # 'factualPlaces' is a list of results from factual
     # output: {
@@ -62,14 +73,14 @@ class Factual
 
     for factualPlace in factualPlaces
       factual_id = factualPlace.factual_id
-      Expect.notNull(factual_id)
+      Assert.notNull(factual_id)
       query.orWhere({factual_id})
 
     query.then (results) =>
       foundPlaces = Map.fromList(results, 'factual_id')
 
       ops = for factualPlace in factualPlaces
-        found = foundPlaces[factualPlaces.factual_id]
+        found = foundPlaces[factualPlace.factual_id]
         if found?
           @handleExistingFactualPlace(factualPlace, found)
         else
