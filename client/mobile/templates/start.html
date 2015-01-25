@@ -1,57 +1,37 @@
-<ion-view title='KidFriendly'>
-    <ion-content class="has-header">
-        <div class="row">
+<ion-view hide-nav-bar="true">
+    <ion-content class="home-content" style="padding:6px" scroll="false">
+        <div class="row home-title-row">
             <div class="col col-100">
-                <a  href="#/search/nearby" class="button button-balanced tile-button-wide">Nearby</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-50">
-                <a class="button button-positive tile-button" href="#/search/healthy">Healthy</a>
-            </div>
-            <div class="col col-50">
-                <a class="button button-positive tile-button" href="#/search/%22kids+menu%22">Kids
-                    Menu</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-50">
-                <a class="button button-positive tile-button" href="#/search/activities">Activities</a>
-            </div>
-            <div class="col col-50">
-                <a class="button button-positive tile-button" href="#/search/service">Service/Speed</a>
-            </div>
-        </div>
-        <label class="item item-input item-select">
-            <div class="input-label">
-                Cuisine
-            </div>
-            <select>
-                <option></option>
-                <option>American</option>
-                <option>Mexican</option>
-                <option>Itailian</option>
-                <option>Asian</option>
-                <option>Indian</option>
-            </select>
-        </label>
-        <ul class="list">
-            <li class="item item-toggle">
-                Include Chains
-                <label class="toggle toggle-positive">
-                    <input type="checkbox">
-
-                    <div class="track">
-                        <div class="handle"></div>
-                    </div>
-                </label>
-            </li>
-
-            <div class="row">
-                <div class="col col-100">
-                    <a class="button button-block button-positive" href="#/login" ng-hide="user.authenticated">Sign In</a>
-                    <a class="button button-block button-default" href="#/signup" ng-hide="user.authenticated">Sign up</a>
+                <div>
+                    <span class="title-big">KidFriendly</span>
+                    <span class="subtitle-text">Discover kid friendly restaurants</span>
                 </div>
             </div>
+        </div>
+        <div class="row hideable-row" style="margin-top: 5%">
+            <div class="col col-100">
+                <a  href="#/search/healthy" class="button button-treatment button-block button-positive">
+                    <i class="ion-pinpoint icon-smaller"></i>Search Nearby</a>
+            </div>
+        </div>
+        <div class="row hideable-row" style="margin-top: 5%">
+            <div class="col col-100 or-text">
+                - or -
+            </div>
+        </div>
+        <div class="row" style="margin-top: 5%">
+            <div class="col col-100">
+                <label class="item item-input input-compact">
+                    <input type="text" placeholder=" City, State or Postal">
+                    <button class="button button-treatment button-balanced" style="display:inline-block">
+                        <i class="icon ion-search icon-smaller" style="margin-right: 0px"></i>
+                    </button>
+                </label>
+            </div>
+        </div>
+        <a class="button button-treatment button-block facebook-button button-positive" href="#/login" ng-hide="user.authenticated">
+            <i class="icon-smaller ion-social-facebook"></i>
+            Sign In with Facebook
+        </a>
     </ion-content>
 </ion-view>
