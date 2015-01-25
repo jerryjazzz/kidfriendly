@@ -18,23 +18,54 @@
         <p class="detail-address">{{data.place.vicinity}}</p>
         <!--<kf-price-level level="data.place.price_level"></kf-price-level>-->
         <div class="card">
-                <div class="row">
-                    <div class="col col-center">
-                        <a class="button icon-left ion-ios7-telephone button-clear button-dark" href="tel:{{data.place.phone}}">
-                            Call
-                        </a>
-                    </div>
-                    <div class="col col-center" >
-                        <a class="button icon-left ion-compass button-clear button-dark" href="#">
-                            Directions
-                        </a>
-                    </div>
-                    <div class="col col-center">
-                    <a class="button icon-left ion-map button-clear button-dark" href="#">
-                        Map
+            <div class="row">
+                <div class="col col-center">
+                    <a class="button icon-left ion-ios7-telephone button-clear button-dark" href="tel:{{data.place.phone}}">
+                        Call
                     </a>
-                    </div>
                 </div>
+                <div class="col col-center" >
+                    <a class="button icon-left ion-compass button-clear button-dark" href="#">
+                        Directions
+                    </a>
+                </div>
+                <div class="col col-center">
+                <a class="button icon-left ion-map button-clear button-dark" href="#">
+                    Map
+                </a>
+                </div>
+            </div>
+        </div>
+        <div class="card ">
+            <div class="item compact-card">
+                <h2 class="small-indent">Overall</h2>
+                <hr>
+                <div class="row">
+                    <div class="col-25"><p class="small-text large-indet">Kid's menu</p></div>
+                    <div class="col-66"></div>
+                </div>
+                <div class="row">
+                    <div class="col-33"><p class="small-text large-indet">Healthy options</p></div>
+                    <div class="col-75"></div>
+                </div>
+                <div class="row">
+                    <div class="col-33"><p class="small-text large-indet">Speed / Service</p></div>
+                    <div class="col-66"></div>
+                </div>
+                <div class="row">
+                    <div class="col-33"><p class="small-text large-indet">Table activities</p></div>
+                    <div class="col-66"></div>
+                </div>
+            </div>
+        </div>
+        <div class="card ">
+            <div class="item compact-card">
+                <h2 class="small-indent">User Reviews</h2>
+                <hr>
+                <div class="row">
+                    <div class="col-100"><p class="small-text large-indet">Currently no reviews, be the first</p></div>
+                </div>
+            </div>
         </div>
     </ion-content>
 </ion-view>
