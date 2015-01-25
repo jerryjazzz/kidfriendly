@@ -14,7 +14,7 @@ paths =
   sass: ["./scss/**/*.scss"]
   coffee: ["./src/**/*.coffee"]
   assets: [
-    "./img/**/*.{png, jpg}"
+    "./img/**/*.{png,jpg}"
     "./templates/**/*.html"
     "./index.html"
   ]

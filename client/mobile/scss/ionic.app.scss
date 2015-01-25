@@ -15,16 +15,19 @@ $royal:                           #8a6de9 !default;
 $dark:                            #444 !default;
 */
 
+/* colors */
 $positive:  #4A90E2 !default;
 $balanced: #86DB4E !default;
 $energized: #D98D14;
 $assertive:#DB4E4E;
-$stable:#444 !default;
-$content-padding:4px !default;
-$dark:                            #777 !default;
-$grid-padding-width: 0px !default;
-$padding-base-vertical:           3px !default;
-$padding-base-horizontal:         12px !default;
+$dark: #444 !default;
+$stable:#777 !default;
+
+//$padding-large-horizontal:8px !default;
+
+$content-padding:6px !default;
+$grid-padding-width: 2px !default;
+$item-padding: 4px !default;
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default;
@@ -41,11 +44,69 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
   transform: translateY(-50%);
 }
 
+.input-compact {
+  padding:1px;
+  border-radius: 4px !important;
+}
+
+.button-treatment {
+  border-radius: 4px;
+  font-weight: bold;
+  text-align:center;
+}
+
+.facebook-button {
+  @extend .button-treatment;
+  position: fixed;
+  width:96%;
+  bottom:0px;
+}
+
+.home-content {
+  background-image: url('../img/cake.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+
 .title {
   font-family: 'Cookie', cursive;
   font-size: 25px !important;
-  font-color: white;
-  text-shadow: 0px 1px 2px #4372A8;
+  color: #FFF;
+  text-shadow: 0px 1px 2px #333;
+}
+
+.home-title-row {
+  margin-top: 15%;
+}
+
+.light-text {
+  text-align: center;
+  display:inline-block;
+  width:100%;
+  color: #FFF;
+  text-shadow: 0px 1px 2px #333;
+  font-family: "Helvetica Neue", "Roboto", sans-serif;
+}
+
+.subtitle-text {
+  @extend .light-text;
+  font-size: 12px;
+}
+
+.icon-smaller {
+  font-size: 22px;
+  margin-right: 10px;
+}
+
+.title-big {
+  @extend .title;
+  width:100% !important;
+  font-size: 70px !important;
+  text-align: center;
+  display: inline-block;
 }
 
 .drop-shadow {
@@ -53,8 +114,24 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
   margin-bottom: 0px;
 }
 
+.or-text {
+  @extend .light-text;
+  font-size: 18px;
+  font-weight: bold;
+}
+
 .small-text {
   font-size: 12px !important;
+  padding-bottom: 10px;
+  color:$dark;
+}
+
+.small-indent {
+  padding-left: 5px;
+}
+
+.large-indet {
+  padding-left: 10px;
 }
 
 .button-star {
@@ -76,17 +153,13 @@ textarea::-webkit-input-placeholder {
   color: #444444
 }
 
-.tile-button-wide {
-  width: 305px;
+h6, h5, h1, h2, h4, h3 {
+  color:#777;
 }
 
-.tile-button {
- width:150px;
- height:50px;
-}
-
-h6, h5, h1, h2, h4 {
-  color:#555555;
+h2 {
+  color: $dark;
+  font-size:20px;
 }
 
 .overview-text {
@@ -105,7 +178,7 @@ h6, h5, h1, h2, h4 {
 
 .detail-address {
   @extend .overview-text;
-  font-size:14px;
+  font-size:12px;
   left: 70px;
   top: 180px;
   text-shadow: 0px 2px 4px #000000;
@@ -141,8 +214,6 @@ h6, h5, h1, h2, h4 {
  text-align:center;
 }
 .photo-container {
-//  min-width: 260px;
-//  max-width:500%;
   left:60px;
   width:100%;
   margin: 0px;
@@ -177,4 +248,22 @@ h6, h5, h1, h2, h4 {
 
 .compact-card {
   margin-top:4px;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: #CCC; /* Modern Browsers */
+  margin: 2px 2px 8px 2px;
+}
+
+@media (max-height: 475px) {
+  .facebook-button {
+    display:none;
+  }
+
+  .hideable-row {
+    display: none;
+  }
+
 }
