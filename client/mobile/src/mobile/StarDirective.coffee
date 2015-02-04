@@ -3,7 +3,7 @@ StarsDirective = ->
   restrict:"EA"
   template:"""<div class="button-bar">
                 <a class="button button-clear" ng-repeat="star in stars" ng-click="setVal(star)">
-                  <span class="ion-ios7-star-outline button-star" ng-class="{'ion-ios7-star-outline':$index>=ngModel, 'ion-ios7-star':$index<ngModel}"></span>
+                  <i class="fa fa-star kf-grey-star" ng-class="{'kf-grey-star':$index>=ngModel, 'kf-blue-star':$index<ngModel}"></i>
                 </a>
               </div>
   """
