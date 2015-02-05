@@ -1,40 +1,50 @@
 
+geolib = require('geolib')
 
 GeomUtil =
   milesToMeters: (miles) ->
     return 1609.34 * miles
+  
+  sort2: (x, y) ->
+    if x < y
+      [x, y]
+    else
+      [y, x]
 
-    ###
-  latticePointsForArea: (area, circleRadius) ->
-    # Returns a list of points with the goal of completely covering the 'area' with circles.
-    # Each point in the list is the center of a circle with the given radius.
+  # Bucket sizes were chosen so that one sector is about 40x40 km
+  # Warning! If these bucket sizes are changed, then all existing sector_ids become invalid.
+  sectorBucketSizeLat: 0.359326
+  sectorBucketSizeLong: 0.428448
 
-    if not area.isSquare
-      throw new Error("only works on squares")
+  sectorCoordsForLocation: (lat, long) ->
+    {x: Math.floor(lat / @sectorBucketSizeLat), y: Math.floor(long / @sectorBucketSizeLong)}
 
-    output = []
+  sectorIdForCoords: (coords) ->
+    "1-#{coords.x}-#{coords.y}"
 
-    # math
-    distanceBetweenPoints = {}
-    distanceBetweenPoints.x = circleRadius * Math.sin(120/180.0*Math.PI) / Math.sin(30/180.0*Math.PI)
-    distanceBetweenPoints.y = distanceBetweenPoints.x * Math.sin(60/180.0*Math.PI)
+  sectorIdForLocation: (lat, long) ->
+    coords = @sectorCoordsForLocation(lat, long)
+    @sectorIdForCoords(coords)
 
-    rowStart = area.topLeft
-    offsetX = false
+  getBounds: ({lat, long, meters}) ->
+    bounds = geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
 
-    while rowStart.y < area.bottomRight.y
-      current = rowStart
+    out = {lat1:0,lat2:0,long1:0,long2:0}
+    [out.lat1, out.lat2] = @sort2(bounds[0].latitude, bounds[1].latitude)
+    [out.long1, out.long2] = @sort2(bounds[0].longitude, bounds[1].longitude)
+    return out
 
-      if offsetX
-        current = current.addX(distanceBetweenPoints.x / 2)
+  sectorIdsForLocationDistance: ({lat, long, meters}) ->
+    bounds = geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
+    coords = [@sectorCoordsForLocation(bounds[0]), @sectorCoordsForLocation(bounds[1])]
 
-      while current.x < area.bottomRight.x
-        output.push(current)
+    [x1, x2] = @sort2(coords[0].x, coords[1].x)
+    [y1, y2] = @sort2(coords[0].y, coords[1].y)
 
-        current = current.addX(distanceBetweenPoints.x)
+    results = []
+    for x in [x1..x2]
+      for y in [y1..y2]
+        results.push(@sectorIdForCoords({x,y}))
+    results
 
-      rowStart = rowStart.addY(distanceBetweenPoints.y)
-      offsetX = not offsetX
-
-    return output
-  ###
+exports.GeomUtil = GeomUtil

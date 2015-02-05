@@ -1,14 +1,18 @@
 
 class SearchEndpoint
   constructor: (@app) ->
-    wrap = (f) -> ExpressUtil.wrap({}, f)
+    factual = @app.modules.factual
+    placeSearch = @app.modules.placeSearch
 
-    @endpoint = require('express')()
+    @route = require('express')()
 
-    @endpoint.get '/nearby', wrap (req) =>
-      search = new GoogleSearch(@app)
-      search.start(nearby: req.query)
+    Get @route, '/nearby', {}, (req) =>
+      {lat, long, meters} = req.query
+
+      # Just for beta purposes, first do a Factual pull for this range.
+      factual.geoSearch({lat, long, meters})
+      .then ->
+        placeSearch.search({lat, long, meters})
 
   @create: (app) ->
-    (new SearchEndpoint(app)).endpoint
-      
+    (new SearchEndpoint(app)).route

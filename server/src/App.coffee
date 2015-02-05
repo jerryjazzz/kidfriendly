@@ -4,7 +4,6 @@ Request = require('request')
 Promise = require('bluebird')
 
 class App
-
   constructor: (@config) ->
     @devMode = process.env.KFLY_DEV_MODE
 
@@ -126,6 +125,7 @@ class App
   initModules: =>
     @modules =
       factual: new Factual(this)
+      placeSearch: new PlaceSearch(this)
 
   startExpress: =>
     if not @config.appConfig.express?
