@@ -4,6 +4,9 @@ Assert =
     if not value instanceof t
       throw new Error(value + " is not an instance of " + t)
 
-  notNull: (val) ->
+  notNull: (val, name) ->
     if not val?
-      throw new Error("expected not null")
+      msg = "expected not null"
+      if name?
+        msg += ": " + name
+      throw new Error(msg)
