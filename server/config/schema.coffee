@@ -79,6 +79,8 @@ schema.place.columns = {
   google_id: {type: 'varchar(41)', options: 'unique'}
   factual_id: {type: 'varchar(61)', options: 'unique'}
   details: {type: 'json'}
+  lat: {type: 'real'}
+  long: {type: 'real'}
   created_at
   updated_at
   source_ver
