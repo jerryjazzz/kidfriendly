@@ -42,7 +42,6 @@ class App
       .then(@initializeSourceVersion)
       .then(@setupInbox)
       .then(@setupPub)
-      .then(@initModules)
       .then(@startExpress)
       .then(@finishStartup)
       .catch (err) =>
@@ -122,18 +121,12 @@ class App
   setupPub: =>
     PubChannel.setup(this)
 
-  initModules: =>
-    @modules =
-      factual: new Factual(this)
-      placeSearch: new PlaceSearch(this)
-
   startExpress: =>
     if not @config.appConfig.express?
       return
 
     @expressServer = new ExpressServer(this, @config.appConfig.express)
     @expressServer.start()
-
 
   shouldWriteToLogFile: ->
     return not @devMode
@@ -218,6 +211,7 @@ startApp = (appName = 'web') ->
   config.appConfig = config.apps[appName]
 
   app = new App(config)
+  provide('App', -> app)
   app.start()
 
 exports.startApp = startApp

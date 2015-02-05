@@ -10,7 +10,8 @@ ExpressUtil =
           res.status(statusCode).send(json)
         .catch (err) ->
           statusCode = err.statusCode ? 500
-          res.status(statusCode).send(JSON.stringify(err.stack ? err))
+          res.set('Content-Type', 'text/plain')
+          res.status(statusCode).send(err.stack ? err)
 
     return handler
 
