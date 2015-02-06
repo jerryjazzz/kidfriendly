@@ -1,6 +1,5 @@
 
 Promise = require('bluebird')
-Cities = require('cities')
 
 class FactualService
   # joe's key:
@@ -10,6 +9,7 @@ class FactualService
   constructor: ->
     @app = depend('App')
     @placeDao = depend('PlaceDAO')
+    @placeSearch = depend('PlaceSearch')
 
     lib = require('factual-api')
     @api = new lib(@key, @secret)
@@ -23,14 +23,11 @@ class FactualService
         else
           resolve(res)
 
-  geoSearch: ({lat, long, meters, zipcode}) ->
-    if zipcode?
-      cityLookup = Cities.zip_lookup(zipcode)
-      [lat, long] = [cityLookup.latitude, cityLookup.longitude]
-    else
-      Assert.notNull(lat, 'lat')
-      Assert.notNull(long, 'long')
-
+  geoSearch: (searchOptions) ->
+    @placeSearch.resolveZipcode(searchOptions)
+    {lat, long, meters} = searchOptions
+    Assert.notNull(lat, 'lat')
+    Assert.notNull(long, 'long')
     Assert.notNull(meters, 'meters')
 
     options =

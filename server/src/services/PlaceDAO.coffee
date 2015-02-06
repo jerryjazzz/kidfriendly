@@ -7,7 +7,7 @@ class PlaceDAO
     # queryModifier is a func that takes a Knex query object, and hopefully adds a 'where'
     # clause or something.
 
-    query = @app.db.select('place_id','factual_id','details').from('place')
+    query = @app.db.select('place_id','name','lat','long','rating','factual_id','details').from('place')
     queryModifier(query)
     query.then (rows) ->
       places = for row in rows
