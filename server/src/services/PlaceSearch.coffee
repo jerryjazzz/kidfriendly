@@ -1,35 +1,45 @@
+'use strict'
 
 geolib = require('geolib')
+Cities = require('cities')
 
 class PlaceSearch
   constructor: ->
     @app = depend('App')
+    @placeDao = depend('PlaceDAO')
 
-  search: (locationDistance) ->
-    # locationDistance is {latitude, longitude, meters}
-    query = @app.db.select('place_id','name','lat','long','details').from('place')
+  resolveZipcode: (searchOptions) ->
+    if searchOptions.zipcode?
+      cityLookup = Cities.zip_lookup(searchOptions.zipcode)
+      [searchOptions.lat, searchOptions.long] = [cityLookup.latitude, cityLookup.longitude]
+    return searchOptions
 
-    bounds = GeomUtil.getBounds(locationDistance)
+  search: (searchOptions) ->
+    @resolveZipcode(searchOptions)
 
-    # Filter to nearest rectangle
-    query.orWhere('lat', '>', bounds.lat1)
-    query.orWhere('lat', '<', bounds.lat2)
-    query.orWhere('long', '>', bounds.long1)
-    query.orWhere('long', '<', bounds.long2)
+    bounds = GeomUtil.getBounds(searchOptions)
 
-    # Future: Might want to add additional where clauses to query.
-    
-    query.then (results) =>
-      results = @checkDistance(results, locationDistance)
-      return results
+    @placeDao.get (query) ->
+      # Filter to nearest rectangle
+      query.orWhere('lat', '>', bounds.lat1)
+      query.orWhere('lat', '<', bounds.lat2)
+      query.orWhere('long', '>', bounds.long1)
+      query.orWhere('long', '<', bounds.long2)
 
-  checkDistance: (places, locationDistance) ->
+    .then (places) =>
+      console.log('places ', places)
+      places = @checkDistance(places, searchOptions)
+      console.log('places 1.5', places)
+      return places
+
+  checkDistance: (places, searchOptions) ->
     # Store 'distance' on each result, and filter out places that are too far.
 
     for place in places
-      place.distance = geolib.getDistance({latitude: place.lat, longitude: place.long},
-          {latitude: locationDistance.lat, longitude: locationDistance.long})
+      console.log("checking distance #{place.lat} #{place.long} #{searchOptions}")
+      place.context.distance = geolib.getDistance({latitude: place.lat, longitude: place.long},
+          {latitude: searchOptions.lat, longitude: searchOptions.long})
 
-    return places.filter (place) -> place.distance < locationDistance.meters
+    return places.filter (place) -> place.context.distance < searchOptions.meters
 
 provide('PlaceSearch', PlaceSearch)

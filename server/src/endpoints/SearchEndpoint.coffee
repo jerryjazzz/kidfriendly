@@ -10,14 +10,17 @@ class SearchEndpoint
     @route = require('express')()
 
     Get @route, '/nearby', {}, (req) =>
-      {lat, long, meters} = req.query
-
+      {lat, long, zipcode, meters} = req.query
       meters = meters ? @defaultSearchRange
+      searchOptions = {lat, long, zipcode, meters}
 
       # Just for beta purposes, first do a Factual pull for this range.
-      factual.geoSearch({lat, long, meters})
+      factualService.geoSearch(searchOptions)
       .then ->
-        placeSearch.search({lat, long, meters})
+        placeSearch.search(searchOptions)
+      .then (places) ->
+        console.log('places 2 ', places)
+        place.toClient() for place in places
 
   @create: (app) ->
     (new SearchEndpoint(app)).route

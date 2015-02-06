@@ -11,8 +11,13 @@ class PlaceEndpoint
     @route = require('express')()
 
     @route.get '/:place_id/details', wrap (req) =>
-      operation = new GoogleDetails(@app)
-      operation.start(place_id: req.params.place_id)
+      {place_id} = req.params
+      @placeDao.get((query) -> query.where({place_id}))
+      .then (places) ->
+        place = places[0]
+        if place?
+          place = place.toClient()
+        place
 
     @route.post '/:place_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete

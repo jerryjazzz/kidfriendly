@@ -11,7 +11,21 @@ class Place
     if not @dataSource?
       @dataSource = 'local'
 
+    # 'context' contains mutable data specific to the use case, such as the 'distance' on a
+    # location search.
+    @context = {}
+
     Object.freeze(this)
+
+  toClient: ->
+    fields = {}
+    for k in ['place_id', 'name', 'lat', 'long', 'rating', 'factual_id']
+      fields[k] = this[k]
+    for k,v of @context
+      fields[k] = v
+    for k,v of @details
+      fields[k] = v
+    return fields
 
   withPatch: (patch) ->
     fields = {}

@@ -27,7 +27,8 @@
     "pg": "~3.6.3",
     "knex": "~0.7.3",
     "cities": "~1.0.6",
-    "factual-api": "~1.0.7"
+    "factual-api": "~1.0.7",
+    "geolib": "~2.0.14"
   },
   "devDependencies": {
     "chai": "~1.10.0"
