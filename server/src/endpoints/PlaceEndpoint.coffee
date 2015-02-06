@@ -14,10 +14,10 @@ class PlaceEndpoint
       {place_id} = req.params
       @placeDao.get((query) -> query.where({place_id}))
       .then (places) ->
-        place = places[0]
-        if place?
-          place = place.toClient()
-        place
+        if places[0]?
+          places[0].toClient()
+        else
+          {error: "Place not found", place_id: place_id}
 
     @route.post '/:place_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
@@ -50,7 +50,6 @@ class PlaceEndpoint
       @app.db.select('*').from('place').where({place_id: req.params.place_id})
       .then (rows) ->
         place = rows[0]
-        console.log('place = ', rows[0])
 
         log = []
 

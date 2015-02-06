@@ -27,16 +27,13 @@ class PlaceSearch
       query.orWhere('long', '<', bounds.long2)
 
     .then (places) =>
-      console.log('places ', places)
       places = @checkDistance(places, searchOptions)
-      console.log('places 1.5', places)
       return places
 
   checkDistance: (places, searchOptions) ->
     # Store 'distance' on each result, and filter out places that are too far.
 
     for place in places
-      console.log("checking distance #{place.lat} #{place.long} #{searchOptions}")
       place.context.distance = geolib.getDistance({latitude: place.lat, longitude: place.long},
           {latitude: searchOptions.lat, longitude: searchOptions.long})
 

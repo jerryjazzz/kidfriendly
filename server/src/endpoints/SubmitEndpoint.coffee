@@ -1,7 +1,8 @@
 mcapi = require('mailchimp-api')
 
 class SubmitEndpoint
-  constructor: (@app) ->
+  constructor: ->
+    @app = depend('App')
     @endpoint = require('express')()
     @emailSignupLog = new Log(@app, 'email_signup.json')
     @surveyAnswerLog = new Log(@app, 'survey_answer.json')

@@ -1,4 +1,4 @@
-
+'use strict'
 
 class FactualConsumer
   constructor: ->
@@ -26,53 +26,49 @@ class FactualConsumer
       ops = for factualPlace in factualPlaces
         foundPlace = foundPlaces[factualPlace.factual_id]
         if foundPlace?
+          console.log(JSON.stringify(foundPlace))
           @app.log("updating place #{foundPlace.place_id} with factual #{factualPlace.factual_id}")
-          patch = @updatePlaceWithFactualData(foundPlace, factualPlace)
-          patch2 = @recalculateFactualBasedRanking(foundPlace.withPatch(patch))
-          combinedPatch = ObjectUtil.merge(patch, patch2)
-          @placeDao.apply(foundPlace, combinedPatch)
-          {place_id: foundPlace.place_id, name: factualPlace.name}
+          place = foundPlace.startPatch()
+          @updatePlaceWithFactualData(place, factualPlace)
+          @recalculateFactualBasedRanking(place)
+          @placeDao.save(place)
+          {place_id: place.place_id, name: factualPlace.name}
 
         else
           @app.log("adding missing factual place: #{factualPlace.factual_id}")
           place = Place.make({})
-          place = place.withPatch(@updatePlaceWithFactualData(place, factualPlace))
-          place = place.withPatch(@recalculateFactualBasedRanking(place))
+          @updatePlaceWithFactualData(place, factualPlace)
+          @recalculateFactualBasedRanking(place)
           @placeDao.insert(place)
 
       Promise.all(ops)
 
   updatePlaceWithFactualData: (place, factualPlace) ->
-    # returns a patch
-    patch =
-      name: factualPlace.name
-      factual_id: factualPlace.factual_id
-      lat: factualPlace.latitude
-      long: factualPlace.longitude
-      rating: 0
-      details:
-        address: factualPlace.address
-        hours: factualPlace.hours
-        tel: factualPlace.tel
-        website: factualPlace.website
-        factual_raw:
-          kids_goodfor: factualPlace.kids_goodfor
-          kids_menu: factualPlace.kids_menu
-          chain_id: factualPlace.chain_id
-          chain_name: factualPlace.chain_name
-          rating: factualPlace.rating
-          smoking: factualPlace.smoking
-          options_vegetarian: factualPlace.options_vegetarian
-          options_vegan: factualPlace.options_vegan
-          options_glutenfree: factualPlace.options_glutenfree
-          options_lowfat: factualPlace.options_lowfat
-          options_organic: factualPlace.options_organic
-          options_healthy: factualPlace.options_healthy
-    return patch
+    place.name = factualPlace.name
+    place.factual_id = factualPlace.factual_id
+    place.lat = factualPlace.latitude
+    place.long = factualPlace.longitude
+    place.rating = 0
+    place.details =
+      address: factualPlace.address
+      hours: factualPlace.hours
+      tel: factualPlace.tel
+      website: factualPlace.website
+      factual_raw:
+        kids_goodfor: factualPlace.kids_goodfor
+        kids_menu: factualPlace.kids_menu
+        chain_id: factualPlace.chain_id
+        chain_name: factualPlace.chain_name
+        rating: factualPlace.rating
+        smoking: factualPlace.smoking
+        options_vegetarian: factualPlace.options_vegetarian
+        options_vegan: factualPlace.options_vegan
+        options_glutenfree: factualPlace.options_glutenfree
+        options_lowfat: factualPlace.options_lowfat
+        options_organic: factualPlace.options_organic
+        options_healthy: factualPlace.options_healthy
 
   recalculateFactualBasedRanking: (place, log = null) ->
-    # returns a patch
-    patch = {details: {}}
 
     factual_raw = place.details.factual_raw
 
@@ -112,11 +108,11 @@ class FactualConsumer
     tableActivities = 3
 
     detailedRatings = {kidsMenu, healthyOptions, speedAndService, tableActivities}
-    patch.details.detailedRatings = detailedRatings
+    place.details.detailedRatings = detailedRatings
 
     randomAdjustment = place.details.randomRatingAdjustment
     if not randomAdjustment?
-      randomAdjustment = patch.details.randomRatingAdjustment = Math.random()
+      randomAdjustment = place.details.randomRatingAdjustment = Math.random()
 
     detailedRatingsTotal = (detailedRatings.kidsMenu + detailedRatings.healthyOptions \
       + detailedRatings.speedAndService + detailedRatings.tableActivities)
@@ -141,8 +137,6 @@ class FactualConsumer
     overallRating = Math.min(overallRating, 100)
     overallRating = Math.max(overallRating, 0)
 
-    patch.rating = Math.round(overallRating)
-
-    return patch
+    place.rating = Math.round(overallRating)
 
 provide('FactualConsumer', FactualConsumer)

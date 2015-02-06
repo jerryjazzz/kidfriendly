@@ -1,6 +1,7 @@
 
 class DevEndpoint
-  constructor: (@app) ->
+  constructor: ->
+    @app = depend('App')
     @endpoint = require('express')()
 
     @endpoint.get '/config', (req, res) =>
