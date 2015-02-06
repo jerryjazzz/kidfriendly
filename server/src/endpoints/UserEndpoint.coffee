@@ -1,6 +1,7 @@
 
 class UserEndpoint
-  constructor: (@app) ->
+  constructor: ->
+    @app = depend('App')
     wrap = (f) -> ExpressUtil.wrap({}, f)
 
     @endpoint = require('express')()

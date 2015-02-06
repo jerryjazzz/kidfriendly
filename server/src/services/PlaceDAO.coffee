@@ -11,37 +11,32 @@ class PlaceDAO
     queryModifier(query)
     query.then (rows) ->
       places = for row in rows
-        fields = row
-        fields.dataSource = 'db'
-        Place.make(fields)
+        Place.fromDatabase(row)
       places
 
   insert: (place) ->
     fields = {}
     for own k,v of place
-      switch k
-        when 'dataSource'
-        else
-          fields[k] = v
+      if k in ['dataSource', 'context', 'original']
+        continue
+      fields[k] = v
     fields.details = JSON.stringify(place.details)
 
     @app.insert('place', fields)
     .then (res) =>
       {place_id: res.place_id, name: place.name}
 
-  apply: (place, patch) ->
+  save: (place) ->
     # Save a modification to DB
-    if place.dataSource != 'db'
-      throw new Error("PlaceDAO.apply must be called on DB sourced data")
+    if place.dataSource != 'local' or not place.original?
+      throw new Error("PlaceDAO.save must be called on patch data")
 
-    if patch.dataSource?
-      throw new Error("2nd arg of PlaceDAO.apply should be a patch, not Place")
-
+    # TODO: Would be cool to only write modified fields.
     fields = {}
-    for k,v of patch
+    for k,v of place
       switch k
         when 'details'
-          fields[k] = ObjectUtil.merge(place.details, patch.details)
+          fields[k] = ObjectUtil.merge(place.original.details, place.details)
         else
           fields[k] = v
 

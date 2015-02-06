@@ -19,7 +19,6 @@ class SearchEndpoint
       .then ->
         placeSearch.search(searchOptions)
       .then (places) ->
-        console.log('places 2 ', places)
         place.toClient() for place in places
 
   @create: (app) ->
