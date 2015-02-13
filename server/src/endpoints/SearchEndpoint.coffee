@@ -6,7 +6,6 @@ class SearchEndpoint
     @app = depend('App')
     factualService = depend('FactualService')
     placeSearch = depend('PlaceSearch')
-
     @route = require('express')()
 
     Get @route, '/nearby', {}, (req) =>

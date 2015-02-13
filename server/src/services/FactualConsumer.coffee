@@ -68,7 +68,12 @@ class FactualConsumer
         options_organic: factualPlace.options_organic
         options_healthy: factualPlace.options_healthy
 
-  recalculateFactualBasedRanking: (place, log = null) ->
+  recalculateFactualBasedRanking: (place) ->
+    extended = @getExtendedRating(place)
+    place.rating = extended.overallRating
+    place.details.detailedRatings = extended.detailedRatings
+
+  getExtendedRating: (place) ->
 
     factual_raw = place.details.factual_raw
 
@@ -108,7 +113,6 @@ class FactualConsumer
     tableActivities = 3
 
     detailedRatings = {kidsMenu, healthyOptions, speedAndService, tableActivities}
-    place.details.detailedRatings = detailedRatings
 
     randomAdjustment = place.details.randomRatingAdjustment
     if not randomAdjustment?
@@ -119,24 +123,23 @@ class FactualConsumer
 
     overallRating = 0
 
-    # List of factors in the overall rating. Each of these numbers is in the range 0..1
+    # List of factors in the overall rating, with weighting.
     factors =
-      goodforkids: cond3(factual_raw.kids_goodfor, 1.0, 0, 0.5)
-      kidsmenu: cond3(factual_raw.kids_menu, 1.0, 0, 0.5)
-      detailedRatingsTotal: detailedRatingsTotal / 20.0
-      factualGenericRating: parseFloat(factual_raw.rating ? 3.5) / 5
-      randomAdjustment: randomAdjustment
+      goodforkids: cond3(factual_raw.kids_goodfor, 1.0, 0, 0.5) * 35
+      kidsmenu: cond3(factual_raw.kids_menu, 1.0, 0, 0.5) * 15
+      detailedRatingsTotal: (detailedRatingsTotal / 20.0) * 25
+      factualGenericRating: (parseFloat(factual_raw.rating ? 3.5) / 5) * 26
+      randomAdjustment: randomAdjustment * 6 - 3
 
     # Now the final rating, with weighting
-    overallRating = factors.goodforkids * 35 \
-      + factors.kidsmenu * 15 \
-      + factors.detailedRatingsTotal * 25 \
-      + factors.factualGenericRating * 25 \
-      + factors.randomAdjustment * 6 - 3
+    overallRating = 0
+    for k,v of factors
+      overallRating += v
 
     overallRating = Math.min(overallRating, 100)
     overallRating = Math.max(overallRating, 0)
+    overallRating = Math.round(overallRating)
 
-    place.rating = Math.round(overallRating)
+    return { detailedRatings, detailedRatingsTotal, randomAdjustment, factors, overallRating }
 
 provide('FactualConsumer', FactualConsumer)
