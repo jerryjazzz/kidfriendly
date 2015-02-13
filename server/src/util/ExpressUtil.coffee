@@ -6,8 +6,13 @@ ExpressUtil =
       Promise.resolve(callbackResult)
         .then (result) ->
           statusCode = result?.statusCode ? 200
-          json = JSON.stringify(result, null, '\t')
-          res.status(statusCode).send(json)
+          if result?.contentType?
+            res.set('Content-Type', result.contentType)
+            res.status(statusCode).send(result.content)
+          else
+            res.set('Content-Type', 'application/json')
+            json = JSON.stringify(result, null, '\t')
+            res.status(statusCode).send(json)
         .catch (err) ->
           statusCode = err?.statusCode ? 500
           res.set('Content-Type', 'text/plain')
