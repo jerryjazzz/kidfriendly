@@ -45,4 +45,7 @@ class Place
       fields[k] = v
     return fields
 
+  getFactualUrl: ->
+    "http://factual.com/#{@factual_id}"
+
 exports.Place = Place

@@ -40,6 +40,10 @@ class ExpressServer
     @server.use('/api/place', PlaceEndpoint.create(@app))
     @server.use('/api/factual', FactualEndpoint.create(@app))
 
+    # New style endpoints
+    for endpoint in [depend('InternalEndpoint')]
+      @server.use('/api' + endpoint.defaultPath, endpoint.route)
+
     port = @expressConfig.port
     @app.log("launching Express server on port #{port}")
     @server.listen(port)
