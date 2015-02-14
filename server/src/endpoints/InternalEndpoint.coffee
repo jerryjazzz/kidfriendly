@@ -31,7 +31,7 @@ class InternalEndpoint
           'n'
 
         for place in places
-          factual_raw = place.details.factual_raw
+          factual_raw = place.details?.factual_raw ? {}
           extendedRating = @factualConsumer.getExtendedRating(place)
           detailedRatings = extendedRating.detailedRatings
           writeRow([

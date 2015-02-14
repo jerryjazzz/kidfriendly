@@ -75,7 +75,7 @@ class FactualConsumer
 
   getExtendedRating: (place) ->
 
-    factual_raw = place.details.factual_raw
+    factual_raw = place.details?.factual_raw ? {}
 
     cond = (b, ifTrue, ifFalse) ->
       if b
