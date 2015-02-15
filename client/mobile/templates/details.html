@@ -9,56 +9,66 @@
             <p class="rating-text">{{data.place.rating}}</p>
             <p class="rating-text-small">{{data.place.distance}}1.5 mi</p>
         </div>
-        <ul ng-if="data.place.photos.length > 0" rn-carousel class="photo-container">
+        <ul ng-if="data.place.photos.length > 1" rn-carousel class="photo-container">
             <li ng-repeat="photo in data.place.photos">
                 <img class="center-cropped" src="{{photo}}">
             </li>
         </ul>
+        <img ng-if="data.place.photos.length <= 1" class="photo-container center-cropped" src="{{data.place.photos[0]}}">
         <p class="detail-name">{{data.place.name}}</p>
-        <p class="detail-address">{{data.place.vicinity}}</p>
+        <p class="detail-address">{{data.place.address}}</p>
         <!--<kf-price-level level="data.place.price_level"></kf-price-level>-->
         <div class="card">
             <div class="row">
                 <div class="col col-center">
-                    <a class="button icon-left ion-ios7-telephone button-clear button-dark" href="tel:{{data.place.phone}}">
+                    <a class="button icon-left ion-ios7-telephone button-clear button-dark responsive-button" href="tel:{{data.place.tel}}">
                         Call
                     </a>
                 </div>
                 <div class="col col-center" >
-                    <a class="button icon-left ion-compass button-clear button-dark" href="#">
+                    <a class="button icon-left ion-compass button-clear button-dark responsive-button" href="#">
                         Directions
                     </a>
                 </div>
                 <div class="col col-center">
-                <a class="button icon-left ion-map button-clear button-dark" href="#">
+                <button ng-class="data.mapStyle" class="button icon-left ion-map button-clear responsive-button" ng-click="toggleMap()">
                     Map
-                </a>
+                </button>
                 </div>
             </div>
+        </div>
+        <div class="card" ng-if="data.mapVisible">
+            <div class="row">
+                <div class="col col-center">
+                <ui-gmap-google-map center='map.center' zoom="14" options="map.options">
+                    <ui-gmap-marker idKey="data.place.place_id" coords="map.center"></ui-gmap-marker>
+                </ui-gmap-google-map>
+            </div>
+                </div>
         </div>
         <div class="card ">
             <div class="item compact-card">
-                <h2 class="small-indent">Overall</h2>
+                <h2 class="small-indent">Ratings</h2>
                 <hr>
                 <div class="row">
-                    <div class="col-25"><p class="small-text large-indet">Kid's menu</p></div>
-                    <div class="col-66"></div>
+                    <div class="col-50"><p class="small-text large-indet">Kid's menu</p></div>
+                    <div class="col-50"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
                 </div>
                 <div class="row">
-                    <div class="col-33"><p class="small-text large-indet">Healthy options</p></div>
-                    <div class="col-75"></div>
+                    <div class="col-50"><p class="small-text large-indet">Healthy options</p></div>
+                    <div class="col-50"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
                 </div>
                 <div class="row">
-                    <div class="col-33"><p class="small-text large-indet">Speed / Service</p></div>
-                    <div class="col-66"></div>
+                    <div class="col-50"><p class="small-text large-indet">Speed / Service</p></div>
+                    <div class="col-50"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
                 </div>
                 <div class="row">
-                    <div class="col-33"><p class="small-text large-indet">Table activities</p></div>
-                    <div class="col-66"></div>
+                    <div class="col-50"><p class="small-text large-indet">Table activities</p></div>
+                    <div class="col-66"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
                 </div>
             </div>
         </div>
-        <div class="card ">
+        <div class="card">
             <div class="item compact-card">
                 <h2 class="small-indent">User Reviews</h2>
                 <hr>

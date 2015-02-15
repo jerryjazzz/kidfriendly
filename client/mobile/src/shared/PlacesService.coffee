@@ -4,12 +4,13 @@ class PlacesService
 
   search:(keyword, position) ->
     deferred = @$q.defer()
-    @$http.get("http://kidfriendlyreviews.com/api/search/nearby?type=restaurant&location=#{position.coords.latitude},#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
+    @$http.get("http://kidfriendlyreviews.com/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
       @searchResults = data
+      console.log data
       for result in @searchResults
         result.distance = @locationService.calculateDistance position.coords,
-          latitude:parseFloat(result.location.split(',')[0], 10)
-          longitude:parseFloat(result.location.split(',')[1], 10)
+          latitude:parseFloat result.lat, 10
+          longitude:parseFloat result.long, 10
         result.distance = Math.round(result.distance * 10 *1.5) / 10
       deferred.resolve(@searchResults)
     deferred.promise
