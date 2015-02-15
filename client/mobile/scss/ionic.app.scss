@@ -49,6 +49,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
   border-radius: 4px !important;
 }
 
+.button-selected {
+  color:#FFF !important;
+  background-color: #888 !important;
+}
+
 .button-treatment {
   border-radius: 4px;
   font-weight: bold;
@@ -224,11 +229,12 @@ h2 {
 }
 
 .center-cropped {
-  object-fit: none; /* Do not scale the image */
+  object-fit: fill; /* Do not scale the image */
   object-position: center; /* Center the image within the element */
   width: 100%;
   height: 200px;
 }
+
 
 .tab-item-large {
   font-size: 14px !important;
@@ -237,9 +243,10 @@ h2 {
 .col-center {
  text-align:center;
 }
+
 .photo-container {
   left:60px;
-  width:100%;
+  width:85%;
   margin: 0px;
   align:left;
   height: 200px;
@@ -256,7 +263,7 @@ h2 {
   color: #FFFFFF;
   position: absolute;
   box-shadow: 1px -1px 4px #333333 !important;
-  z-index:1
+  z-index:1;
 }
 
 .rating-text {
@@ -274,11 +281,20 @@ h2 {
   margin-top:4px;
 }
 
+.scroll {
+  height: 100%;
+}
+
 hr {
   border: none;
   height: 1px;
   background-color: #CCC; /* Modern Browsers */
   margin: 2px 2px 8px 2px;
+}
+
+.angular-google-map-container {
+  width: 100%;
+  height: 200px;
 }
 
 @media (max-height: 370px) {
@@ -297,4 +313,13 @@ hr {
     font-size: 13px !important;
   }
 
+}
+
+a[href^="http://maps.google.com/maps"]{display:none !important}
+
+.gmnoprint a, .gmnoprint span {
+  display:none;
+}
+.gmnoprint div {
+  background:none !important;
 }

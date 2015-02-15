@@ -6,7 +6,7 @@
 # the 2nd parameter is an array of 'requires'
 # 'starter.services' is found in services.js
 # 'starter.controllers' is found in controllers.js
-angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel'])
+angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel', 'uiGmapgoogle-maps'])
 .run ($ionicPlatform, user, $state, $ionicHistory) ->
   attemptedRoute = undefined
   #userApp user object
@@ -38,7 +38,12 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
 
 
 
-.config ($stateProvider, $urlRouterProvider, resolvers) ->
+.config ($stateProvider, $urlRouterProvider, resolvers, uiGmapGoogleMapApiProvider) ->
+  uiGmapGoogleMapApiProvider.configure
+    key: 'AIzaSyC0wntPebMoKnIwbpa82NzLPbwEIlvZvlM'
+    v: '3.17'
+    libraries: 'weather,geometry,visualization'
+
   # Ionic uses AngularUI Router which uses the concept of states
   # Learn more here: https:#github.com/angular-ui/ui-router
   # Set up the various states which the app can be in.
