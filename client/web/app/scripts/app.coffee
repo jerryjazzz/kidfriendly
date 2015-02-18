@@ -1,12 +1,7 @@
 'use strict'
 angular
   .module('web', [
-    'ngAnimate',
-    'ngCookies',
-    'ngResource',
-    'ngRoute',
-    'ngSanitize',
-    'ngTouch'
+    'ngRoute'
   ])
   .config ($routeProvider) ->
     $routeProvider

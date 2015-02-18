@@ -227,7 +227,7 @@ module.exports = (grunt) ->
   # },
   # concat: {
   #   dist: {}
-  # },
+#  },
     imagemin:
       dist:
         files: [
