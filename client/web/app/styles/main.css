@@ -31,6 +31,10 @@ a {
     font-weight: 400;
 }
 
+.img-center {
+  margin:auto;
+}
+
 .intro-header {
     margin-left: auto;
     margin-right: auto;
