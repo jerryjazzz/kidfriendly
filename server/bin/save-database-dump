@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+temp_dir="temp-$$"
+cd ~
+mkdir -p $temp_dir
+cd $temp_dir
+
+date=`date -u +"%Y-%m-%d-%H:%M"`
+filename="kidfriendly_db_${date}.sql"
+pg_dump -E UTF-8 -F p -b -f $filename kidfriendly
+gzip $filename
+
+aws s3 cp $filename* s3://kidfriendly/db_backup/
+
+cd ~
+rm -r $temp_dir
