@@ -1,6 +1,6 @@
 
 ExpressUtil =
-  wrap: (options, callback) ->
+  wrapRequestHandler: (callback) ->
     handler = (req, res) ->
       callbackResult = callback(req)
       Promise.resolve(callbackResult)
@@ -19,4 +19,13 @@ ExpressUtil =
           res.status(statusCode).send(err.stack ? err)
 
     return handler
+
+  wrappedGet: (router, path, callback) ->
+    router.get(path, ExpressUtil.wrapRequestHandler(callback))
+
+  wrappedPost: (router, path, callback) ->
+    router.post(path, ExpressUtil.wrapRequestHandler(callback))
+
+provide('ExpressGet', -> ExpressUtil.wrappedGet)
+provide('ExpressPost', -> ExpressUtil.wrappedPost)
 

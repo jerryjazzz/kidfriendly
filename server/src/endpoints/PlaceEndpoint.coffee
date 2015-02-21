@@ -5,12 +5,12 @@ class PlaceEndpoint
   constructor: ->
     @app = depend('App')
     @placeDao = depend('PlaceDAO')
-
-    wrap = (f) -> ExpressUtil.wrap({}, f)
+    get = depend('ExpressGet')
+    post = depend('ExpressPost')
 
     @route = require('express')()
 
-    @route.get '/:place_id/details', wrap (req) =>
+    get @route, '/:place_id/details', (req) =>
       {place_id} = req.params
       @placeDao.get((query) -> query.where({place_id}))
       .then (places) ->
@@ -19,22 +19,22 @@ class PlaceEndpoint
         else
           {error: "Place not found", place_id: place_id}
 
-    @route.post '/:place_id/delete', wrap (req) =>
+    post @route, '/:place_id/delete', (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"
       @app.db('place').where({place_id:req.params.place_id}).delete()
       .then -> {}
 
-    @route.post '/from_google_id/:google_id/delete', wrap (req) =>
+    post @route, '/from_google_id/:google_id/delete', (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"
       @app.db('place').where({google_id:req.params.google_id}).delete()
       .then -> {}
 
-    @route.get '/any', wrap (req) =>
+    get @route, '/any', (req) =>
       @placeDao.get((query) -> query.limit(1))
 
-    @route.post '/new', wrap (req) =>
+    post @route, '/new', (req) =>
       manualId = req.body.place_id # usually null
       place =
         place_id: manualId
@@ -46,7 +46,7 @@ class PlaceEndpoint
 
       @app.insert('place',place)
 
-    Get @route, '/:place_id/rerank', {}, (req) =>
+    get @route, '/:place_id/rerank', (req) =>
       @app.db.select('*').from('place').where({place_id: req.params.place_id})
       .then (rows) ->
         place = rows[0]

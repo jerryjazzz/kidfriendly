@@ -7,8 +7,9 @@ class SearchEndpoint
     factualService = depend('FactualService')
     placeSearch = depend('PlaceSearch')
     @route = require('express')()
+    get = depend('ExpressGet')
 
-    Get @route, '/nearby', {}, (req) =>
+    get @route, '/nearby', (req) =>
       {lat, long, zipcode, meters} = req.query
       meters = meters ? @defaultSearchRange
       searchOptions = {lat, long, zipcode, meters}

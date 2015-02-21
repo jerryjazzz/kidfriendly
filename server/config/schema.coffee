@@ -69,6 +69,15 @@ schema.email_signup.columns = {
   source_ver
 }
 
+# Survey_answer #
+schema.survey_answer = {}
+schema.survey_answer.columns = {
+  signup_id: {type: 'text'}
+  body: {type: 'json', options: 'not null'}
+  created_at
+  source_ver
+}
+
 # Place table #
 
 schema.place = {primary_key: 'place_id'}
