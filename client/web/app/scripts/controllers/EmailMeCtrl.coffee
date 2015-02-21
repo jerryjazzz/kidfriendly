@@ -3,7 +3,7 @@ class EmailMeCtrl
   constructor:(@$scope, @$http, @$location, @splashPageService)->
 
   _submitEmail: ->
-    @$http.post('/submit/email', {email:@$scope.email})
+    @$http.post('/api/submit/email', {email:@$scope.email})
     .success (data) =>
       @splashPageService.id = data.id
       @$location.path '/survey'

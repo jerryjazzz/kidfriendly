@@ -150,6 +150,13 @@ class App
     if not row.source_ver? and tableSchema.columns.source_ver?
       row.source_ver = @sourceVersion
 
+    # Check to auto-generate an ID. This involves some retry logic on the (unlikely)
+    # chance that our random ID is taken.
+
+    if not idColumn?
+      # no ID column
+      return @db(tableName).insert(row).then(-> row)
+
     if row[idColumn]?
       # new row already has an ID
       successResult = {}

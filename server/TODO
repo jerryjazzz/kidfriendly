@@ -3,8 +3,8 @@
 
 Needed for MVP:
 
-    Search endpoint
-      Takes lat/long or zipcode as input
+ X  Search endpoint
+ X    Takes lat/long or zipcode as input
       Sorted by combination of KF rank and distance
 
     Details endpoint

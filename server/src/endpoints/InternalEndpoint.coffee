@@ -7,9 +7,9 @@ class InternalEndpoint
     @factualConsumer = depend('FactualConsumer')
     @defaultPath = '/internal'
     @route = require('express')()
-    wrap = (f) -> ExpressUtil.wrap({}, f)
+    get = depend('ExpressGet')
 
-    @route.get '/places.csv', wrap (req) =>
+    get @route, '/places.csv', (req) =>
       {limit} = req.query
       @placeDao.get((query) -> query.limit(limit ? 500))
       .then (places) =>

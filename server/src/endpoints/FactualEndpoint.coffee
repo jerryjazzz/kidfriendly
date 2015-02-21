@@ -5,16 +5,17 @@ class FactualEndpoint
     @app = depend('App')
     @factualService = depend('FactualService')
     @factualConsumer = depend('FactualConsumer')
+    get = depend('ExpressGet')
 
-    Get @route, '/geo', {}, (req) =>
+    get @route, '/geo', (req) =>
       {lat, long, meters, zipcode} = req.query
       @factualService.geoSearch({lat, long, meters, zipcode})
 
-    Get @route, '/consume/geo', {}, (req) =>
+    get @route, '/consume/geo', (req) =>
       {lat, long, meters, zipcode} = req.query
       @factualConsumer.geoSearch({lat, long, meters, zipcode})
 
-    Get @route, '/details/:factual_id', {}, (req) =>
+    get @route, '/details/:factual_id', (req) =>
       @app.log(req.query)
       {factual_id} = req.params
       @factualService.placeDetails(factual_id)

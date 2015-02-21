@@ -2,11 +2,11 @@
 class UserEndpoint
   constructor: ->
     @app = depend('App')
-    wrap = (f) -> ExpressUtil.wrap({}, f)
-
+    get = depend('ExpressGet')
+    post = depend('ExpressPost')
     @endpoint = require('express')()
 
-    @endpoint.get '/:user_id/place/:place_id/review', wrap (req) =>
+    get @endpoint, '/:user_id/place/:place_id/review', (req) =>
 
       {user_id, place_id, token} = req.params
 
@@ -22,7 +22,7 @@ class UserEndpoint
         .then (response) ->
           response[0] ? null
 
-    @endpoint.post '/:user_id/place/:place_id/review', wrap (req) =>
+    post @endpoint, '/:user_id/place/:place_id/review', (req) =>
       {user_id, place_id, token} = req.params
 
       manualId = req.body.review_id # usually null
