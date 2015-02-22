@@ -1,10 +1,11 @@
 'use strict'
 class PlacesService
-  constructor:(@$http, @$q, @$timeout, @locationService)->
+  constructor:(@$http, @$q, @$timeout, @locationService, @kfUri)->
 
   search:(keyword, position) ->
+    console.log 'urixxsx', @kfUri
     deferred = @$q.defer()
-    @$http.get("http://kidfriendlyreviews.com/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
+    @$http.get("//#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
       @searchResults = data
       console.log data
       for result in @searchResults
@@ -21,7 +22,7 @@ class PlacesService
 
   getPlaceDetail:(id) ->
     deferred = @$q.defer()
-    @$http.get("http://kidfriendlyreviews.com/api/place/#{id}/details").success (data) =>
+    @$http.get("//#{@kfUri}/api/place/#{id}/details").success (data) =>
       @currentPlace = data
       deferred.resolve(data)
     deferred.promise
@@ -31,11 +32,11 @@ class PlacesService
 
   submitReview: (userId, placeId, review) ->
     deferred = @$q.defer()
-    @$http.post("http://kidfriendlyreviews.com/api/user/#{userId}/place/#{placeId}/review", review)
+    @$http.post("//#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", review)
     .success (data) =>
       deferred.resolve()
     .error (error) =>
       deferred.reject("Error saving review")
 
-PlacesService.$inject = ['$http', '$q', '$timeout', 'locationService']
+PlacesService.$inject = ['$http', '$q', '$timeout', 'locationService', 'kfUri']
 angular.module('kf.shared').service 'placesService', PlacesService
