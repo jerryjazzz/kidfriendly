@@ -5,6 +5,7 @@ class SearchEndpoint
   constructor: ->
     @app = depend('App')
     factualService = depend('FactualService')
+    factualConsumer = depend('FactualConsumer')
     placeSearch = depend('PlaceSearch')
     @route = require('express')()
     get = depend('ExpressGet')
@@ -15,7 +16,7 @@ class SearchEndpoint
       searchOptions = {lat, long, zipcode, meters}
 
       # Just for beta purposes, first do a Factual pull for this range.
-      factualService.geoSearch(searchOptions)
+      factualConsumer.geoSearch(searchOptions)
       .then ->
         placeSearch.search(searchOptions)
       .then (places) ->
