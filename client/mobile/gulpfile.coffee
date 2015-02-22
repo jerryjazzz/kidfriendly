@@ -1,6 +1,10 @@
 gulp = require("gulp")
 gutil = require("gulp-util")
+replace = require('gulp-replace-task')
+args    = require('yargs').argv
+fs = require('fs')
 bower = require("bower")
+runSequence = require('run-sequence')
 concat = require("gulp-concat")
 sass = require("gulp-sass")
 minifyCss = require("gulp-minify-css")
@@ -19,12 +23,9 @@ paths =
     "./index.html"
   ]
 
-gulp.task "default", [
-  "assets"
-  "sass"
-  "coffee"
-  "test"
-]
+gulp.task "default", (done) ->
+  runSequence ["assets", "sass", "coffee"], "replace", "test", ->
+
 gulp.task "sass", (done) ->
   gulp.src("./scss/ionic.app.scss").pipe(sass()).pipe(gulp.dest("./www/css/")).pipe(minifyCss(keepSpecialComments: 0)).pipe(rename(extname: ".min.css")).pipe(gulp.dest("./www/css/")).on "end", done
   return
@@ -39,8 +40,10 @@ gulp.task "coffee", [], (done) ->
   gulp.src(paths.coffee).pipe(sourcemaps.init()).pipe(coffee().on("error", gutil.log)).pipe(sourcemaps.write()).pipe(gulp.dest("./www/js")).on "end", done
   return
 
-gulp.task "watch", ["assets", "sass", "coffee"], ->
-  gulp.watch paths.sass.concat(paths.coffee.concat(paths.assets)), ["assets", "sass", "coffee"]
+gulp.task "watch", ->
+  gulp.watch paths.sass.concat(paths.coffee.concat(paths.assets)), ->
+    runSequence(["assets", "sass", "coffee"], "replace", (done)->)
+
   return
 
 gulp.task "install", ["git-check"], ->
@@ -66,6 +69,20 @@ gulp.task "test", (done) ->
 gulp.task "git-check", (done) ->
   unless sh.which("git")
     console.log "  " + gutil.colors.red("Git is not installed."), "\n  Git, the version control system, is required to download Ionic.", "\n  Download git here:", gutil.colors.cyan("http://git-scm.com/downloads") + ".", "\n  Once git is installed, run '" + gutil.colors.cyan("gulp install") + "' again."
-    process.exit 1
+    process.exit
   done()
   return
+
+
+gulp.task 'replace', ()  ->
+  env = args.env || 'production'
+
+  filename = "#{env}.json"
+  settings = JSON.parse(fs.readFileSync('./config/' + filename, 'utf8'))
+  gulp.src('www/js/shared/KFConstants.js')
+    .pipe replace
+      patterns: [
+        match: 'kfUri',
+        replacement: settings.kfUri
+        ]
+    .pipe(gulp.dest('www/js/shared'))
