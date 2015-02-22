@@ -1,6 +1,7 @@
 'use strict'
 class DetailsCtrl
   constructor:($scope, place, $window)->
+    console.log 'place man!!', place
     place.photos = ['img/no-image.jpg'] unless place.photos?
     $scope.data = {}
     $scope.data.place = place
