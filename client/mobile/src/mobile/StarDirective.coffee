@@ -1,7 +1,15 @@
 StarsDirective = ->
-  scope: "ngModel":"=","max":"="
+  scope:
+    "ngModel":"="
+    "max":"="
+    acceptInput:"="
   restrict:"EA"
-  template:"""<div class="button-bar">
+  template:"""
+              <div ng-if="!acceptInput">
+                <i class="fa fa-star kf-blue-star" ng-repeat="star in stars"></i>
+                <i class="fa fa-star-half kf-blue-star" ng-if="halfStar"></i>
+              </div>
+              <div ng-if="acceptInput" class="button-bar">
                 <a class="button button-clear" ng-repeat="star in stars" ng-click="setVal(star)">
                   <i class="fa fa-star kf-grey-star" ng-class="{'kf-grey-star':$index>=ngModel, 'kf-blue-star':$index<ngModel}"></i>
                 </a>
@@ -9,10 +17,15 @@ StarsDirective = ->
   """
   require:"ngModel"
   link:(scope,elem,attr)->
-    scope.ngModel=parseInt(attr.value, 10) if(attr.value) #set default value
+    scope.ngModel=parseInt(attr.value, 10) if(attr.value)
+    scope.halfStar = (scope.ngModel - Math.floor scope.ngModel) >= .5
   controller:($scope)->
-    console.log 'controller', $scope
-    $scope.stars=[1..$scope.max]#coffee shortcut for make an array
+    if $scope.acceptInput
+      $scope.stars= [1..$scope.max]
+    else
+      $scope.stars = [1..$scope.ngModel]
+      console.log 'here2', $scope.stars
+
     $scope.setVal=(index)->
       if($scope.readonly)
         return
