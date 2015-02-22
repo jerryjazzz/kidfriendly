@@ -79,6 +79,16 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 }
 
+.fa-star-half  {
+  margin-left: -5px;
+  font-size: 22px !important;
+  color: $positive;
+  padding-right: 10px;
+  text-shadow: 0px 1px 2px #333;
+
+}
+
+
 .kf-blue-star{
   color: $positive;
   text-shadow: 0px 1px 2px #333;
