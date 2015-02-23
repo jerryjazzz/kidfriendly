@@ -17,7 +17,6 @@ StarsDirective = ->
   """
   require:"ngModel"
   link:(scope,elem,attr)->
-    scope.ngModel=parseInt(attr.value, 10) if(attr.value)
     scope.halfStar = (scope.ngModel - Math.floor scope.ngModel) >= .5
   controller:($scope)->
     if $scope.acceptInput

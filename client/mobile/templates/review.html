@@ -1,6 +1,6 @@
 <ion-view title='KidFriendly'>
     <ion-nav-buttons side="secondary">
-        <a class="button button-clear" ng-click="submit(review)">
+        <a class="button button-clear" ng-click="submit()">
             Submit
         </a>
     </ion-nav-buttons>
@@ -15,7 +15,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <kf-stars ng-model="review.kidsMenu" accept-input="true" value="0" max="5"></kf-stars>
+                <kf-stars ng-model="data.review.kidsMenu" accept-input="true" max="5"></kf-stars>
             </div>
         </div>
         <div class="row">
@@ -25,7 +25,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <kf-stars ng-model="review.healthOptions" accept-input="true" value="0" max="5"></kf-stars>
+                <kf-stars ng-model="data.review.healthOptions" accept-input="true" max="5"></kf-stars>
             </div>
         </div>
         <div class="row">
@@ -35,7 +35,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <kf-stars ng-model="review.service" accept-input="true" value="0" max="5"></kf-stars>
+                <kf-stars ng-model="data.review.service" accept-input="true" max="5"></kf-stars>
             </div>
         </div>
         <div class="row">
@@ -47,12 +47,12 @@
         </div>
         <div class="row">
             <div class="col">
-                <kf-stars ng-model="review.accommodations" accept-input="true" value="0" max="5"></kf-stars>
+                <kf-stars ng-model="data.review.accommodations" accept-input="true" max="5"></kf-stars>
             </div>
         </div>
         <div class="row">
              <div class="col">
-                <textarea class="text-area-border" ng-model="review.comments" rows="4" placeholder="Advice for other parents..."></textarea>
+                <textarea class="text-area-border" ng-model="data.review.comments" rows="4" placeholder="Advice for other parents..."></textarea>
              </div>
         </div>
       </div>
