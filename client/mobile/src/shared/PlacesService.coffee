@@ -31,7 +31,8 @@ class PlacesService
 
   submitReview: (userId, placeId, review) ->
     deferred = @$q.defer()
-    @$http.post("//#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", review)
+    console.log 'review', review
+    @$http.post("//#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", {review:review})
     .success (data) =>
       deferred.resolve()
     .error (error) =>
