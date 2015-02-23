@@ -1,6 +1,14 @@
 'use strict'
 class ReviewCtrl
   constructor:($scope, placesService, $stateParams, user, $ionicModal)->
+    $scope.data = {}
+    $scope.data.review =
+      kidsMenu:0
+      healthOptions:0
+      service: 0
+      accommodations:0
+      comments:""
+
     placesService.getPlaceDetail($stateParams.placeId).then (data) => $scope.place = data
     $ionicModal.fromTemplateUrl 'templates/thank-you-modal.html',
       scope: $scope
@@ -14,8 +22,8 @@ class ReviewCtrl
     $scope.$on '$destroy', ->
       $scope.modal.remove()
 
-    $scope.submit = (review) ->
-      placesService.submitReview(user.current.user_id, $stateParams.placeId, review)
+    $scope.submit = () ->
+      placesService.submitReview(user.current.user_id, $stateParams.placeId, $scope.data.review)
       $scope.modal.show()
 #      .then ->
 
