@@ -1,4 +1,4 @@
-{
+  {
   "name": "mobile",
   "private": "true",
   "dependencies": {
@@ -13,7 +13,8 @@
     "userapp-phonegap": "~1.2.0",
     "ngCordova": "~0.1.7-alpha",
     "angular-carousel": "~0.3.7",
-    "angular-google-maps": "~2.0.12"
+    "angular-google-maps": "~2.0.12",
+    "geolib": "~2.0.9"
   },
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.0.0-beta.14",
