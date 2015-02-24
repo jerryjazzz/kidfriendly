@@ -1,6 +1,7 @@
 
 forever = require('forever-monitor')
 config = require('./../config')
+{AdminPort} = require('./../src/AdminPort')
 
 process.chdir(__dirname+'/../..')
 
@@ -61,18 +62,15 @@ process.on 'uncaughtException', (e) ->
   shutdown()
 
 # Listen for 'restart' messages
-inbox = require('nanomsg').socket('rep')
-inbox.bind(config.services.forever.inbox)
-inbox.on 'message', (buf) ->
-  msg = buf.toString()
-  log('[forever] Received message: '+ msg)
-  switch msg
+adminPort = config.services.forever.adminPort
+console.log('[forever] listening on admin port: ' + adminPort)
+adminServer = new AdminPort(adminPort)
+adminServer.onMessage (message) ->
+  log('[forever] Received message: '+ message)
+  switch message
     when 'restart'
       for app in apps
         app.restart()
-      inbox.send('ok')
-    when 'simulate_exception'
-      throw new Error('simulated_exception')
+      return 'ok'
     else
-      inbox.send('command not recognized')
-
+      return 'command not recognized: ' + message

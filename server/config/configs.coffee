@@ -1,7 +1,7 @@
 module.exports = configs =
   services:
     forever:
-      inbox: "tcp://127.0.0.1:3500"
+      adminPort: 3500
     postgres:
       host: '/tmp'
       debugConnection: false
@@ -9,9 +9,9 @@ module.exports = configs =
 
   apps:
     web:
-      inbox: "tcp://127.0.0.1:3501"
+      adminPort: 3501
       express:
-        "port": 3000
+        port: 3000
       
       roles:
         dbMigration: {}
