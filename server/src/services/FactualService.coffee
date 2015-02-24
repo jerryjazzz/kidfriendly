@@ -2,6 +2,8 @@
 Promise = require('bluebird')
 
 class FactualService
+  queryLimit: 50 # max allowed by factual
+
   # joe's key:
   key: '***REMOVED***'
   secret: '***REMOVED***'
@@ -38,6 +40,7 @@ class FactualService
           $center: [lat, long]
           $meters: meters
           $meters: meters
+      limit: @queryLimit
 
     @_apiGet('/t/restaurants-us', options)
       .then (result) =>
