@@ -5,7 +5,6 @@ class PlacesService
     deferred = @$q.defer()
     @$http.get("//#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
       @searchResults = data
-      console.log data
       for result in @searchResults
         result.distance = @geolib.getDistance(position.coords,
           {latitude:parseFloat(result.lat, 10), longitude:parseFloat(result.long, 10)}
@@ -21,7 +20,7 @@ class PlacesService
 
   getPlaceDetail:(id) ->
     deferred = @$q.defer()
-    @$http.get("//#{@kfUri}/api/place/#{id}/details").success (data) =>
+    @$http.get("//#{@kfUri}/api/place/#{id}/details/reviews").success (data) =>
       @currentPlace = data
       deferred.resolve(data)
     deferred.promise
@@ -31,7 +30,6 @@ class PlacesService
 
   submitReview: (userId, placeId, review) ->
     deferred = @$q.defer()
-    console.log 'review', review
     @$http.post("//#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", {review:review})
     .success (data) =>
       deferred.resolve()

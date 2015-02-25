@@ -104,10 +104,12 @@ schema.review.columns = {
   user_id
   place_id: {type: id_type, options: 'not null'}
   body: {type: 'json'}
+  reviewer_name: {type:'varchar(30)'}
   created_at
   updated_at
   source_ver
 }
+
 
 # Source_version table #
 #

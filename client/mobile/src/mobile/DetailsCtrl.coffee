@@ -1,7 +1,6 @@
 'use strict'
 class DetailsCtrl
   constructor:($scope, place, $window)->
-    console.log 'place man!!', place
     place.photos = ['img/no-image.jpg'] unless place.photos?
     $scope.data = {}
     $scope.data.place = place
@@ -9,7 +8,6 @@ class DetailsCtrl
     $scope.data.mapStyle =
       "button-dark":true
       "button-selected":false
-    console.log 'place', place
     $scope.map =
       center:
         latitude: place.lat
