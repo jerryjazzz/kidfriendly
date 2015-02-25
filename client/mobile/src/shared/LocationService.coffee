@@ -5,9 +5,7 @@ class LocationService
 
   fetchPosition: ->
     deferred = @$q.defer()
-    console.log 'fetch'
     @$cordovaGeolocation.getCurrentPosition().then (position) =>
-      console.log 'resolve', position
       @cachedPosition = position
       deferred.resolve(position)
     deferred.promise

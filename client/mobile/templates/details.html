@@ -11,10 +11,10 @@
         </div>
         <ul ng-if="data.place.photos.length > 1" rn-carousel class="photo-container">
             <li ng-repeat="photo in data.place.photos">
-                <img class="center-cropped" src="{{photo}}">
+                <img class="center-cropped" ng-src="{{photo}}">
             </li>
         </ul>
-        <img ng-if="data.place.photos.length <= 1" class="photo-container center-cropped" src="{{data.place.photos[0]}}">
+        <img ng-if="data.place.photos.length <= 1" class="photo-container center-cropped" ng-src="{{data.place.photos[0]}}">
         <p class="detail-name">{{data.place.name}}</p>
         <p class="detail-address">{{data.place.address}}</p>
         <!--<kf-price-level level="data.place.price_level"></kf-price-level>-->
