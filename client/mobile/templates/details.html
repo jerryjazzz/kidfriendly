@@ -71,9 +71,15 @@
         <div class="card">
             <div class="item compact-card">
                 <h2 class="small-indent">User Reviews</h2>
-                <hr>
-                <div class="row">
-                    <div class="col-100"><p class="small-text large-indet">Currently no reviews, be the first</p></div>
+            </div>
+            <div ng-if="data.place.reviews.length == 0" class="row">
+                <div class="col-100"><p class="small-text large-indet">Currently no reviews, be the first</p></div>
+            </div>
+            <div ng-repeat="review in data.place.reviews" class="item">
+                <div class="user-review-rating user-rating-text">92</div>
+                <div class="review-right-content">
+                    <div>{{review.reviewer_name}}</div>
+                    <div style="white-space: pre-wrap; width:100%"><i class="ion-quote icon-quote"></i>{{review.body.comments}}</div>
                 </div>
             </div>
         </div>
