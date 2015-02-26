@@ -9,6 +9,7 @@ class FactualConsumer
   geoSearch: (options) ->
     @factualService.geoSearch(options)
     .then (factualPlaces) =>
+      console.log 'factual data', factualPlaces
       @correlateFactualPlaces(factualPlaces)
 
   correlateFactualPlaces: (factualPlaces) ->

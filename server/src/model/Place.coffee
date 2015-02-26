@@ -1,7 +1,7 @@
 
 class Place
   constructor: ({@place_id, @name, @lat, @long, @rating, @factual_id, @details}) ->
-
+    @reviews = []
     if not @details?
       @details = {}
     else if typeof @details == 'string'
@@ -43,6 +43,9 @@ class Place
       fields[k] = v
     for k,v of @details
       fields[k] = v
+    fields['reviews']=[]
+    for review in @reviews
+      fields['reviews'].push review.toClient()
     return fields
 
   getFactualUrl: ->
