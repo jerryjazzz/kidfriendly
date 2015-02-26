@@ -19,6 +19,15 @@ class PlaceEndpoint
         else
           {error: "Place not found", place_id: place_id}
 
+    get @route, '/:place_id/details/reviews', (req) =>
+      place_id = req.params.place_id
+      @placeDao.getWithReviews(place_id)
+      .then (place) ->
+        if place?
+          place.toClient()
+        else
+          {error: "Place not found", place_id: place_id}
+
     post @route, '/:place_id/delete', (req) =>
       # SECURITY_TODO: Verify permission to delete
       "todo"

@@ -22,6 +22,7 @@ $energized: #D98D14;
 $assertive:#DB4E4E;
 $dark: #444 !default;
 $stable:#777 !default;
+$bright:#999 !default;
 
 //$padding-large-horizontal:8px !default;
 
@@ -34,7 +35,6 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
-
 
 @mixin vertical-align {
   position: relative;
@@ -279,6 +279,35 @@ h2 {
 .rating-text {
   font-size:36px;
   vertical-align: top;
+  margin-bottom: 8px;
+}
+
+.review-right-content {
+  margin-left:50px;
+  font-size:12px;
+}
+
+.user-review-rating {
+  background-color: $balanced;
+  color:white;
+  max-width: 40px;
+  max-height: 40px;
+  height:40px;
+  width: 100%;
+}
+
+.icon-quote {
+  color: $bright;
+  font-size: 24px;
+  padding-right: 5px;
+}
+
+.user-rating-text {
+  line-height: 30px;
+  font-size:20px;
+  text-align: center;
+  padding:6px;
+  position:absolute;
   margin-bottom: 8px;
 }
 

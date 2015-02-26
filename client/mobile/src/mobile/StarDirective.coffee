@@ -23,7 +23,6 @@ StarsDirective = ->
       $scope.stars= [1..$scope.max]
     else
       $scope.stars = [1..$scope.ngModel]
-      console.log 'here2', $scope.stars
 
     $scope.setVal=(index)->
       if($scope.readonly)
