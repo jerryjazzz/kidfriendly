@@ -34,6 +34,7 @@ class UserEndpoint
         if existing[0]?
           @app.db('review').update
             body: blob
+            reviewer_name: req.body.review.name
             updated_at: DateUtil.timestamp()
           .then -> {review_id: existing[0].review_id}
         else
@@ -41,6 +42,7 @@ class UserEndpoint
             review_id: manualId
             user_id: user_id
             place_id: place_id
+            reviewer_name: req.body.review.name
             body: blob
             created_at: DateUtil.timestamp()
             source_ver: @app.sourceVersion
