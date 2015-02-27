@@ -24,8 +24,6 @@ sort2 = (x, y) ->
 
 LatLongUtil =
   earthRadiusMiles: 3959
-  areas:
-    phoenix: new Square(new Location(33.90, -112.53), new Location(33.19, -111.50))
 
   parse: (latLongString) ->
     items = latLongString.split(',')

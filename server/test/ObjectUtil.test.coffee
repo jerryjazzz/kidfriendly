@@ -1,5 +1,5 @@
 
-{ObjectUtil, Place} = require('./../build/kfly_server.js')
+{ObjectUtil, Place} = require('kfly_server')
 {assert, expect} = require('chai')
 
 describe 'ObjectUtil', ->
