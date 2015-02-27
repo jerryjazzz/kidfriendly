@@ -32,15 +32,14 @@ class App
     if @shouldWriteToLogFile()
       @logs.debug = new Log(this, "#{config.appName}.log")
 
-    @inbox = null
-    @pub = null
+    @adminPort = null
 
   start: ->
     Promise.resolve()
       .then(@postgresConnect)
       .then(@sqlMigrate)
       .then(@initializeSourceVersion)
-      .then(@setupInbox)
+      .then(@setupAdminPort)
       .then(@setupPub)
       .then(@startExpress)
       .then(@finishStartup)
@@ -115,11 +114,9 @@ class App
         @sourceVersion = id
         @log("current source version is:", id)
 
-  setupInbox: =>
-    Inbox.setup(this)
-
-  setupPub: =>
-    PubChannel.setup(this)
+  setupAdminPort: =>
+    @log("listening on admin port: " + @config.appConfig.adminPort)
+    @adminPort = new AdminPort(@config.appConfig.adminPort)
 
   startExpress: =>
     if not @config.appConfig.express?
