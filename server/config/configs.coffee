@@ -24,11 +24,6 @@ module.exports = configs =
         env:
           NODE_ENV: 'production'
 
+configs.currentFeatures = []
 
 configs.schema = require('./schema')
-
-# Machine-specific config (intended for AWS boxes)
-#machineConfig = {}
-#try
-#  machineConfig = require('/kfly/machineConfig.json')
-

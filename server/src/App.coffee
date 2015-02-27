@@ -108,7 +108,7 @@ class App
       @log("skipping source version init (no DB)")
       return
 
-    @sourceUtil = new SourceUtil(this)
+    @sourceUtil = depend('SourceUtil')
     @sourceUtil.insertSourceVersion()
       .then (id) =>
         @sourceVersion = id
