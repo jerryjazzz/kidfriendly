@@ -23,6 +23,8 @@ class ReviewCtrl
       $scope.modal.remove()
 
     $scope.submit = () ->
+      name = "#{user.current.first_name} #{user.current.last_name?.substring(0, 1)}"
+      $scope.data.review.name = name
       placesService.submitReview(user.current.user_id, $stateParams.placeId, $scope.data.review)
       $scope.modal.show()
 #      .then ->
