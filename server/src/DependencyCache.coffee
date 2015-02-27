@@ -36,6 +36,9 @@ class DependencyCache
     delete @currentlyResolving[name]
     return resolved
 
+  dependOptional: (name) ->
+    return @cache[name]
+
   callProvider: (provider) ->
     if provider.prototype?
       return new provider()
@@ -53,5 +56,12 @@ _globalDependencyCache = new DependencyCache()
 depend = (name) ->
   return _globalDependencyCache.depend(name)
 
+depend_optional = (name) ->
+  return _globalDependencyCache.dependOptional(name)
+
 provide = (name, provider) ->
   return _globalDependencyCache.provide(name, provider)
+
+exports.depend = depend
+exports.depend_optional = depend_optional
+exports.provide = provide

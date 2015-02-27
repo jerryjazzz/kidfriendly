@@ -1,5 +1,5 @@
 
-{GeomUtil} = require('./../build/kfly_server.js')
+{GeomUtil} = require('kfly_server')
 {assert} = require('chai')
 
 describe 'GeomUtil', ->
