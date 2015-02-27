@@ -1,69 +1,43 @@
 
 config = require('./../config')
-nano = require('nanomsg')
 
 findDestination = (name) ->
   appConfig = config.apps[name]
   if appConfig?
-    if not appConfig.inbox?
-      throw new Error("App has no inbox: "+name)
-    return {inbox: appConfig.inbox, pub: appConfig.pub}
+    if not appConfig.adminPort?
+      throw new Error("App has no adminPort: "+name)
+    return {adminPort: appConfig.adminPort}
 
   serviceConfig = config.services[name]
   if serviceConfig?
-    if not serviceConfig.inbox?
-      throw new Error("Service has no inbox: "+name)
-    return {inbox: serviceConfig.inbox, pub: serviceConfig.pub}
+    if not serviceConfig.adminPort?
+      throw new Error("Service has no adminPort: "+name)
+    return {port: serviceConfig.adminPort}
 
   throw new Error("App or service not found: "+name)
 
 send = (destinationName, msg, {andListen, log, ignoreError} = {}) ->
-  {inbox, pub} = findDestination(destinationName)
+  {port} = findDestination(destinationName)
 
   if not log?
     log = console.log
 
-  if andListen
-    if not pub?
-      throw new Error("Destination has no pub channel: "+destinationName)
+  req = require('http').request
+    host: '127.0.0.1'
+    port: port
+    method: 'POST'
+    path: '/' + msg
 
-    subSocket = nano.socket('sub')
-    subSocket.connect(pub)
-    subSocket.on 'message', (buf) ->
-      log('[pub]   ' + buf.toString())
+  req.on 'error', (e) ->
+    if not ignoreError
+      console.log(e)
 
-  socket = nano.socket('req')
-  socket.connect(inbox)
-  socket.send(msg)
+  req.on 'response', (res) ->
+    res.setEncoding('utf8')
+    res.on 'data', (data) ->
+      log(data)
 
-  timeout = null
-
-  socket.on 'message', (buf) ->
-    line = buf.toString()
-    if andListen
-      line = '[reply] ' +line
-    log(line)
-
-    socket.close()
-    socket = null
-
-    #if timeout?
-      # todo: cancel timeout
-
-  socket.on 'error', (err) ->
-    socket.close()
-    socket = null
-    throw err
-
-  timeoutMs = 1000
-
-  timeout = setTimeout((->
-    if socket?
-      if not ignoreError
-        log("Timed out waiting for a reply (#{timeoutMs}ms)")
-      socket.close()
-      socket = null
-    ), timeoutMs)
+  req.end()
 
 main = ->
   args = process.argv.slice(2)
@@ -74,7 +48,6 @@ main = ->
     args = args.slice(1)
 
   send(args[0], args.slice(1).join(' '), {andListen})
-  
 
 if require.main == module
   main()
