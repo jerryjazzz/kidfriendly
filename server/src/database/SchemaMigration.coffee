@@ -33,6 +33,9 @@ class ExistingColumn
     if typeDef == 'serial' and @type == 'integer'
       return true
 
+    if @type == 'USER-DEFINED'
+      return true
+
     return false
 
 class SchemaMigration
@@ -40,6 +43,7 @@ class SchemaMigration
 
   start: ->
     @getExistingTableNames()
+    .then(@updateTypes)
     .then(@updateEveryTable)
 
   getExistingTableNames: ->
@@ -48,10 +52,24 @@ class SchemaMigration
         #console.log('existing table names = ', rows)
         @existingTableNames = (row.table_name for row in rows)
 
-  updateEveryTable: =>
-    Promise.all(for tableName, table of @app.config.schema
-      @updateTable(tableName, table)
+  updateTypes: =>
+    Promise.all(\
+      for typename, details of (@app.config.schema._types ? [])
+        @app.db.select('typname').from('pg_type').where(typname:typename)
+        .then (existing) =>
+          if not existing[0]?
+            @app.log("SchemaMigration: creating type #{typename}")
+            @app.db.raw("create type #{typename} as #{details.decl}")
     )
+
+  updateEveryTable: =>
+    Promise.all(\
+      for tableName, table of @app.config.schema
+        if tableName == '_types'
+          continue
+        @updateTable(tableName, table)
+    )
+
 
   updateTable: (tableName, table) ->
     if not (tableName in @existingTableNames)

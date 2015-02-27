@@ -5,7 +5,7 @@ Needed for MVP:
 
  X  Search endpoint
  X    Takes lat/long or zipcode as input
-      Sorted by combination of KF rank and distance
+ X    Sorted by combination of KF rank and distance
 
     Details endpoint
       Includes a few user reviews

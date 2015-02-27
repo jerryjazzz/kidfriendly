@@ -20,6 +20,8 @@ Changes that are NOT supported by automatic migration:
 
 module.exports = schema = {}
 
+schema._types = {}
+
 # Common types
 id_type = 'varchar(10)'
 ip_address_type = 'varchar(15)'
@@ -122,4 +124,16 @@ schema.source_version.columns = {
   sha1: {type: 'varchar(40)', options: 'not null unique'}
   commit_date: {type: 'timestamp', change_type_from: ['timestamp']}
   first_deployed_at: {type: 'timestamp', change_type_from: ['timestamp']}
+  feature_list: {type: 'text'}
 }
+
+schema._types.add_or_remove =
+  decl: "enum ('add', 'remove')"
+
+schema.source_feature_delta = {}
+schema.source_feature_delta.columns = {
+  source_ver
+  affected_feature: {type: 'text'}
+  change_type: {type: 'add_or_remove'}
+}
+
