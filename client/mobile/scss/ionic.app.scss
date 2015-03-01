@@ -268,12 +268,23 @@ h2 {
   width: 60px;
   height: 200px;
   padding: 15px 0px 10px 0px;
-  background-color: $balanced;
   text-align: center;
   color: #FFFFFF;
   position: absolute;
   box-shadow: 1px -1px 4px #333333 !important;
   z-index:1;
+}
+
+.rating-average {
+  background-color: $energized;
+}
+
+.rating-bad {
+  background-color: $assertive;
+}
+
+.rating-good {
+  background-color: $balanced;
 }
 
 .rating-text {
@@ -288,7 +299,6 @@ h2 {
 }
 
 .user-review-rating {
-  background-color: $balanced;
   color:white;
   max-width: 40px;
   max-height: 40px;

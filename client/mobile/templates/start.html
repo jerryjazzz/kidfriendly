@@ -29,9 +29,13 @@
                 </label>
             </div>
         </div>
-        <a class="button button-treatment button-block facebook-button button-positive" href="#/login" ng-hide="user.authenticated">
+        <a class="button button-treatment button-block facebook-button button-positive" ua-oauth-link="facebook" ng-hide="user.authenticated">
             <i class="icon-smaller ion-social-facebook"></i>
-            Sign In with Facebook
+            Sign in with Facebook
+        </a>
+        <a class="button button-treatment button-block facebook-button button-positive" ng-show="user.authenticated" ua-logout>
+            <i class="icon-smaller ion-social-facebook"></i>
+            Sign out
         </a>
     </ion-content>
 </ion-view>
