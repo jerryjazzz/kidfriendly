@@ -5,7 +5,7 @@
         </a>
     </ion-nav-buttons>
     <ion-content>
-        <div class="rating-banner">
+        <div class="rating-banner" ng-class="ratingStyle(data.place.rating)">
             <p class="rating-text">{{data.place.rating}}</p>
             <p class="rating-text-small">{{data.place.distance}}1.5 mi</p>
         </div>
@@ -76,7 +76,7 @@
                 <div class="col-100"><p class="small-text large-indet">Currently no reviews, be the first</p></div>
             </div>
             <div ng-repeat="review in data.place.reviews" class="item">
-                <div class="user-review-rating user-rating-text">92</div>
+                <div class="user-review-rating user-rating-text" ng-class="ratingStyle(review.score)">{{review.score}}</div>
                 <div class="review-right-content">
                     <div>{{review.reviewer_name}}</div>
                     <div style="white-space: pre-wrap; width:100%"><i class="ion-quote icon-quote"></i>{{review.body.comments}}</div>
