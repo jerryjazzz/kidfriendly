@@ -1,6 +1,6 @@
 'use strict'
 class ReviewCtrl
-  constructor:($scope, placesService, $stateParams, user, $ionicModal)->
+  constructor:($scope, placesService, $stateParams, user, $ionicModal, $state, $ionicHistory)->
     $scope.data = {}
     $scope.data.review =
       kidsMenu:0
@@ -17,6 +17,8 @@ class ReviewCtrl
       $scope.modal = modal
 
     $scope.closeModal = ->
+      $ionicHistory.clearCache()
+      $ionicHistory.goBack()
       $scope.modal.hide()
 
     $scope.$on '$destroy', ->
@@ -33,6 +35,6 @@ class ReviewCtrl
 #      .error ->
 
 
-ReviewCtrl.$inject = ['$scope', 'placesService', '$stateParams', 'user', '$ionicModal']
+ReviewCtrl.$inject = ['$scope', 'placesService', '$stateParams', 'user', '$ionicModal', '$state', '$ionicHistory']
 
 angular.module('Mobile').controller('ReviewCtrl', ReviewCtrl)

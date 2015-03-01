@@ -10,7 +10,9 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
 .run ($ionicPlatform, user, $state, $ionicHistory) ->
   attemptedRoute = undefined
   #userApp user object
-  user.init({ appId: '***REMOVED***' })
+  user.init
+    appId: '***REMOVED***'
+    heartbeatInterval: 600000
 
   user.onAuthenticationRequired (route, stateParams) =>
     attemptedRoute =
@@ -21,7 +23,6 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
 
   user.onAuthenticationSuccess =>
     if attemptedRoute?
-      console.log $state.current.name, attemptedRoute.route.name
       $ionicHistory.currentView($ionicHistory.backView());
       $state.transitionTo  attemptedRoute.route.name, attemptedRoute.params
       attemptedRoute = undefined
