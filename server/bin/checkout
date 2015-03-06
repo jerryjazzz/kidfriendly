@@ -1,4 +1,6 @@
 
+cd $KFLY_HOME
+
 echo -- git fetch and checkout
 git fetch origin
 git reset --hard HEAD

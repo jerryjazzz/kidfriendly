@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-echo -- cd kfly
 cd $KFLY_HOME
 
 checkout $1
