@@ -56,20 +56,21 @@ class PlaceEndpoint
       @app.insert('place',place)
 
     get @route, '/:place_id/rerank', (req) =>
-      @app.db.select('*').from('place').where({place_id: req.params.place_id})
-      .then (rows) ->
-        place = rows[0]
+      factualConsumer = depend('FactualConsumer')
 
-        log = []
+      query = @app.db.select('place_id').from('place')
 
-        depend('FactualConsumer').recalculateFactualBasedRanking
-          place: place
-          trace: (label, arg) ->
-            log += "#{label}: #{arg}"
+      placeIds = switch
+        when req.params.place_id == '*'
+          query.where({place_id: req.params.place_id})
+        else
+          [req.params.place_id]
 
-        @app.db('place').where({place_id}).update(place)
-        .then ->
-          return log
+      Promise.resolve(placeIds)
+      .map (placeId) =>
+        @placeDao.modify placeId, (place) =>
+          console.log('callback got: ', place)
+          factualConsumer.recalculateFactualBasedRanking(place)
 
   @create: (app) ->
     (new PlaceEndpoint(app)).route

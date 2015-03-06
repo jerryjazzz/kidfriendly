@@ -73,6 +73,7 @@ class FactualConsumer
     extended = @getExtendedRating(place)
     place.rating = extended.overallRating
     place.details.detailedRatings = extended.detailedRatings
+    place
 
   getExtendedRating: (place) ->
 
