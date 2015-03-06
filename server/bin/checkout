@@ -1,7 +1,14 @@
 
 cd $KFLY_HOME
 
+ref=$1
+
+if [ -z $ref ]
+  then
+    ref="origin/develop"
+fi
+
 echo -- git fetch and checkout
 git fetch origin
 git reset --hard HEAD
-git checkout $1
+git checkout $ref
