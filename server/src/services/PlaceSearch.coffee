@@ -4,6 +4,8 @@ geolib = require('geolib')
 Cities = require('cities')
 
 class PlaceSearch
+  SearchLimit: 100
+
   constructor: ->
     @placeDao = depend('PlaceDAO')
 
@@ -26,6 +28,8 @@ class PlaceSearch
       query.orWhere('long', '<', bounds.long2)
 
       query.orderBy('rating', 'desc')
+
+      query.limit(@SearchLimit)
 
     .then (places) =>
       @checkDistance(places, searchOptions)

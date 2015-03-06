@@ -8,7 +8,6 @@ class PlaceDAO
   get: (queryModifier) ->
     # queryModifier is a func that takes a Knex query object, and hopefully adds a 'where'
     # clause or something.
-    console.log 'get query'
     query = @app.db.select('place_id','name','lat','long','rating','factual_id','details').from('place')
     queryModifier(query)
     query.then (rows) ->
@@ -17,7 +16,6 @@ class PlaceDAO
       places
 
   getWithReviews:(placeId) ->
-    console.log 'here'
     query = @app.db.select('place.place_id','name','lat','long','rating','factual_id','details',
     'reviewer_name', 'body', 'review_id', 'review.created_at', 'review.updated_at').from('place')
     .leftOuterJoin('review', 'place.place_id', 'review.place_id').where('place.place_id', placeId)
@@ -64,14 +62,14 @@ class PlaceDAO
     # This callback should be a pure function, it might be executued multiple times.
 
     # Future: Will update this to do concurrency-safe modification.
+
     @get((query) -> query.where({place_id}))
     .then (places) ->
       original = places[0]
-      console.log("original = ", original)
-      console.log('func = ', func)
       func(original.startPatch())
     .then (modified) =>
-      console.log('modified = ', modified)
       @save(modified)
+      .then ->
+        return modified
 
 provide('PlaceDAO', PlaceDAO)
