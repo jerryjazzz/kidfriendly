@@ -3,7 +3,7 @@ class PlacesService
   constructor:(@$http, @$q, @$timeout, @locationService, @kfUri, @geolib)->
   search:(keyword, position) ->
     deferred = @$q.defer()
-    @$http.get("//#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
+    @$http.get("http://#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
       @searchResults = data
       for result in @searchResults
         result.distance = @geolib.getDistance(position.coords,
@@ -20,7 +20,7 @@ class PlacesService
 
   getPlaceDetail:(id) ->
     deferred = @$q.defer()
-    @$http.get("//#{@kfUri}/api/place/#{id}/details/reviews").success (data) =>
+    @$http.get("http://#{@kfUri}/api/place/#{id}/details/reviews").success (data) =>
       @currentPlace = data
       deferred.resolve(data)
     deferred.promise
@@ -30,7 +30,7 @@ class PlacesService
 
   submitReview: (userId, placeId, review) ->
     deferred = @$q.defer()
-    @$http.post("//#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", {review:review})
+    @$http.post("http://#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", {review:review})
     .success (data) =>
       deferred.resolve()
     .error (error) =>
