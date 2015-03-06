@@ -4,7 +4,7 @@ module.exports = configs =
       adminPort: 3500
     postgres:
       host: '/tmp'
-      debugConnection: false
+      debugConnection: true
       database: 'kidfriendly'
 
   apps:
