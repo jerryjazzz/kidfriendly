@@ -31,7 +31,7 @@ class PlaceDAO
   insert: (place) ->
     fields = {}
     for own k,v of place
-      if k in ['dataSource', 'context', 'original']
+      if k in ['dataSource', 'context', 'original', 'reviews']
         continue
       fields[k] = v
     fields.details = JSON.stringify(place.details)
