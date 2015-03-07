@@ -317,6 +317,12 @@ module.exports = (grunt) ->
             src: "fonts/*"
             dest: "<%= yeoman.dist %>"
           }
+          {
+            expand: true
+            cwd: "<%= yeoman.app %>/styles"
+            dest: "<%= yeoman.dist %>"
+            src: "{,*/}*.css"
+          }
         ]
 
       styles:
@@ -325,12 +331,6 @@ module.exports = (grunt) ->
             expand: true
             cwd: "<%= yeoman.app %>/styles"
             dest: ".tmp/styles/"
-            src: "{,*/}*.css"
-          }
-          {
-            expand: true
-            cwd: "<%= yeoman.app %>/styles"
-            dest: "<%= yeoman.dist %>"
             src: "{,*/}*.css"
           }
         ]
