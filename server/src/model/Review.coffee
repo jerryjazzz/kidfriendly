@@ -1,5 +1,5 @@
 class Review
-  constructor: ({@review_id, @reviewer_name, @body, @created_at, @updated_at}) ->
+  constructor: ({@review_id, @user_id, @place_id, @reviewer_name, @body, @created_at, @updated_at}) ->
 
     if not @body?
       @body = {}
@@ -20,7 +20,7 @@ class Review
     Object.freeze(review.body)
     return review
 
-  @make: (fields) ->
+  @make: (fields = {}) ->
     review = new Review(fields)
     review.dataSource = 'local'
     return review

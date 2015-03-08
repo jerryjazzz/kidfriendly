@@ -12,7 +12,10 @@ class PlaceSearch
   resolveZipcode: (searchOptions) ->
     if searchOptions.zipcode?
       cityLookup = Cities.zip_lookup(searchOptions.zipcode)
+      if not cityLookup?
+        throw new Error("zipcode not found: " + searchOptions.zipcode)
       [searchOptions.lat, searchOptions.long] = [cityLookup.latitude, cityLookup.longitude]
+
     return searchOptions
 
   search: (searchOptions) ->

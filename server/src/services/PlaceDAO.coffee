@@ -1,14 +1,15 @@
 
 class PlaceDAO
-  FieldsNotForDB: ['dataSource', 'context', 'original', 'reviews']
-
   constructor: ->
     @app = depend('App')
+    @UpdateableFields = ['name','lat','long','rating','factual_id','details']
+    @InsertableFields = @UpdateableFields.concat(['place_id'])
+    @ReadableFields = @InsertableFields
 
   get: (queryModifier) ->
     # queryModifier is a func that takes a Knex query object, and hopefully adds a 'where'
     # clause or something.
-    query = @app.db.select('place_id','name','lat','long','rating','factual_id','details').from('place')
+    query = @app.db.select.apply(@ReadableFields).from('place')
     queryModifier(query)
     query.then (rows) ->
       places = for row in rows
@@ -31,9 +32,8 @@ class PlaceDAO
   insert: (place) ->
     fields = {}
     for own k,v of place
-      if k in @FieldsNotForDB
-        continue
-      fields[k] = v
+      if k in @InsertableFields
+        fields[k] = v
     fields.details = JSON.stringify(place.details)
 
     @app.insert('place', fields)
@@ -48,11 +48,9 @@ class PlaceDAO
     # TODO: Would be cool to only write modified fields.
     fields = {}
     for own k,v of place
-      if k in @FieldsNotForDB
-        continue
       if k == 'details'
         fields[k] = ObjectUtil.merge(place.original.details, place.details)
-      else
+      else if k in @UpdateableFields
         fields[k] = v
 
     @app.db('place').update(fields).where({place_id:place.place_id})

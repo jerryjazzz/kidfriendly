@@ -63,7 +63,6 @@ class SourceUtil
       currentSourceId
 
   featureListDelta: (prev, current) ->
-    console.log("featureListDelta, prev = #{prev}, current = #{current}")
     out = []
     for feature in prev
       if not (feature in current)
