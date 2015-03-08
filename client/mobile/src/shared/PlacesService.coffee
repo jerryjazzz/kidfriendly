@@ -3,10 +3,11 @@ class PlacesService
   constructor:(@$http, @$q, @$timeout, @locationService, @kfUri, @geolib)->
   search:(keyword, position) ->
     deferred = @$q.defer()
-    @$http.get("http://#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.coords.latitude}&long=#{position.coords.longitude}&keyword=#{keyword}").success (data) =>
+    url = "http://#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.latitude}&long=#{position.longitude}&keyword=#{keyword}"
+    @$http.get(url).success (data) =>
       @searchResults = data
       for result in @searchResults
-        result.distance = @geolib.getDistance(position.coords,
+        result.distance = @geolib.getDistance(position,
           {latitude:parseFloat(result.lat, 10), longitude:parseFloat(result.long, 10)}
         )
         result.distance = Math.round(result.distance * 0.000621371 * 10) / 10
