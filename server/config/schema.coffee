@@ -86,8 +86,6 @@ schema.place = {primary_key: 'place_id'}
 schema.place.columns = {
   place_id: standard_id
   name: {type: 'varchar(255)'}
-  location: {type: 'varchar(30)'}
-  google_id: {type: 'varchar(41)', options: 'unique'}
   factual_id: {type: 'varchar(61)', options: 'unique'}
   details: {type: 'json'}
   lat: {type: 'real'}
