@@ -1,7 +1,5 @@
 'use strict'
-positionResolver = (locationService)->
-  return locationService.cachedPosition if locationService.cachedPosition?
-  return locationService.fetchPosition()
+positionResolver = (locationService)-> return locationService.fetchPosition()
 
 positionResolver.$inject = ['locationService']
 
