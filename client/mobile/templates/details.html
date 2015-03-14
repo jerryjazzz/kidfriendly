@@ -5,10 +5,10 @@
         </a>
     </ion-nav-buttons>
     <ion-content>
-        <div class="rating-banner" ng-class="ratingStyle(data.place.rating)">
+        <kf-rating banner-class="'rating-banner'" rating="data.place.rating">
             <p class="rating-text">{{data.place.rating}}</p>
             <p class="rating-text-small">{{data.place.distance}}1.5 mi</p>
-        </div>
+        </kf-rating>
         <ul ng-if="data.place.photos.length > 1" rn-carousel class="photo-container">
             <li ng-repeat="photo in data.place.photos">
                 <img class="center-cropped" ng-src="{{photo}}">
