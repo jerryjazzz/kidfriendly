@@ -1,21 +1,21 @@
 <ion-view>
     <ion-content class="has-header">
-        <ion-list>
-            <ion-item class="item item-thumbnail-left" href="#details/{{result.place_id}}" ng-repeat="result in results">
-                <img ng-src="{{result.thumbnail_url}}">
-                <div class="row">
-                    <div class="col-80"><h2>{{result.name}}</h2></div>
-                    <div class="col-20"><p class="distance-text">{{result.distance}} mi</p></div>
+        <ion-list class="list">
+            <a style="padding-top: 12px;" class="item item-thumbnail-left" href="#details/{{result.place_id}}" ng-repeat="result in results">
+                <img src="img/no-image-thumb.png">
+                <kf-rating banner-class="'results-rating-stripe'" rating="result.rating"></kf-rating>
+                <!--<div class="results-rating-banner rating-good" ng-class="ratingStyle(data.place.rating)"></div>-->
+                <div style="width:100%">
+                    <h2 style="display:inline-block">{{result.name}}</h2>
+                    <span style="position: absolute; right:6px">{{result.distance}} mi</span>
                 </div>
-                <div class="row">
-                    <div class="col-90">
-                      <span>Rating: {{result.rating}}</span>
-                    </div>
+                <div style="width:100%">
+                    <kf-rating style="display:inline-block" banner-class="'results-rating-banner'" rating="result.rating">{{result.rating}}</kf-rating>
+                    <kf-price-level style="position:absolute; right:6px" level="2"></kf-price-level>
                 </div>
-                <div class="row">
-                    <div class="col-90"><kf-price-level level="result.price_level"></kf-price-level></div>
-                </div>
-            </ion-item>
+                <p>{{result.address}}</p>
+                <kf-hours hours="result.hours"></kf-hours>
+            </a>
         </ion-list>
     </ion-content>
 </ion-view>
