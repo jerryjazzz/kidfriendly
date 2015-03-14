@@ -5,7 +5,8 @@ class SearchCtrl
     coords =
       latitude: position.coords.latitude
       longitude: position.coords.longitude
-    placesService.search($stateParams.keyword, coords).then (results) => $scope.results = results
+    placesService.search($stateParams.keyword, coords).then (results) ->
+      $scope.results = results
 
 SearchCtrl.$inject = ['$scope', '$state', 'placesService', 'position', '$stateParams']
 angular.module('Mobile').controller 'SearchCtrl', SearchCtrl

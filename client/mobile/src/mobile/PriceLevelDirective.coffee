@@ -4,7 +4,7 @@ PriceLevelDirective = ->
     "level":"="
   restrict:"E"
   template:"""
-  <i ng-repeat="i in getLength(level) track by $index" class="ion-cash cash-icon"></i>
+  <i ng-repeat="i in getLength(level) track by $index" class="fa fa-usd cash-icon"></i>
   """
   link:(scope,elem,attr)->
     scope.getLength = (level) ->
