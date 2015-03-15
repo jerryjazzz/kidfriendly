@@ -6,8 +6,8 @@
                 <kf-rating banner-class="'results-rating-stripe'" rating="result.rating"></kf-rating>
                 <!--<div class="results-rating-banner rating-good" ng-class="ratingStyle(data.place.rating)"></div>-->
                 <div style="width:100%">
-                    <h2 style="display:inline-block">{{result.name}}</h2>
-                    <span style="position: absolute; right:6px">{{result.distance}} mi</span>
+                    <h2 class="results-restaurant-name">{{result.name}}</h2>
+                    <span class="distance-text">{{result.distance}} mi</span>
                 </div>
                 <div style="width:100%">
                     <kf-rating style="display:inline-block" banner-class="'results-rating-banner'" rating="result.rating">{{result.rating}}</kf-rating>

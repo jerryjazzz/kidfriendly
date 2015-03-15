@@ -4,12 +4,12 @@ HoursDirective = ->
     "hours":"="
   restrict:"E"
   template:"""
-  <p class="distance-text">{{openText(hours)}}</p>
+  <p>{{openText(hours)}}</p>
   """
   link:(scope,elem,attr)->
     allHoursInTwelveHourFormat = (hours) ->
       results = []
-      for hour in hours
+      for key, hour of hours
         result = ""
         result += hoursInTwelveHourFormat(hour[0])
         result += " - "
@@ -18,7 +18,7 @@ HoursDirective = ->
       results[0]
 
     hoursInTwelveHourFormat = (hour) ->
-      return if hour.indexOf(":") == -1
+      return unless hour?.indexOf(":") != -1
       hoursAsInt = parseInt(hour.substr(0, hour.indexOf(":")))
       if hoursAsInt > 12
         return "#{hoursAsInt-12}#{hour.substr(hour.indexOf(":"))}pm"
