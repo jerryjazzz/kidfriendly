@@ -4,13 +4,18 @@ geolib = require('geolib')
 Cities = require('cities')
 
 class PlaceSearch
+  SearchLimit: 100
+
   constructor: ->
     @placeDao = depend('PlaceDAO')
 
   resolveZipcode: (searchOptions) ->
     if searchOptions.zipcode?
       cityLookup = Cities.zip_lookup(searchOptions.zipcode)
+      if not cityLookup?
+        throw new Error("zipcode not found: " + searchOptions.zipcode)
       [searchOptions.lat, searchOptions.long] = [cityLookup.latitude, cityLookup.longitude]
+
     return searchOptions
 
   search: (searchOptions) ->
@@ -26,6 +31,8 @@ class PlaceSearch
       query.orWhere('long', '<', bounds.long2)
 
       query.orderBy('rating', 'desc')
+
+      query.limit(@SearchLimit)
 
     .then (places) =>
       @checkDistance(places, searchOptions)

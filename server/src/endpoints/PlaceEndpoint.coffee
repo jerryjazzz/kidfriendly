@@ -5,6 +5,7 @@ class PlaceEndpoint
   constructor: ->
     @app = depend('App')
     @placeDao = depend('PlaceDAO')
+    @factualRating = depend('FactualRating')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
 
@@ -56,20 +57,21 @@ class PlaceEndpoint
       @app.insert('place',place)
 
     get @route, '/:place_id/rerank', (req) =>
-      @app.db.select('*').from('place').where({place_id: req.params.place_id})
-      .then (rows) ->
-        place = rows[0]
 
-        log = []
+      placeIds = switch
+        when req.params.place_id == 'all'
+          @app.db.select('place_id').from('place')
+          .then (rows) ->
+            row.place_id for row in rows
+        else
+          [req.params.place_id]
 
-        depend('FactualConsumer').recalculateFactualBasedRanking
-          place: place
-          trace: (label, arg) ->
-            log += "#{label}: #{arg}"
-
-        @app.db('place').where({place_id}).update(place)
-        .then ->
-          return log
+      Promise.resolve(placeIds)
+      .map (placeId) =>
+        @placeDao.modify placeId, (place) =>
+          @factualRating.recalculateFactualBasedRating(place)
+        .then (place) ->
+          {place_id:place.place_id, name: place.name, rating:place.rating}
 
   @create: (app) ->
     (new PlaceEndpoint(app)).route

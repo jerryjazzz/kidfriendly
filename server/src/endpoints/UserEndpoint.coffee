@@ -2,11 +2,13 @@
 class UserEndpoint
   constructor: ->
     @app = depend('App')
+    @reviewDao = depend('ReviewDAO')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
     @endpoint = require('express')()
 
     get @endpoint, '/:user_id/place/:place_id/review', (req) =>
+      # SECURITY_TODO: Check auth token
 
       {user_id, place_id, token} = req.params
 
@@ -23,30 +25,22 @@ class UserEndpoint
           response[0] ? null
 
     post @endpoint, '/:user_id/place/:place_id/review', (req) =>
+      # TODO: Should check that user_id and place_id actually exist.
+      # SECURITY_TODO: Check auth token
+
       {user_id, place_id, token} = req.params
 
       manualId = req.body.review_id # usually null
 
-      blob = JSON.stringify(req.body.review)
+      whereFunc = (query) -> query.where({user_id, place_id})
+      modifyFunc = (review) ->
+        review.review_id = manualId
+        review.body = JSON.stringify(req.body.review)
+        review.user_id = user_id
+        review.place_id = place_id
+        review.reviewer_name = req.body.review.name
 
-      @app.db.select("review_id").from('review').where({user_id, place_id})
-      .then (existing) =>
-        if existing[0]?
-          @app.db('review').update
-            body: blob
-            reviewer_name: req.body.review.name
-            updated_at: DateUtil.timestamp()
-          .then -> {review_id: existing[0].review_id}
-        else
-          @app.insert 'review',
-            review_id: manualId
-            user_id: user_id
-            place_id: place_id
-            reviewer_name: req.body.review.name
-            body: blob
-            created_at: DateUtil.timestamp()
-            source_ver: @app.sourceVersion
-          .then (row) -> {review_id} = row
+      @reviewDao.modify(whereFunc, modifyFunc, {allowInsert:true})
 
     ###
     @endpoint.post '/:user_id/delete', wrap (req) =>

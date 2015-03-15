@@ -33,6 +33,7 @@ class ExpressServer
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
+    @server.use("/dashboard", staticDir('client/dashboard'))
     @server.use('/api/submit', SubmitEndpoint.create(@app))
     @server.use('/api/search', SearchEndpoint.create(@app))
     @server.use('/api/dev', DevEndpoint.create(@app))
