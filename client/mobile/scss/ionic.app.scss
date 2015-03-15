@@ -129,7 +129,14 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 }
 
 .distance-text {
+  position: absolute;
+  font-size: 12px;
+  right:6px;
+}
 
+.results-restaurant-name {
+  display:inline-block;
+  width:83%;
 }
 
 .subtitle-text {
@@ -200,7 +207,7 @@ h6, h5, h1, h2, h4, h3 {
 
 h2 {
   color: $dark;
-  font-size:20px;
+  font-size:16px;
 }
 
 .overview-text {
