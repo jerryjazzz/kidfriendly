@@ -11,14 +11,21 @@ class PlaceEndpoint
 
     @route = require('express')()
 
+    get @route, '/:place_id/explain', (req) =>
+      @placeDao.getId(req.params.place_id)
+      .then (place) ->
+        if not place?
+          return {error: "Place not found", place_id: place_id}
+
+        factualRating = depend('FactualRating').getExtendedRating(place)
+        {raw: place, factualRating: factualRating}
+
     get @route, '/:place_id/details', (req) =>
-      {place_id} = req.params
-      @placeDao.get((query) -> query.where({place_id}))
-      .then (places) ->
-        if places[0]?
-          places[0].toClient()
-        else
-          {error: "Place not found", place_id: place_id}
+      @placeDao.getId(req.params.place_id)
+      .then (place) ->
+        if not place?
+          return {error: "Place not found", place_id: place_id}
+        place.toClient()
 
     get @route, '/:place_id/details/reviews', (req) =>
       place_id = req.params.place_id
@@ -43,6 +50,8 @@ class PlaceEndpoint
 
     get @route, '/any', (req) =>
       @placeDao.get((query) -> query.limit(1))
+      .then (places) ->
+        places[0].toClient()
 
     post @route, '/new', (req) =>
       manualId = req.body.place_id # usually null
