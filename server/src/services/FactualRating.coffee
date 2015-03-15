@@ -73,7 +73,7 @@ class FactualRating
     if factual_raw.kids_menu
       overallRating += 2
     if factual_raw.chain_id?
-      overallRating -= 2
+      overallRating -= 10
     # todo: what was the label for fine dining?
 
     overallRating += randomAdjustment

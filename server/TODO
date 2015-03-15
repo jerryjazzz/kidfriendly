@@ -1,18 +1,29 @@
 
 1/10/15
 
-Needed for MVP:
+# Server #
 
- X  Search endpoint
- X    Takes lat/long or zipcode as input
- X    Sorted by combination of KF rank and distance
+[Internal beta]
 
-    Details endpoint
-      Includes a few user reviews
-        Each with username & avatar
+ X Search endpoint
+ X   Takes lat/long or zipcode as input
+ X   Sorted by combination of KF rank and distance
 
-    Update user profile
+ X Details endpoint
+ X   Includes a few user reviews
+ X     Each with username
+ -     and avatar
 
-    Submit review
+ - Update user profile
 
- X  Factual scraping
+ X Submit review
+
+ X Factual scraping
+ X Rework scoring algorithm
+ - Security audit
+   - User authentication
+
+[External beta]
+ - Recalculate rating from user-generated ratings
+   - Dock 10 points for a chain
+ - Restaurant image from google
