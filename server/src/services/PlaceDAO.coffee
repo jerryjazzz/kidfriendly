@@ -16,6 +16,10 @@ class PlaceDAO
         Place.fromDatabase(row)
       places
 
+  getId: (id) ->
+    @get((query) -> query.where(place_id:id))
+    .then (places) -> places[0]
+
   getWithReviews:(placeId) ->
     query = @app.db.select('place.place_id','name','lat','long','rating','factual_id','details',
     'reviewer_name', 'body', 'review_id', 'review.created_at', 'review.updated_at').from('place')
