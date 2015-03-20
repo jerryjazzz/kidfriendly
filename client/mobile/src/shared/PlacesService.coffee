@@ -3,7 +3,7 @@ class PlacesService
   constructor:(@$http, @$q, @$timeout, @locationService, @kfUri, @geolib)->
   search:(keyword, position) ->
     deferred = @$q.defer()
-    url = "http://#{@kfUri}/api/search/nearby?type=restaurant&lat=#{position.latitude}&long=#{position.longitude}&keyword=#{keyword}"
+    url = @createUrl(keyword, position)
     @$http.get(url).success (data) =>
       @searchResults = data
       for result in @searchResults
@@ -12,8 +12,16 @@ class PlacesService
         )
         result.distance = Math.round(result.distance * 0.000621371 * 10) / 10
       deferred.resolve(@searchResults)
+    .error (reason) ->
+      deferred.resolve []
     deferred.promise
 
+  createUrl:(keyword, position) ->
+    url = "http://#{@kfUri}/api/search/nearby?type=restaurant"
+    if keyword == 'nearby'
+      "#{url}&lat=#{position.latitude}&long=#{position.longitude}"
+    else
+      "#{url}&zipcode=#{keyword}"
 
   getPlace: (id) ->
     return result for result in @searchResults when result.place_id == id

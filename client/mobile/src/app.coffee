@@ -37,8 +37,6 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
       # org.apache.cordova.statusbar required
       StatusBar.styleDefault()
 
-
-
 .config ($stateProvider, $urlRouterProvider, resolvers, uiGmapGoogleMapApiProvider) ->
   uiGmapGoogleMapApiProvider.configure
     key: 'AIzaSyC0wntPebMoKnIwbpa82NzLPbwEIlvZvlM'
@@ -58,7 +56,7 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     templateUrl: 'templates/search-results.html'
     controller: 'SearchCtrl'
     resolve:
-      position: resolvers.position
+      results: resolvers.results
     data:
       public: true
     public:true
