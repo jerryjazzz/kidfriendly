@@ -1,6 +1,8 @@
 'use strict'
 
 class FactualConsumer
+  CurrentVersion: 1
+
   constructor: ->
     @app = depend('App')
     @placeDao = depend('PlaceDAO')
@@ -10,7 +12,6 @@ class FactualConsumer
   geoSearch: (options) ->
     @factualService.geoSearch(options)
     .then (factualPlaces) =>
-      console.log 'factual data', factualPlaces
       @correlateFactualPlaces(factualPlaces)
 
   correlateFactualPlaces: (factualPlaces) ->
@@ -28,11 +29,11 @@ class FactualConsumer
       ops = for factualPlace in factualPlaces
         foundPlace = foundPlaces[factualPlace.factual_id]
         if foundPlace?
-          console.log(JSON.stringify(foundPlace))
           @app.log("updating place #{foundPlace.place_id} with factual #{factualPlace.factual_id}")
+
+          # TODO: use PlaceDAO.modify instead.
           place = foundPlace.startPatch()
           @updatePlaceWithFactualData(place, factualPlace)
-          @factualRating.recalculateFactualBasedRating(place)
           @placeDao.save(place)
           {place_id: place.place_id, name: factualPlace.name}
 
@@ -40,12 +41,12 @@ class FactualConsumer
           @app.log("adding missing factual place: #{factualPlace.factual_id}")
           place = Place.make({})
           @updatePlaceWithFactualData(place, factualPlace)
-          @factualRating.recalculateFactualBasedRating(place)
           @placeDao.insert(place)
 
       Promise.all(ops)
 
   updatePlaceWithFactualData: (place, factualPlace) ->
+    place.factual_consume_ver = @CurrentVersion
     place.name = factualPlace.name
     place.factual_id = factualPlace.factual_id
     place.lat = factualPlace.latitude
@@ -56,6 +57,10 @@ class FactualConsumer
       hours: factualPlace.hours
       tel: factualPlace.tel
       website: factualPlace.website
+      price: factualPlace.price
+      locality: factualPlace.locality
+      region: factualPlace.region
+      postcode: factualPlace.postcode
       factual_raw:
         kids_goodfor: factualPlace.kids_goodfor
         kids_menu: factualPlace.kids_menu
@@ -69,5 +74,26 @@ class FactualConsumer
         options_lowfat: factualPlace.options_lowfat
         options_organic: factualPlace.options_organic
         options_healthy: factualPlace.options_healthy
+        price: factualPlace.price
+
+    @factualRating.recalculateFactualBasedRating(place)
+
+  refreshOnePlace: (place) =>
+    console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
+    @factualService.singlePlace(place.factual_id)
+    .then (factualPlace) =>
+      @updatePlaceWithFactualData(place, factualPlace)
+
+  refreshOldPlaceData: ->
+    # triggered during nightly tasks
+
+    count = 100
+
+    queryFunc = (query) =>
+      query.where('factual_consume_ver', '!=', @CurrentVersion)
+      query.orWhereNull('factual_consume_ver')
+      query.limit(count)
+
+    @placeDao.modifyMulti(queryFunc, @refreshOnePlace)
 
 provide('FactualConsumer', FactualConsumer)

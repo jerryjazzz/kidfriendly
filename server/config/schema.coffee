@@ -91,6 +91,7 @@ schema.place.columns = {
   lat: {type: 'real'}
   long: {type: 'real'}
   rating: {type: 'integer'}
+  factual_consume_ver: {type: 'integer'}
   created_at
   updated_at
   source_ver
