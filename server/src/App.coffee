@@ -129,6 +129,8 @@ class App
     return not @devMode
 
   finishStartup: =>
+    depend('NightlyTasks')
+
     duration = Date.now() - @startedAt
     @log("Server startup completed (in #{duration} ms)")
 
