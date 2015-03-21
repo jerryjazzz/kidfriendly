@@ -9,6 +9,9 @@ class InternalEndpoint
     @route = require('express')()
     get = depend('ExpressGet')
 
+    get @route, '/trigger_nightly', (req) =>
+      depend('NightlyTasks').run()
+
     get @route, '/places.csv', (req) =>
       {limit} = req.query
       @placeDao.get((query) -> query.limit(limit ? 500))

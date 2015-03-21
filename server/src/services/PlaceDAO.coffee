@@ -2,15 +2,15 @@
 class PlaceDAO
   constructor: ->
     @app = depend('App')
-    @UpdateableFields = ['name','lat','long','rating','factual_id','details']
+    @UpdateableFields = ['name','lat','long','rating','factual_id','details','factual_consume_ver']
     @InsertableFields = @UpdateableFields.concat(['place_id'])
     @ReadableFields = @InsertableFields
 
-  get: (queryModifier) ->
-    # queryModifier is a func that takes a Knex query object, and hopefully adds a 'where'
+  get: (queryFunc) ->
+    # queryFunc is a func that takes a Knex query object, and hopefully adds a 'where'
     # clause or something.
     query = @app.db.select.apply(@ReadableFields).from('place')
-    queryModifier(query)
+    queryFunc(query)
     query.then (rows) ->
       places = for row in rows
         Place.fromDatabase(row)
@@ -55,19 +55,34 @@ class PlaceDAO
 
     @app.db('place').update(fields).where({place_id:place.place_id})
 
-  modify: (place_id, func) ->
-    # The callback 'func' should take an original 'place' and returns a modified place. 
+  modify: (place_id, modifyFunc) ->
+    # The callback 'modifyFunc' should take an original 'place' and returns a modified place. 
     # This callback should be a pure function, it might be executued multiple times.
 
     # Future: Will update this to do concurrency-safe modification.
 
     @get((query) -> query.where({place_id}))
     .then (places) ->
+      if places.length == 0
+        return Promise.reject("place ID not found: ", place_id)
       original = places[0]
-      func(original.startPatch())
+      modifyFunc(original.startPatch())
     .then (modified) =>
       @save(modified)
       .then ->
         return modified
+
+  modifyMulti: (queryFunc, modifyFunc) ->
+    # Fetch a list of place_ids
+
+    modifyOne = (place_id) =>
+      @modify(place_id, modifyFunc)
+
+    query = @app.db.select(['place_id']).from('place')
+    queryFunc(query)
+    query.then (results) ->
+      for result in results
+        result.place_id
+    .map(modifyOne, {concurrency: 1})
 
 provide('PlaceDAO', PlaceDAO)
