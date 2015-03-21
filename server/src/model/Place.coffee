@@ -1,6 +1,9 @@
 
 class Place
-  constructor: ({@place_id, @name, @lat, @long, @rating, @factual_id, @details}) ->
+  constructor: (initialValues) ->
+    for k,v of initialValues
+      this[k] = v
+
     @reviews = []
     if not @details?
       @details = {}
@@ -42,7 +45,13 @@ class Place
     for k,v of @context
       fields[k] = v
     for k,v of @details
-      fields[k] = v
+      if k in ['address','hours','tel','website','detailedRatings','price','locality','region','postcode']
+        fields[k] = v
+
+      # TODO: don't send factual_raw
+      if k == 'factual_raw'
+        fields[k] = v
+
     fields['reviews']=[]
     for review in @reviews
       fields['reviews'].push review.toClient()

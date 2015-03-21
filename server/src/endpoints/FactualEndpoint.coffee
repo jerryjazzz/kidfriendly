@@ -18,7 +18,7 @@ class FactualEndpoint
     get @route, '/details/:factual_id', (req) =>
       @app.log(req.query)
       {factual_id} = req.params
-      @factualService.placeDetails(factual_id)
+      @factualService.singlePlace(factual_id)
 
   @create: (app) ->
     (new FactualEndpoint(app)).route
