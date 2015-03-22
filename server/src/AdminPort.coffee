@@ -12,3 +12,5 @@ class AdminPort
       res.end()
 
 exports.AdminPort = AdminPort
+if provide?
+  provide('AdminPort', -> AdminPort)

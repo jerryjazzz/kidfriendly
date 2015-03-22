@@ -20,5 +20,4 @@ class FactualEndpoint
       {factual_id} = req.params
       @factualService.singlePlace(factual_id)
 
-  @create: (app) ->
-    (new FactualEndpoint(app)).route
+provide('FactualEndpoint', FactualEndpoint)

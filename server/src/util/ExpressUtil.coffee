@@ -1,4 +1,6 @@
 
+Promise = require('bluebird')
+
 class ExpressUtil
   constructor: ->
     @htmlPresentation = depend('HtmlPresentation')

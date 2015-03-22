@@ -1,6 +1,6 @@
 "use strict"
 
-{Place} = require('kfly_server')
+Place = require('kfly_server').depend('Place')
 {assert, expect} = require('chai')
 
 describe 'Place', ->

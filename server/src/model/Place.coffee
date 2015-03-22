@@ -60,4 +60,5 @@ class Place
   getFactualUrl: ->
     "http://factual.com/#{@factual_id}"
 
-exports.Place = Place
+provide('Place', -> Place)
+provide('newPlace', -> (fields) -> new Place(fields))
