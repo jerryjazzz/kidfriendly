@@ -25,7 +25,7 @@ class App
     @db = null
     @express = null
     @startedAt = Date.now()
-    @cache = new LocalCache(this)
+    @databaseUtil = depend('DatabaseUtil')
 
     @logs = {}
 
@@ -63,12 +63,12 @@ class App
 
   postgresConnect: =>
 
-    PromiseUtil.retry (retry) =>
+    depend('PromiseUtil').retry (retry) =>
       @db = require('knex')(@getKnexOptions())
 
       # connection test
       @db.raw('select 1')
-        .catch Database.missingDatabaseError, =>
+        .catch @databaseUtil.missingDatabaseError, =>
 
           # Create database and retry
           @db.destroy()
@@ -100,6 +100,7 @@ class App
         @log("skipping migration (no DB)")
         return
 
+      SchemaMigration = depend('SchemaMigration')
       migration = new SchemaMigration(this)
       migration.start()
 
@@ -116,12 +117,14 @@ class App
 
   setupAdminPort: =>
     @log("listening on admin port: " + @config.appConfig.adminPort)
-    @adminPort = new AdminPort(@config.appConfig.adminPort)
+    AdminPort = depend('AdminPort')
+    @adminPort = AdminPort(@config.appConfig.adminPort)
 
   startExpress: =>
     if not @config.appConfig.express?
       return
 
+    ExpressServer = depend('ExpressServer')
     @expressServer = new ExpressServer(this, @config.appConfig.express)
     @expressServer.start()
 
@@ -144,7 +147,7 @@ class App
     idColumn = tableSchema.primary_key
 
     if not row.created_at? and tableSchema.columns.created_at?
-      row.created_at = DateUtil.timestamp()
+      row.created_at = timestamp()
 
     if not row.source_ver? and tableSchema.columns.source_ver?
       row.source_ver = @sourceVersion
@@ -167,13 +170,13 @@ class App
         if numAttempts > 5
           return reject(msg: "failed to generate ID after 5 attempts")
 
-        row[idColumn] = Database.randomId()
+        row[idColumn] = @databaseUtil.randomId()
         @db(tableName).insert(row)
         .then ->
           result = {}
           result[idColumn] = row[idColumn]
           resolve(result)
-        .catch Database.existingKeyError(idColumn), (err) ->
+        .catch @databaseUtil.existingKeyError(idColumn), (err) ->
           attempt(numAttempts + 1)
         .catch (otherErr) ->
           reject(otherErr)
@@ -197,7 +200,7 @@ class App
       else
         JSON.stringify(arg)
 
-    @logs.debug.write("[#{DateUtil.timestamp()}] #{args.join(' ')}")
+    @logs.debug.write("[#{timestamp()}] #{args.join(' ')}")
 
 startApp = (appName = 'web') ->
   console.log('Launching app: '+appName)

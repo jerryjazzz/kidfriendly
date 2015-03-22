@@ -48,7 +48,7 @@ class PlaceScraper
       name: googlePlace.name
       location: "#{googlePlace.geometry.location.lat},#{googlePlace.geometry.location.lng}"
       google_id: googlePlace.id
-      created_at: DateUtil.timestamp()
+      created_at: timestamp()
       source_ver: @app.sourceVersion
 
     Database.writeRow(@app, 'place', row, {generateId: true})

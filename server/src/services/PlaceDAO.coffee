@@ -5,15 +5,16 @@ class PlaceDAO
     @UpdateableFields = ['name','lat','long','rating','factual_id','details','factual_consume_ver']
     @InsertableFields = @UpdateableFields.concat(['place_id'])
     @ReadableFields = @InsertableFields
+    @modelClass = depend('Place')
 
   get: (queryFunc) ->
     # queryFunc is a func that takes a Knex query object, and hopefully adds a 'where'
     # clause or something.
     query = @app.db.select.apply(@ReadableFields).from('place')
     queryFunc(query)
-    query.then (rows) ->
+    query.then (rows) =>
       places = for row in rows
-        Place.fromDatabase(row)
+        @modelClass.fromDatabase(row)
       places
 
   getId: (id) ->
@@ -27,7 +28,7 @@ class PlaceDAO
     query.toSQL()
     query.then (rows) ->
       if rows? and rows.length > 0
-        place = Place.fromDatabase(rows[0])
+        place = @modelClass.fromDatabase(rows[0])
         for row in rows
           if row.review_id?
             place.reviews.push Review.fromDatabase(row)

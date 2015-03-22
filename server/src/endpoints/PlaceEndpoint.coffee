@@ -60,7 +60,7 @@ class PlaceEndpoint
         name: req.body.name
         location: req.body.location
         google_id: req.body.google_id
-        created_at: DateUtil.timestamp()
+        created_at: timestamp()
         source_ver: @app.sourceVersion
 
       @app.insert('place',place)
@@ -82,5 +82,4 @@ class PlaceEndpoint
         .then (place) ->
           {place_id:place.place_id, name: place.name, rating:place.rating}
 
-  @create: (app) ->
-    (new PlaceEndpoint(app)).route
+provide('PlaceEndpoint', PlaceEndpoint)

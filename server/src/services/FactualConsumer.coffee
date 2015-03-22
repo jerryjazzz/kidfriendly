@@ -1,5 +1,7 @@
 'use strict'
 
+Promise = require('bluebird')
+
 class FactualConsumer
   CurrentVersion: 1
 
@@ -39,7 +41,7 @@ class FactualConsumer
 
         else
           @app.log("adding missing factual place: #{factualPlace.factual_id}")
-          place = Place.make({})
+          place = depend('newPlace')({})
           @updatePlaceWithFactualData(place, factualPlace)
           @placeDao.insert(place)
 

@@ -22,5 +22,4 @@ class SearchEndpoint
       .then (places) ->
         place.toClient() for place in places
 
-  @create: (app) ->
-    (new SearchEndpoint(app)).route
+provide('SearchEndpoint', SearchEndpoint)

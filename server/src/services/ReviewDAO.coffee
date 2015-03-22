@@ -6,15 +6,15 @@ class ReviewDAO
     @UpdateableFields = ['body', 'reviewer_name']
     @InsertableFields = @UpdateableFields.concat(['review_id','place_id', 'user_id'])
     @ReadableFields = @InsertableFields
-    @modelClass = Review
+    @modelClass = depend('Review')
 
   get: (whereFunc) ->
     # whereFunc is a callback that takes a Knex query object, and hopefully adds a 'where'
     # clause or something.
     query = @app.db.select.apply(@ReadableFields).from('review')
     whereFunc(query)
-    query.then (rows) ->
-      Review.fromDatabase(row) for row in rows
+    query.then (rows) =>
+      @modelClass.fromDatabase(row) for row in rows
 
   insert: (review) ->
     fields = {}
@@ -24,7 +24,7 @@ class ReviewDAO
 
     @app.insert('review', fields)
     .then (res) =>
-      {place_id: res.place_id, name: review.name}
+      {review_id: res.review_id, name: review.name}
 
   save: (review) ->
     # Save a modification to DB
@@ -32,7 +32,7 @@ class ReviewDAO
       throw new Error("ReviewDAO.save must be called on patch data: "+ review)
 
     fields = {}
-    for own k,v of place
+    for own k,v of review
       if k in @UpdateableFields
         fields[k] = v
 

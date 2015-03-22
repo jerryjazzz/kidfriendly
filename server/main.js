@@ -1,3 +1,3 @@
 
-kfly_server = require("./build/kfly_server.js")
-kfly_server.startApp(process.argv[2])
+main = require("./build/main.js")
+main.startApp(process.argv[2])

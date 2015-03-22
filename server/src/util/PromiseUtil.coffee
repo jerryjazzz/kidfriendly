@@ -15,3 +15,5 @@ PromiseUtil =
           result
 
     doAttempt()
+
+provide('PromiseUtil', -> PromiseUtil)
