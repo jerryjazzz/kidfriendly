@@ -1,15 +1,11 @@
 'use strict'
-# Ionic Starter App
-
-# angular.module is a global place for creating, registering and retrieving Angular modules
-# 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-# the 2nd parameter is an array of 'requires'
-# 'starter.services' is found in services.js
-# 'starter.controllers' is found in controllers.js
 angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel', 'uiGmapgoogle-maps'])
-.run ($ionicPlatform, user, $state, $ionicHistory) ->
+.run ($ionicPlatform, user, $state, $ionicHistory, analyticsService) ->
   attemptedRoute = undefined
-  #userApp user object
+
+  analyticsService.initAndTrackPages()
+  user.getCurrent().then (u) -> analyticsService.setUser(u.user_id)
+
   user.init
     appId: '***REMOVED***'
     heartbeatInterval: 600000
@@ -20,8 +16,9 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
       params: stateParams
     $state.go 'login'
 
-
   user.onAuthenticationSuccess =>
+    analyticsService.setUser(user.current.user_id) if user.current.authenticated
+    analyticsService.trackEvent("Auth", "SignIn", "Success")
     if attemptedRoute?
       $ionicHistory.currentView($ionicHistory.backView());
       $state.transitionTo  attemptedRoute.route.name, attemptedRoute.params
@@ -43,14 +40,7 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     v: '3.17'
     libraries: 'weather,geometry,visualization'
 
-  # Ionic uses AngularUI Router which uses the concept of states
-  # Learn more here: https:#github.com/angular-ui/ui-router
-  # Set up the various states which the app can be in.
-  # Each state's controller can be found in controllers.js
-
   $stateProvider
-
-    # setup an abstract state for the tabs directive
   .state 'search',
     url: '/search/:keyword'
     templateUrl: 'templates/search-results.html'
