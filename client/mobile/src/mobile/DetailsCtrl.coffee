@@ -1,8 +1,9 @@
 'use strict'
 class DetailsCtrl
-  constructor:($scope, place, $window)->
+  constructor:($scope, place, @placesService, analyticsService, $window)->
     @_calculateScores(place)
     place.photos = ['img/no-image.jpg'] unless place.photos?
+    analyticsService.trackEvent("Details", "View", place.name, place.rating)
     $scope.ratingStyle = (rating) ->
       "rating-bad": rating < 60
       "rating-average": rating >= 60 and rating < 80
@@ -31,13 +32,18 @@ class DetailsCtrl
       $scope.data.mapVisible = !$scope.data.mapVisible
       $scope.data.mapStyle["button-dark"]= !$scope.data.mapVisible
       $scope.data.mapStyle["button-selected"] = $scope.data.mapVisible
+      mapVisible = if $scope.data.mapVisible then "show" else "hide"
+      analyticsService.trackEvent("Details", "Toggle Map", mapVisible)
+
+    $scope.makeCall = (phoneNumber) ->
+      analyticsService.trackEvent("Details", "Make Call")
+      $window.location.href = "tel: #{phoneNumber}"
+
 
   _calculateScores: (place) ->
     for review in place.reviews
-      review.score = review.score = review.body.kidsMenu * 6 +
-        review.body.healthOptions * 6 +
-        review.body.accommodations * 4 +
-        review.body.service * 4
+      @placesService.calculateScore(review)
 
-DetailsCtrl.$inject = ['$scope', 'place', '$window']
+
+DetailsCtrl.$inject = ['$scope', 'place', 'placesService', 'analyticsService', '$window']
 angular.module('Mobile').controller 'DetailsCtrl', DetailsCtrl

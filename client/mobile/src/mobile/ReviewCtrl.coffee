@@ -1,8 +1,9 @@
 'use strict'
 class ReviewCtrl
-  constructor:($scope, placesService, $stateParams, user, $ionicModal, $state, $ionicHistory)->
+  constructor:($scope, placesService, $stateParams, user, $ionicModal, $ionicHistory, analyticsService)->
     $scope.data = {}
-    $scope.data.review =
+    $scope.data.review = {}
+    $scope.data.review.body =
       kidsMenu:0
       healthOptions:0
       service: 0
@@ -28,13 +29,17 @@ class ReviewCtrl
       name = "#{user.current.first_name} #{user.current.last_name?.substring(0, 1)}"
       $scope.data.review.name = name
       placesService.submitReview(user.current.user_id, $stateParams.placeId, $scope.data.review)
+      analyticsService.trackEvent("Review", "submit", 'new', placesService.calculateScore($scope.data.review))
       $scope.modal.show()
-#      .then ->
 
-
-#      .error ->
-
-
-ReviewCtrl.$inject = ['$scope', 'placesService', '$stateParams', 'user', '$ionicModal', '$state', '$ionicHistory']
+ReviewCtrl.$inject = [
+  '$scope'
+  'placesService'
+  '$stateParams'
+  'user'
+  '$ionicModal'
+  '$ionicHistory'
+  'analyticsService'
+]
 
 angular.module('Mobile').controller('ReviewCtrl', ReviewCtrl)
