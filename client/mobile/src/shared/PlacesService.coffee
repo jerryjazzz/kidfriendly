@@ -23,6 +23,13 @@ class PlacesService
     else
       "#{url}&zipcode=#{keyword}"
 
+  calculateScore: (review) ->
+    review.score = review.score =
+      review.body.kidsMenu * 6 +
+      review.body.healthOptions * 6 +
+      review.body.accommodations * 4 +
+      review.body.service * 4
+
   getPlace: (id) ->
     return result for result in @searchResults when result.place_id == id
     return null

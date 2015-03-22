@@ -1,7 +1,7 @@
 <ion-view>
     <ion-content class="has-header">
         <ion-list class="list">
-            <a style="padding-top: 12px;" class="item item-thumbnail-left" href="#details/{{result.place_id}}" ng-repeat="result in results">
+            <a style="padding-top: 12px;" class="item item-thumbnail-left" ng-click="goToDetails(result.place_id, $index)" ng-repeat="result in results">
                 <img src="img/no-image-thumb.png">
                 <kf-rating banner-class="'results-rating-stripe'" rating="result.rating"></kf-rating>
                 <div style="width:100%">
