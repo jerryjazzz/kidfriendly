@@ -22,11 +22,13 @@ class PlaceDAO
     .then (places) -> places[0]
 
   getWithReviews:(placeId) ->
+    Review = depend('Review')
+
     query = @app.db.select('place.place_id','name','lat','long','rating','factual_id','details',
     'reviewer_name', 'body', 'review_id', 'review.created_at', 'review.updated_at').from('place')
     .leftOuterJoin('review', 'place.place_id', 'review.place_id').where('place.place_id', placeId)
     query.toSQL()
-    query.then (rows) ->
+    query.then (rows) =>
       if rows? and rows.length > 0
         place = @modelClass.fromDatabase(rows[0])
         for row in rows
