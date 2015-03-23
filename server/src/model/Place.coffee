@@ -55,6 +55,7 @@ class Place
     fields['reviews']=[]
     for review in @reviews
       fields['reviews'].push review.toClient()
+    fields.type = 'Place'
     return fields
 
   getFactualUrl: ->

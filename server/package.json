@@ -26,7 +26,8 @@
     "factual-api": "~1.0.7",
     "geolib": "~2.0.14",
     "cron": "~1.0.9",
-    "gulp-sourcemaps": "~1.5.1"
+    "gulp-sourcemaps": "~1.5.1",
+    "react": "~0.13.1"
   },
   "devDependencies": {
     "chai": "~1.10.0"
