@@ -1,19 +1,20 @@
 
 gulp = require('gulp')
 gutil = require('gulp-util')
-tar = require('gulp-tar')
-gzip = require('gulp-gzip')
 coffee = require('gulp-coffee')
 concat = require('gulp-concat')
 watch = require('gulp-watch')
+sourcemaps = require('gulp-sourcemaps')
 
-coffeeFiles = ['src/**/*.coffee']
+coffeeFiles = ['src/DependencyCache.coffee', 'src/**/*.coffee']
 watchFiles = coffeeFiles.concat(['config/*'])
 
 gulp.task 'coffee', ->
   gulp.src(coffeeFiles)
-    .pipe(concat('kfly_server.coffee'))
+    .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(coffee())
+    .pipe(concat('main.js'))
+    .pipe(sourcemaps.write('.', {sourceRoot: '/src'}))
     .pipe(gulp.dest('build'))
 
 gulp.task 'watch', ->

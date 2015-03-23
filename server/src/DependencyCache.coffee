@@ -53,13 +53,13 @@ class DependencyCache
 
 _globalDependencyCache = new DependencyCache()
 
-depend = (name) ->
+global.depend = (name) ->
   return _globalDependencyCache.depend(name)
 
-depend_optional = (name) ->
+global.depend_optional = (name) ->
   return _globalDependencyCache.dependOptional(name)
 
-provide = (name, provider) ->
+global.provide = (name, provider) ->
   return _globalDependencyCache.provide(name, provider)
 
 exports.depend = depend

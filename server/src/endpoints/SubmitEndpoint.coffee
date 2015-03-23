@@ -3,18 +3,19 @@ mcapi = require('mailchimp-api')
 class SubmitEndpoint
   constructor: ->
     @app = depend('App')
-    @endpoint = require('express')()
+    @route = require('express')()
+    Log = depend('Log')
     @emailSignupLog = new Log(@app, 'email_signup.json')
     @surveyAnswerLog = new Log(@app, 'survey_answer.json')
     mc = new mcapi.Mailchimp('7c0352fbb770ec2a76b0d631df95d473-us9')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
 
-    post @endpoint, '/email', (req) =>
+    post @route, '/email', (req) =>
 
       data =
         email: req.body.email
-        created_at: DateUtil.timestamp()
+        created_at: timestamp()
         ip: req.get_ip()
         source_ver: @app.sourceVersion
 
@@ -33,19 +34,18 @@ class SubmitEndpoint
       .then ->
         data.id
 
-    post @endpoint, '/survey_answer', (req) =>
+    post @route, '/survey_answer', (req) =>
 
       row =
         signup_id: req.body.signup_id
         body: JSON.stringify
           survey_version: req.body.survey_version
           answer: req.body.answer
-        created_at: DateUtil.timestamp()
+        created_at: timestamp()
         source_ver: @app.sourceVersion
 
       @surveyAnswerLog.write(row)
 
       @app.insert('survey_answer', row)
 
-  @create: (app) ->
-    (new SubmitEndpoint(app)).endpoint
+provide('SubmitEndpoint', SubmitEndpoint)

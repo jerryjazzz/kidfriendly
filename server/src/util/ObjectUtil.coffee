@@ -15,4 +15,5 @@ ObjectUtil =
         result[k] = rightV
     return result
 
+global.ObjectUtil = ObjectUtil
 exports.ObjectUtil = ObjectUtil

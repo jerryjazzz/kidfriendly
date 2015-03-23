@@ -48,3 +48,4 @@ GeomUtil =
     results
 
 exports.GeomUtil = GeomUtil
+provide('GeomUtil', -> GeomUtil)

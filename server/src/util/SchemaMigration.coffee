@@ -1,7 +1,6 @@
 
 Promise = require('bluebird')
 
-
 class ColumnDefinition
   # Definition for our *desired* state of a single column. This data comes from schema config.
   constructor: (@name, {@type, @options, @foreign_key, @change_type_from}) ->
@@ -145,3 +144,4 @@ class SchemaMigration
       else
         info.data_type
 
+provide('SchemaMigration', -> SchemaMigration)

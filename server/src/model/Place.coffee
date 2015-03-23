@@ -55,9 +55,11 @@ class Place
     fields['reviews']=[]
     for review in @reviews
       fields['reviews'].push review.toClient()
+    fields.type = 'Place'
     return fields
 
   getFactualUrl: ->
     "http://factual.com/#{@factual_id}"
 
-exports.Place = Place
+provide('Place', -> Place)
+provide('newPlace', -> (fields) -> new Place(fields))

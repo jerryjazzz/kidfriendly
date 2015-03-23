@@ -11,17 +11,26 @@ class PlaceEndpoint
 
     @route = require('express')()
 
+    get @route, '/:place_id/explain', (req) =>
+      {place_id} = req.params
+      @placeDao.getId(place_id)
+      .then (place) ->
+        if not place?
+          return {error: "Place not found", place_id: place_id}
+
+        factualRating = depend('FactualRating').getExtendedRating(place)
+        {raw: place, factualRating: factualRating}
+
     get @route, '/:place_id/details', (req) =>
       {place_id} = req.params
-      @placeDao.get((query) -> query.where({place_id}))
-      .then (places) ->
-        if places[0]?
-          places[0].toClient()
-        else
-          {error: "Place not found", place_id: place_id}
+      @placeDao.getId(place_id)
+      .then (place) ->
+        if not place?
+          return {error: "Place not found", place_id: place_id}
+        place.toClient()
 
     get @route, '/:place_id/details/reviews', (req) =>
-      place_id = req.params.place_id
+      {place_id} = req.params
       @placeDao.getWithReviews(place_id)
       .then (place) ->
         if place?
@@ -43,6 +52,8 @@ class PlaceEndpoint
 
     get @route, '/any', (req) =>
       @placeDao.get((query) -> query.limit(1))
+      .then (places) ->
+        places[0].toClient()
 
     post @route, '/new', (req) =>
       manualId = req.body.place_id # usually null
@@ -51,7 +62,7 @@ class PlaceEndpoint
         name: req.body.name
         location: req.body.location
         google_id: req.body.google_id
-        created_at: DateUtil.timestamp()
+        created_at: timestamp()
         source_ver: @app.sourceVersion
 
       @app.insert('place',place)
@@ -73,5 +84,4 @@ class PlaceEndpoint
         .then (place) ->
           {place_id:place.place_id, name: place.name, rating:place.rating}
 
-  @create: (app) ->
-    (new PlaceEndpoint(app)).route
+provide('PlaceEndpoint', PlaceEndpoint)

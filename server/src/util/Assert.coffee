@@ -10,3 +10,5 @@ Assert =
       if name?
         msg += ": " + name
       throw new Error(msg)
+
+global.Assert = Assert

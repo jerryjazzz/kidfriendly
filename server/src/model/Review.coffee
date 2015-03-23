@@ -27,7 +27,7 @@ class Review
 
   startPatch: ->
     if this.dataSource != 'db'
-      throw Error("Place.startPatch can only be called on original DB data")
+      throw Error("startPatch can only be called on original DB data")
     review = new Review(this)
     review.original = this
     review.dataSource = 'local'
@@ -47,4 +47,4 @@ class Review
   getFactualUrl: ->
     "http://factual.com/#{@factual_id}"
 
-exports.Review = Review
+provide('Review', -> Review)

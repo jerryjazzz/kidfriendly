@@ -1,4 +1,6 @@
 
+path = require('path')
+
 class ExpressServer
   constructor: (@app, @expressConfig) ->
     @server = null
@@ -18,7 +20,7 @@ class ExpressServer
     @server.use(require('body-parser').json())
 
     morgan = require('morgan')
-    morgan.token('timestamp', (req, res) -> DateUtil.timestamp())
+    morgan.token('timestamp', (req, res) -> timestamp())
     logFormat = '[:timestamp] :method :url :status :res[content-length] - :response-time ms'
     @server.use(require('morgan')(logFormat, {stream: @app.logs.debug}))
 
@@ -30,16 +32,17 @@ class ExpressServer
     redirect = (to) -> ((req,res) -> res.redirect(301, to))
 
     @server.get("/", staticFile('client/web/dist/index.html'))
+    @server.get("/static/RestView.js", staticFile('server/build/RestView.js'))
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
     @server.use("/dashboard", staticDir('client/dashboard'))
-    @server.use('/api/submit', SubmitEndpoint.create(@app))
-    @server.use('/api/search', SearchEndpoint.create(@app))
-    @server.use('/api/dev', DevEndpoint.create(@app))
-    @server.use('/api/user', UserEndpoint.create(@app))
-    @server.use('/api/place', PlaceEndpoint.create(@app))
-    @server.use('/api/factual', FactualEndpoint.create(@app))
+    @server.use('/api/submit', depend('SubmitEndpoint').route)
+    @server.use('/api/search', depend('SearchEndpoint').route)
+    @server.use('/api/dev', depend('DevEndpoint').route)
+    @server.use('/api/user', depend('UserEndpoint').route)
+    @server.use('/api/place', depend('PlaceEndpoint').route)
+    @server.use('/api/factual', depend('FactualEndpoint').route)
 
     # New style endpoints
     for endpoint in [depend('InternalEndpoint')]
@@ -62,3 +65,5 @@ class ExpressServer
     res.set('Access-Control-Allow-Origin', '*')
     #res.set('Access-Control-Expose-Headers', ...)
     next()
+
+provide('ExpressServer', -> ExpressServer)
