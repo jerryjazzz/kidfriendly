@@ -1,10 +1,19 @@
 'use strict'
 class PlacesService
   constructor:(@$http, @$q, @$timeout, @locationService, @kfUri, @geolib)->
+
+  httpGet: (path) ->
+    url = "http://#{@kfUri}" + path
+    @$http.get(url, headers: {Accept: 'application/json'})
+
+  httpPost: (path) ->
+    url = "http://#{@kfUri}" + path
+    @$http.post(url, headers: {Accept: 'application/json'})
+
   search:(keyword, position) ->
     deferred = @$q.defer()
     url = @createUrl(keyword, position)
-    @$http.get(url).success (data) =>
+    @httpGet(url).success (data) =>
       @searchResults = data
       for result in @searchResults
         result.distance = @geolib.getDistance(position,
@@ -17,7 +26,7 @@ class PlacesService
     deferred.promise
 
   createUrl:(keyword, position) ->
-    url = "http://#{@kfUri}/api/search/nearby?type=restaurant"
+    url = "/api/search/nearby?type=restaurant"
     if keyword == 'nearby'
       "#{url}&lat=#{position.latitude}&long=#{position.longitude}"
     else
@@ -36,7 +45,7 @@ class PlacesService
 
   getPlaceDetail:(id) ->
     deferred = @$q.defer()
-    @$http.get("http://#{@kfUri}/api/place/#{id}/details/reviews").success (data) =>
+    @httpGet("/api/place/#{id}/details/reviews").success (data) =>
       @currentPlace = data
       deferred.resolve(data)
     deferred.promise
@@ -46,7 +55,7 @@ class PlacesService
 
   submitReview: (userId, placeId, review) ->
     deferred = @$q.defer()
-    @$http.post("http://#{@kfUri}/api/user/#{userId}/place/#{placeId}/review", {review:review})
+    @httpPost("/api/user/#{userId}/place/#{placeId}/review", {review:review})
     .success (data) =>
       deferred.resolve()
     .error (error) =>
