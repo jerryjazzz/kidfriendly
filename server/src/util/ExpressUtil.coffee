@@ -46,7 +46,7 @@ class ExpressUtil
     if req.accepts('html')
       # Wrap json result in a nice html presentation
       res.set('Content-Type', 'text/html')
-      html = @htmlPresentation.render(options.type, result)
+      html = @htmlPresentation.render(result)
       res.status(statusCode).send(html)
       return
 

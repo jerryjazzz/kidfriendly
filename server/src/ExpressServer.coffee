@@ -32,6 +32,7 @@ class ExpressServer
     redirect = (to) -> ((req,res) -> res.redirect(301, to))
 
     @server.get("/", staticFile('client/web/dist/index.html'))
+    @server.get("/static/RestView.js", staticFile('server/build/RestView.js'))
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
