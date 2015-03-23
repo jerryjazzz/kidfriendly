@@ -30,6 +30,7 @@ class App
     @logs = {}
 
     if @shouldWriteToLogFile()
+      Log = depend('Log')
       @logs.debug = new Log(this, "#{config.appName}.log")
 
     @adminPort = null
