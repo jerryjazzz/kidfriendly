@@ -67,21 +67,22 @@ class FactualRating
     ###
 
     # Rating algorithm discussed in a meeting in Feb 2015
-    overallRating = (factual_raw.rating ? 4) / 5 * 100
-    if factual_raw.kids_goodfor
-      overallRating += 2
-    if factual_raw.kids_menu
-      overallRating += 2
-    if factual_raw.chain_id?
-      overallRating -= 10
-    # todo: what was the label for fine dining?
+    factors =
+      factual_base: (factual_raw.rating ? 4) / 5 * 100
+      kids_goodfor: cond(factual_raw.kids_goodfor, 2, 0)
+      kids_menu: cond(factual_raw.kids_menu, 2, 0)
+      is_chain: cond(factual_raw.chain_id?, -10, 0)
+      random_adjustment: randomAdjustment
 
-    overallRating += randomAdjustment
+    overallRating = 0
+    for k,v of factors
+      overallRating += v
+
     overallRating = Math.min(overallRating, 100)
     overallRating = Math.max(overallRating, 0)
     overallRating = Math.round(overallRating)
 
-    return { detailedRatings, detailedRatingsTotal, randomAdjustment, overallRating }
+    return { detailedRatings, detailedRatingsTotal, randomAdjustment, factors, overallRating }
 
   recalculateFactualBasedRating: (place) ->
     extended = @getExtendedRating(place)

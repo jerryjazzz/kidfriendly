@@ -2,10 +2,9 @@
 class DevEndpoint
   constructor: ->
     @app = depend('App')
-    @endpoint = require('express')()
+    @route = require('express')()
 
-    @endpoint.get '/config', (req, res) =>
+    @route.get '/config', (req, res) =>
       res.send(app.config)
 
-  @create: (app) ->
-    (new DevEndpoint(app)).endpoint
+provide('DevEndpoint', DevEndpoint)

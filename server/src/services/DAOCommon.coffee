@@ -1,4 +1,6 @@
 
+Promise = require('bluebird')
+
 class DAOCommon
   modify: (dao, whereFunc, modifyFunc, {allowInsert}) ->
     allowInsert = allowInsert ? false

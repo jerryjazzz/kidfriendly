@@ -9,3 +9,5 @@ Map =
       for item in list
         out[item[key]] = item
     return out
+ 
+global.Map = Map

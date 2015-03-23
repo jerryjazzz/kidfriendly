@@ -18,3 +18,5 @@ class Log
       str = JSON.stringify(obj)
 
     @fileStream.write(str+"\n", encoding)
+
+provide('Log', -> Log)

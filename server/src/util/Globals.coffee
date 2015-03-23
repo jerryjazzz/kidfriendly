@@ -1,6 +1,5 @@
 
-DateUtil =
-  timestamp: (value=null) ->
+timestamp = (value=null) ->
     if value?
       date = new Date(value)
     else
@@ -18,4 +17,5 @@ DateUtil =
         ':' + pad( date.getUTCMinutes() ) +
         ':' + pad( date.getUTCSeconds() )
 
-exports.DateUtil = DateUtil
+exports.timestamp = timestamp
+global.timestamp = timestamp

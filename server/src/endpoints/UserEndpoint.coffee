@@ -5,9 +5,9 @@ class UserEndpoint
     @reviewDao = depend('ReviewDAO')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
-    @endpoint = require('express')()
+    @route = require('express')()
 
-    get @endpoint, '/:user_id/place/:place_id/review', (req) =>
+    get @route, '/:user_id/place/:place_id/review', (req) =>
       # SECURITY_TODO: Check auth token
 
       {user_id, place_id, token} = req.params
@@ -24,7 +24,7 @@ class UserEndpoint
         .then (response) ->
           response[0] ? null
 
-    post @endpoint, '/:user_id/place/:place_id/review', (req) =>
+    post @route, '/:user_id/place/:place_id/review', (req) =>
       # TODO: Should check that user_id and place_id actually exist.
       # SECURITY_TODO: Check auth token
 
@@ -43,12 +43,12 @@ class UserEndpoint
       @reviewDao.modify(whereFunc, modifyFunc, {allowInsert:true})
 
     ###
-    @endpoint.post '/:user_id/delete', wrap (req) =>
+    @route.post '/:user_id/delete', wrap (req) =>
       # SECURITY_TODO: Verify permission to delete
       @app.db('users').where(user_id:req.params.user_id).delete()
         .then(-> {})
 
-    @endpoint.post '/new', wrap (req) =>
+    @route.post '/new', wrap (req) =>
 
       if not req.body.email?
         return {statusCode: 400, message: "email is missing from body"}
@@ -58,7 +58,7 @@ class UserEndpoint
       row =
         user_id: manualId
         email: req.body.email
-        created_at: DateUtil.timestamp()
+        created_at: timestamp()
         created_by_ip: req.get_ip()
         source_ver: @app.sourceVersion
 
@@ -67,5 +67,4 @@ class UserEndpoint
         {statusCode: 400, error: type: 'email_already_exists'}
     ###
 
-  @create: (app) ->
-    (new UserEndpoint(app)).endpoint
+provide('UserEndpoint', UserEndpoint)

@@ -61,7 +61,7 @@ class GoogleSearch
       @app.insert "place",
         name: googlePlace.name
         google_id: googlePlace.place_id
-        created_at: DateUtil.timestamp()
+        created_at: timestamp()
         source_ver: @app.sourceVersion
         location: googlePlace.location
       .then ({id}) =>

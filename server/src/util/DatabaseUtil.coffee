@@ -1,7 +1,7 @@
 
 Promise = require('bluebird')
 
-Database =
+DatabaseUtil =
   UNIQUE_VIOLATION: '23505'
   INVALID_CATALOG_NAME: '3D000'
 
@@ -20,3 +20,4 @@ Database =
   missingDatabaseError: (err) ->
     return err.code == Database.INVALID_CATALOG_NAME
 
+provide('DatabaseUtil', -> DatabaseUtil)

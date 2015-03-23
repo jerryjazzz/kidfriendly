@@ -1,6 +1,6 @@
 'use strict'
 
-geolib = require('geolib')
+Geolib = require('geolib')
 Cities = require('cities')
 
 class PlaceSearch
@@ -8,6 +8,7 @@ class PlaceSearch
 
   constructor: ->
     @placeDao = depend('PlaceDAO')
+    @geom = depend('GeomUtil')
 
   resolveZipcode: (searchOptions) ->
     if searchOptions.zipcode?
@@ -21,9 +22,9 @@ class PlaceSearch
   search: (searchOptions) ->
     @resolveZipcode(searchOptions)
 
-    bounds = GeomUtil.getBounds(searchOptions)
+    bounds = @geom.getBounds(searchOptions)
 
-    @placeDao.get (query) ->
+    @placeDao.get (query) =>
       # Filter to nearest rectangle
       query.orWhere('lat', '>', bounds.lat1)
       query.orWhere('lat', '<', bounds.lat2)
@@ -43,7 +44,7 @@ class PlaceSearch
     # Store 'distance' on each result, and filter out places that are too far.
 
     for place in places
-      place.context.distance = geolib.getDistance({latitude: place.lat, longitude: place.long},
+      place.context.distance = Geolib.getDistance({latitude: place.lat, longitude: place.long},
           {latitude: searchOptions.lat, longitude: searchOptions.long})
 
     return places.filter (place) -> place.context.distance < searchOptions.meters
