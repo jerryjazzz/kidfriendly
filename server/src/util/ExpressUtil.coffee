@@ -43,7 +43,7 @@ class ExpressUtil
 
     # Returning a plain JSON value
 
-    if false #req.accepts('html')
+    if req.accepts('html')
       # Wrap json result in a nice html presentation
       res.set('Content-Type', 'text/html')
       html = @htmlPresentation.render(result)
