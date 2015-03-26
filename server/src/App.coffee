@@ -59,8 +59,8 @@ class App
     client: 'pg'
     debug: @config.services.postgres.debugConnection
     connection:
+      user: process._successfulSetuidUser
       host: @config.services.postgres.host
-      user: 'web'
       database: @config.services.postgres.database
 
   postgresConnect: =>
@@ -212,7 +212,8 @@ startApp = (appName = 'web') ->
     # on server.
     user = appName
     process.setuid(user)
-    console.log("successfully set uid to: "+user)
+    console.log("setuid() successful with: "+user)
+    process._successfulSetuidUser = user
 
   # Change directory to top-level, one above the 'server' dir. (such as /kfly)
   dir = path.resolve(path.join(__dirname, '../..'))
