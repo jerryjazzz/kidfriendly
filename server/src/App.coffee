@@ -60,6 +60,7 @@ class App
     debug: @config.services.postgres.debugConnection
     connection:
       host: @config.services.postgres.host
+      user: 'web'
       database: @config.services.postgres.database
 
   postgresConnect: =>
