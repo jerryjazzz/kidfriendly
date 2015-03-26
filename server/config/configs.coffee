@@ -19,6 +19,7 @@ module.exports = configs =
     ghost:
       main: 'index.js'
       foreverOptions:
+        uid: 'ghost'
         cwd: '/ghost'
         options: ['--production']
         env:

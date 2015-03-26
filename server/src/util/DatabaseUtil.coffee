@@ -14,10 +14,10 @@ DatabaseUtil =
   existingKeyError: (key) ->
     return (err) ->
       console.log("checking #{err} for #{key}")
-      (err.code == Database.UNIQUE_VIOLATION)\
+      (err.code == @UNIQUE_VIOLATION)\
         and err.detail.indexOf("Key (#{key})") != -1
 
   missingDatabaseError: (err) ->
-    return err.code == Database.INVALID_CATALOG_NAME
+    return err.code == @INVALID_CATALOG_NAME
 
 provide('DatabaseUtil', -> DatabaseUtil)
