@@ -206,6 +206,13 @@ class App
 startApp = (appName = 'web') ->
   console.log('Launching app: '+appName)
 
+  try
+    # Try to setuid() to a user matching the app name. Only expected to work when running
+    # on server.
+    user = appName
+    process.setuid(user)
+    console.log("successfully set uid to: "+user)
+
   # Change directory to top-level, one above the 'server' dir. (such as /kfly)
   dir = path.resolve(path.join(__dirname, '../..'))
 
