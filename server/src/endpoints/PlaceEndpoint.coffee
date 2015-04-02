@@ -38,18 +38,6 @@ class PlaceEndpoint
         else
           {error: "Place not found", place_id: place_id}
 
-    post @route, '/:place_id/delete', (req) =>
-      # SECURITY_TODO: Verify permission to delete
-      "todo"
-      @app.db('place').where({place_id:req.params.place_id}).delete()
-      .then -> {}
-
-    post @route, '/from_google_id/:google_id/delete', (req) =>
-      # SECURITY_TODO: Verify permission to delete
-      "todo"
-      @app.db('place').where({google_id:req.params.google_id}).delete()
-      .then -> {}
-
     get @route, '/any', (req) =>
       @placeDao.get((query) -> query.limit(1))
       .then (places) ->

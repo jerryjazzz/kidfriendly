@@ -30,6 +30,8 @@
     "react": "~0.13.1"
   },
   "devDependencies": {
-    "chai": "~1.10.0"
+    "chai": "~1.10.0",
+    "mocha": "~1.21.5",
+    "mocha-as-promised": "~2.0.0"
   }
 }

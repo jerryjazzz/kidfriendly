@@ -4,7 +4,8 @@ Request = require('request')
 Promise = require('bluebird')
 
 class App
-  constructor: (@config) ->
+  constructor: ->
+    @config = depend('Configs')
     @devMode = process.env.KFLY_DEV_MODE
 
     @appConfig = @config.appConfig
@@ -25,7 +26,6 @@ class App
     @db = null
     @express = null
     @startedAt = Date.now()
-    @databaseUtil = depend('DatabaseUtil')
 
     @logs = {}
 
@@ -37,7 +37,7 @@ class App
 
   start: ->
     Promise.resolve()
-      .then(@postgresConnect)
+      .then(@postgresSetup)
       .then(@sqlMigrate)
       .then(@initializeSourceVersion)
       .then(@setupAdminPort)
@@ -50,61 +50,17 @@ class App
         else
           @log(err)
 
+  postgresSetup: =>
+    @postgresClient = depend('PostgresClient')
+    @postgresClient.connect()
+    .then =>
+      @db = @postgresClient.knex
+      @insert = @postgresClient.insert
+
   fetchCurrentGitVersion: =>
     SourceUtil.getCurrentGitCommit()
       .then (info) =>
         @currentGitCommit = info
-
-  getKnexOptions: =>
-    client: 'pg'
-    debug: @config.services.postgres.debugConnection
-    connection:
-      user: process._successfulSetuidUser
-      host: @config.services.postgres.host
-      database: @config.services.postgres.database
-
-  postgresConnect: =>
-
-    depend('PromiseUtil').retry (retry) =>
-      @db = require('knex')(@getKnexOptions())
-
-      # connection test
-      @db.raw('select 1')
-        .catch @databaseUtil.missingDatabaseError, =>
-
-          # Create database and retry
-          @db.destroy()
-          @db = null
-          @createDatabase().then -> retry
-          
-    .then =>
-      @log("postgres connected")
-    .catch (e) =>
-      @log("[ERROR] postgres connection: " + e)
-      @db = null
-
-  createDatabase: ->
-    @log("creating database 'kidfriendly'")
-    host = @config.services.postgres.hostname
-
-    knexOptions = @getKnexOptions()
-    knexOptions.connection.database = 'postgres'
-
-    connection = require('knex')(knexOptions)
-    connection.raw('create database kidfriendly')
-    .then =>
-      connection.destroy()
-
-  sqlMigrate: =>
-    if @appConfig.roles?.dbMigration?
-
-      if not @db?
-        @log("skipping migration (no DB)")
-        return
-
-      SchemaMigration = depend('SchemaMigration')
-      migration = new SchemaMigration(this)
-      migration.start()
 
   initializeSourceVersion: =>
     if not @db?
@@ -143,47 +99,6 @@ class App
       @log("logs are now being written to: #{@logs.debug.filename}")
       @log = @_logToFile
       @log("Server startup completed (in #{duration} ms)")
-
-  insert: (tableName, row) ->
-    tableSchema = @config.schema[tableName]
-    idColumn = tableSchema.primary_key
-
-    if not row.created_at? and tableSchema.columns.created_at?
-      row.created_at = timestamp()
-
-    if not row.source_ver? and tableSchema.columns.source_ver?
-      row.source_ver = @sourceVersion
-
-    # Check to auto-generate an ID. This involves some retry logic on the (unlikely)
-    # chance that our random ID is taken.
-
-    if not idColumn?
-      # no ID column
-      return @db(tableName).insert(row).then(-> row)
-
-    if row[idColumn]?
-      # new row already has an ID
-      successResult = {}
-      successResult[idColumn] = row[idColumn]
-      return @db(tableName).insert(row).then(-> successResult)
-
-    new Promise (resolve, reject) =>
-      attempt = (numAttempts) =>
-        if numAttempts > 5
-          return reject(msg: "failed to generate ID after 5 attempts")
-
-        row[idColumn] = @databaseUtil.randomId()
-        @db(tableName).insert(row)
-        .then ->
-          result = {}
-          result[idColumn] = row[idColumn]
-          resolve(result)
-        .catch @databaseUtil.existingKeyError(idColumn), (err) ->
-          attempt(numAttempts + 1)
-        .catch (otherErr) ->
-          reject(otherErr)
-
-      attempt(0)
 
   request: (args) ->
     @debugLog("url request: " + args.url)
@@ -229,6 +144,7 @@ startApp = (appName = 'web') ->
   config.appName = appName
   config.appConfig = config.apps[appName]
 
+  provide('Configs', -> config)
   app = new App(config)
   provide('App', -> app)
   app.start()
