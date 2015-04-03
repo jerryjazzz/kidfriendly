@@ -1,14 +1,41 @@
 
 # Yum install #
-yum -y update
-yum -y groupinstall "Development Tools"
-yum -y install git nginx
+sudo yum -y update  # (this takes a while)
+sudo yum -y groupinstall "Development Tools"
+sudo yum -y install git nginx vim wget
+
+# Setup 'dev' user
+sudo useradd dev
+
+# Modify sudoers
+sudo vim /etc/sudoers
+# comment this line: %wheel  ALL=(ALL)
+# uncomment this line: %wheel  ALL=(ALL)       NOPASSWD: ALL
+sudo usermod -a -G wheel dev
+
+# Update authorized_keys
+sudo su - dev
+cd ~
+mkdir -p .ssh
+vim .ssh/authorized_keys # then paste in the contents of authorized_keys from an existing server
+chmod 700 .ssh
+chmod 400 .ssh/authorized_keys 
+
+# Fix sshd_config
+sudo vim /etc/ssh/sshd_config
+# uncomment: RSAAuthentication yes
+# uncomment: PubkeyAuthentication yes
+# at the bottom, add this line:
+    DenyUsers postgres
+
+sudo service sshd restart
+
+# Log out and back in as 'dev'
 
 # Top level dirs #
 
-mkdir /kfly
-mkdir /data
-(future: /data might be a symlink to a separate volume)
+sudo mkdir /kfly
+sudo chown dev /kfly
 
 # Git Checkout #
 
@@ -16,19 +43,23 @@ cd /kfly
 git init
 git remote add origin https://XXX@github.com/andyfischer/kidfriendly.git
   (where XXX is a token generated from Github.com)
+git fetch origin
+git checkout develop
 
 Change .git/config to have:
 
 [receive]
     denyCurrentBranch=false
 
-# Building Node #
+# Install Node #
 
-cd /kfly/3rdparty
+mkdir -p /kfly/3rdparty
+cd 3rdparty
 wget http://nodejs.org/dist/v0.10.31/node-v0.10.31.tar.gz
+tar -xvf node-v0.10.31.tar.gz
 cd node-v0.10.31
-sudo ./configure
-sudo make
+./configure
+make
 sudo make install
 
 # Dev user account #
@@ -64,7 +95,7 @@ sudo yum install postgresql postgresql-server postgresql-devel postgresql-contri
 sudo service postgresql initdb
 sudo chkconfig postgres on
 
-# Add 'dev' user
+# Add 'dev' user to postgres
 sudo su - postgres
 createuser dev
 exit
