@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+temp_dir="temp-$$"
+cd ~
+mkdir -p $temp_dir
+cd $temp_dir
+
+
+
+cd ~
+rm -r $temp_dir

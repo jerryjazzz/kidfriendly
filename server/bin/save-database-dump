@@ -5,8 +5,7 @@ cd ~
 mkdir -p $temp_dir
 cd $temp_dir
 
-date=`date -u +"%Y-%m-%d-%H:%M"`
-filename="kidfriendly_db_${date}.sql"
+filename="kidfriendly_db_`filename-timestamp`.sql"
 pg_dump -E UTF-8 -F p -b -f $filename kidfriendly
 gzip $filename
 
