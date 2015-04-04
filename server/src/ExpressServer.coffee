@@ -22,7 +22,7 @@ class ExpressServer
     morgan = require('morgan')
     morgan.token('timestamp', (req, res) -> timestamp())
     logFormat = '[:timestamp] :method :url :status :res[content-length] - :response-time ms'
-    @server.use(require('morgan')(logFormat, {stream: @app.logs.debug}))
+    @server.use(require('morgan')(logFormat)
 
     @server.use(@cors)
 
