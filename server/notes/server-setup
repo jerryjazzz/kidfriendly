@@ -78,7 +78,7 @@ sudo systemctl enable postgresql-9.3
 sudo /usr/pgsql-9.3/bin/postgresql93-setup initdb
 sudo systemctl start postgresql-9.3
 
-# Add 'dev' user to postgres
+# Add 'dev' and 'web-app' users to postgres
 sudo su - postgres
 createuser dev
 exit
