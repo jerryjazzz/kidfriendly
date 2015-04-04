@@ -1,0 +1,9 @@
+
+[Unit]
+Description=Forever
+
+[Service]
+PIDFile=/var/run/forever.pid
+ExecStart=/usr/local/bin/node /kfly/server/forever
+WorkingDirectory=/kfly/server
+
