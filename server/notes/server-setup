@@ -2,7 +2,7 @@
 # Yum install #
 sudo yum -y update  # (this takes a while)
 sudo yum -y groupinstall "Development Tools"
-sudo yum -y install git nginx vim wget
+sudo yum -y install git vim wget
 
 # Setup 'dev' user
 sudo useradd dev
@@ -62,47 +62,51 @@ cd node-v0.10.31
 make
 sudo make install
 
-# Dev user account #
+# Add this to the bottom of .bashrc:
+    . /kfly/server/etc/dev.profile
 
-Add this to .bash_profile: PATH=$PATH:/kfly/server/bin
+# Nginx #
+sudo yum -y install epel-release
+sudo yum -y install nginx
+sudo ln -s /kfly/server/etc/nginx.conf /etc/nginx/conf.d/kfly.conf
+sudo service start nginx
 
-Install global node modules:
-
-sudo npm install -g coffee-script grunt-cli
-
-# Sudo setup #
-
-sudo visudo
-(add /usr/local/bin to secure_path)
-
-# Symlinks #
-
-  /etc/init/forever.conf -> /kfly/server/scripts/forever.conf
-  /etc/profile.d/kfly.sh -> /kfly/server/scripts/profile.d.sh
-  /etc/nginx/conf.d/kfly.conf -> /kfly/server/scripts/nginx.conf
-
-# Updating upstart configuration #
-
-sudo initctl reload-configuration
-
-or just: ~/bin/init-reload
-
-# Starting forever #
-sudo start forever
-
-# Postgres #
-sudo yum install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
-sudo service postgresql initdb
-sudo chkconfig postgres on
+# Postgres 9.3 #
+sudo rpm -iUvh http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
+sudo yum -y install postgresql93 postgresql93-server postgresql93-contrib postgresql93-libs --disablerepo=* --enablerepo=pgdg93
+sudo systemctl enable postgresql-9.3
+sudo /usr/pgsql-9.3/bin/postgresql93-setup initdb
+sudo systemctl start postgresql-9.3
 
 # Add 'dev' user to postgres
 sudo su - postgres
 createuser dev
 exit
 
-# Also, modify sshd config to block 'postgres' user
-sudo vim /etc/ssh/sshd_config
+# Sudo setup #
+# still necessary?
+#sudo visudo
+#(add /usr/local/bin to secure_path)
 
-add a line that says:
+# Global node tools
+sudo `which npm` install -g coffee
 
-DenyUsers postgres
+# First build
+checkout-rebuild
+
+# Setup app-specific users
+sudo useradd ghost-app
+sudo useradd web-app
+
+# Ghost setup
+# (Copy content to /ghost)
+sudo chown -R ghost-app /ghost/content
+
+# Forever service
+cd /kfly/server
+npm install
+sudo ln -s /kfly/server/etc/forever.service /etc/systemd/system
+sudo systemctl start forever.service
+sudo systemctl status forever.service
+
+
