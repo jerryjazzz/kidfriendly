@@ -124,8 +124,8 @@ startApp = (appName = 'web') ->
 
   try
     # Try to setuid() to a user matching the app name. Only expected to work when running
-    # on server.
-    user = appName
+    # on a server (not locally)
+    user = appName + '-app'
     process.setuid(user)
     console.log("setuid() successful with: "+user)
     process._successfulSetuidUser = user
