@@ -27,12 +27,6 @@ class App
     @express = null
     @startedAt = Date.now()
 
-    @logs = {}
-
-    if @shouldWriteToLogFile()
-      Log = depend('Log')
-      @logs.debug = new Log(this, "#{@appConfig.appName}.log")
-
     @adminPort = null
 
   start: ->
@@ -86,19 +80,11 @@ class App
     @expressServer = new ExpressServer(this, @config.appConfig.express)
     @expressServer.start()
 
-  shouldWriteToLogFile: ->
-    return not @devMode
-
   finishStartup: =>
     depend('NightlyTasks')
 
     duration = Date.now() - @startedAt
     @log("Server startup completed (in #{duration} ms)")
-
-    if @shouldWriteToLogFile()
-      @log("logs are now being written to: #{@logs.debug.filename}")
-      @log = @_logToFile
-      @log("Server startup completed (in #{duration} ms)")
 
   request: (args) ->
     @debugLog("url request: " + args.url)
@@ -109,15 +95,6 @@ class App
           reject(error)
         else
           resolve(body)
-
-  _logToFile: =>
-    args = for arg in arguments
-      if typeof arg is 'string'
-        arg
-      else
-        JSON.stringify(arg)
-
-    @logs.debug.write("[#{timestamp()}] #{args.join(' ')}")
 
 startApp = (appName = 'web') ->
   console.log('Launching app: '+appName)
