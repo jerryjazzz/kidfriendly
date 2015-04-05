@@ -29,6 +29,7 @@
   "cordovaPlugins": [
     "org.apache.cordova.inappbrowser",
     "org.apache.cordova.geolocation",
-    "com.ionic.keyboard"
+    "com.ionic.keyboard",
+    "uk.co.workingedge.phonegap.plugin.launchnavigator"
   ]
 }

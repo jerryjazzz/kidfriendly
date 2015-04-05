@@ -39,11 +39,13 @@ class DetailsCtrl
       analyticsService.trackEvent("Details", "Make Call")
       $window.location.href = "tel: #{phoneNumber}"
 
+    $scope.navigate = ->
+      launchnavigator.navigate [place.lat, place.long], null, ->
+        analyticsService.trackEvent("Details", "directions")
 
   _calculateScores: (place) ->
     for review in place.reviews
       @placesService.calculateScore(review)
-
 
 DetailsCtrl.$inject = ['$scope', 'place', 'placesService', 'analyticsService', '$window']
 angular.module('Mobile').controller 'DetailsCtrl', DetailsCtrl
