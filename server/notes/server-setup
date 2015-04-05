@@ -65,11 +65,16 @@ sudo make install
 # Add this to the bottom of .bashrc:
     . /kfly/server/etc/dev.profile
 
+# Disable selinux
+sudo setenforce 0
+
 # Nginx #
 sudo yum -y install epel-release
 sudo yum -y install nginx
 sudo ln -s /kfly/server/etc/nginx.conf /etc/nginx/conf.d/kfly.conf
-sudo service start nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+sudo nginx -s reload
 
 # Postgres 9.3 #
 sudo rpm -iUvh http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
@@ -81,15 +86,12 @@ sudo systemctl start postgresql-9.3
 # Add 'dev' and 'web-app' users to postgres
 sudo su - postgres
 createuser dev
+createuser web-app
 exit
 
-# Sudo setup #
-# still necessary?
-#sudo visudo
-#(add /usr/local/bin to secure_path)
 
 # Global node tools
-sudo `which npm` install -g coffee
+sudo `which npm` install -g coffee-script grunt-cli
 
 # First build
 checkout-rebuild
@@ -109,4 +111,4 @@ sudo ln -s /kfly/server/etc/forever.service /etc/systemd/system
 sudo systemctl start forever.service
 sudo systemctl status forever.service
 
-
+# Install crontab with crontab -e
