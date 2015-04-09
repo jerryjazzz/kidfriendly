@@ -112,3 +112,12 @@ sudo systemctl start forever.service
 sudo systemctl status forever.service
 
 # Install crontab with crontab -e
+
+# AWS command-line tools
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+unzip awscli-bundle.zip
+sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+
+# Mail server setup (for receiving confirmation emails from StartSSL)
+# https://www.vultr.com/docs/simple-mailserver-postfix-dovecot-sieve-centos-7
+yum install postfix dovecot dovecot-pigeonhole mailx
