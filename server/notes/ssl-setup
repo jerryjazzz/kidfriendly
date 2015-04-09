@@ -1,0 +1,37 @@
+http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/SSL.SingleInstance.html
+
+openssl genrsa 2048 > privatekey.pem
+
+openssl req -new -key privatekey.pem -out csr.pem
+
+openssl x509 -req -days 365 -in csr.pem -signkey privatekey.pem -out server.crt
+
+# based on instructions from https://www.startssl.com/?app=42
+
+First, use the StartSSL™ Control Panel to create a private key and certificate and transfer them to your server. Then execute the following steps (if you use a class 2 certificate replace class1 by class2 in the instructions below):
+
+Decrypt the private key by using the password you entered when you created your key:
+openssl rsa -in ssl.key -out /etc/nginx/ssl/ssl.key
+
+Alternatively you can also use the Tool Box decryption tool of your StartSSL™ account.
+Protect your key from prying eyes:
+
+chmod 600 /etc/nginx/ssl/ssl.key
+
+Fetch the Root CA and Class 1 Intermediate Server CA certificates:
+
+wget http://www.startssl.com/certs/sub.class1.server.ca.pem
+
+Create a unified certificate from your certificate and the CA certificates:
+
+cat ssl.crt sub.class1.server.ca.pem > /etc/nginx/ssl/ssl-unified.crt
+
+Configure your nginx server to use the new key and certificate (in the global settings or a server section):
+
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/ssl/ssl-unified.crt;
+    ssl_certificate_key /etc/nginx/ssl/ssl.key;
+
+Tell nginx to reload its configuration:
+
+killall -HUP nginx
