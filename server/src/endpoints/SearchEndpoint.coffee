@@ -22,4 +22,4 @@ class SearchEndpoint
       .then (places) ->
         place.toClient() for place in places
 
-provide('SearchEndpoint', SearchEndpoint)
+provide('endpoint/api/search', SearchEndpoint)

@@ -36,6 +36,14 @@ class DependencyCache
     delete @currentlyResolving[name]
     return resolved
 
+  dependMulti: (prefix) =>
+    names = (name for name,v of @providers when name.indexOf(prefix) == 0)
+    out = {}
+    for name in names
+      remainingName = name.slice(prefix.length)
+      out[remainingName] = depend(name)
+    return out
+
   dependOptional: (name) ->
     return @cache[name]
 
@@ -55,6 +63,8 @@ _globalDependencyCache = new DependencyCache()
 
 global.depend = (name) ->
   return _globalDependencyCache.depend(name)
+
+global.depend.multi = _globalDependencyCache.dependMulti
 
 global.depend_optional = (name) ->
   return _globalDependencyCache.dependOptional(name)
