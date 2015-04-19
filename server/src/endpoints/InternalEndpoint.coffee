@@ -5,7 +5,6 @@ class InternalEndpoint
     @app = depend('App')
     @placeDao = depend('PlaceDAO')
     @factualConsumer = depend('FactualConsumer')
-    @defaultPath = '/internal'
     @route = require('express')()
     get = depend('ExpressGet')
 
@@ -69,6 +68,4 @@ class InternalEndpoint
           contentType: 'text/csv'
         }
 
-      
-
-provide('InternalEndpoint', InternalEndpoint)
+provide('endpoint/api/internal', InternalEndpoint)

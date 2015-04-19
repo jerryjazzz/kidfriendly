@@ -20,4 +20,4 @@ class FactualEndpoint
       {factual_id} = req.params
       @factualService.singlePlace(factual_id)
 
-provide('FactualEndpoint', FactualEndpoint)
+provide('endpoint/api/factual', FactualEndpoint)
