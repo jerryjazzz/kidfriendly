@@ -18,6 +18,7 @@ class ExpressServer
     @server.use(require('express-domain-middleware'))
     @server.use(require('cookie-parser')())
     @server.use(require('body-parser').json())
+    @server.use(require('passport').initialize())
 
     morgan = require('morgan')
     morgan.token('timestamp', (req, res) -> timestamp())
@@ -37,12 +38,15 @@ class ExpressServer
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
     @server.use("/dashboard", staticDir('client/dashboard'))
+
+    @server.use('/api/auth', depend('AuthEndpoint').route)
     @server.use('/api/submit', depend('SubmitEndpoint').route)
     @server.use('/api/search', depend('SearchEndpoint').route)
     @server.use('/api/dev', depend('DevEndpoint').route)
     @server.use('/api/user', depend('UserEndpoint').route)
     @server.use('/api/place', depend('PlaceEndpoint').route)
     @server.use('/api/factual', depend('FactualEndpoint').route)
+    @server.use('/api/auth', depend('AuthEndpoint').route)
 
     # New style endpoints
     for endpoint in [depend('InternalEndpoint')]

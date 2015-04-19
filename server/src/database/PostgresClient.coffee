@@ -101,3 +101,5 @@ class PostgresClient
       attempt(0)
 
 provide('PostgresClient', PostgresClient)
+provide('db', -> depend('PostgresClient').knex)
+provide('db.insert', -> depend('PostgresClient').insert)
