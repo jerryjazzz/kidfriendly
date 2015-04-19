@@ -12,4 +12,8 @@ class AdminEndpoint
       passport.authenticate('facebook', { successRedirect: '/', \
                                           failureRedirect: '/login' }))
 
+    adminHome = depend('view/admin/home')
+    get @route, '/', ->
+      {presentation: 'view/admin/home'}
+
 provide('endpoint/admin', AdminEndpoint)

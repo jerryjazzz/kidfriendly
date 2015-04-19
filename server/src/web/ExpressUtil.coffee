@@ -1,9 +1,9 @@
 
 Promise = require('bluebird')
+React = require('react')
 
 class ExpressUtil
   constructor: ->
-    @htmlPresentation = depend('HtmlPresentation')
 
   wrappedGet: (router, path, arg1, arg2) =>
     router.get(path, @wrapRequestHandler(arg1, arg2))
@@ -11,19 +11,12 @@ class ExpressUtil
   wrappedPost: (router, path, arg1, arg2) =>
     router.post(path, @wrapRequestHandler(arg1, arg2))
   
-  wrapRequestHandler: (arg1, arg2) ->
-    if arg2?
-      options = arg1
-      callback = arg2
-    else
-      options = {}
-      callback = arg1
-
+  wrapRequestHandler: (callback) ->
     handler = (req, res) =>
       callbackResult = callback(req)
       Promise.resolve(callbackResult)
-        .then (result) =>
-          @writeResponse(req, res, options, result)
+        .then (data) =>
+          @renderResponse(req, res, data)
 
         .catch (err) ->
           statusCode = err?.statusCode ? 500
@@ -32,27 +25,47 @@ class ExpressUtil
 
     return handler
 
-  writeResponse: (req, res, options, result) ->
-    statusCode = result?.statusCode ? 200
+  renderResponse: (req, res, data) ->
+    statusCode = data?.statusCode ? 200
 
-    if result?.contentType?
+    if data?.contentType?
       # Result has custom content-type, don't mess with it.
-      res.set('Content-Type', result.contentType)
-      res.status(statusCode).send(result.content)
+      res.set('Content-Type', data.contentType)
+      res.status(statusCode).send(data.content)
       return
 
-    # Returning a plain JSON value
-
-    if req.accepts('html')
-      # Wrap json result in a nice html presentation
-      res.set('Content-Type', 'text/html')
-      html = @htmlPresentation.render(result)
-      res.status(statusCode).send(html)
+    if not req.accepts('html')
+      # Plain JSON response
+      res.set('Content-Type', 'application/json')
+      json = JSON.stringify(data, null, '\t')
+      res.status(statusCode).send(json)
       return
 
-    res.set('Content-Type', 'application/json')
-    json = JSON.stringify(result, null, '\t')
-    res.status(statusCode).send(json)
+    # Find view name, possibly from the data itself.
+    # Default view is jsonDump (used when a browser loads a plain JSON endpoint)
+    console.log('data = ', data)
+    viewName = data.presentation ? 'view/jsonDump'
+    console.log('viewName = ', viewName)
+
+    view = depend(viewName)(data)
+    if (not view.body?) or (not view.title?)
+      throw new Error("View needs to return {body,title} (for now)")
+
+    html = """
+    <html>
+      <head>
+        <title>#{view.title}</title>
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+          <script src="/js/jquery.min.js"></script>
+      </head>
+      #{React.renderToStaticMarkup(view.body)}
+    </html>
+    """
+
+    res.set('Content-Type', 'text/html')
+    res.status(statusCode).send(html)
+    return
 
 provide('ExpressUtil', ExpressUtil)
 provide('ExpressGet', -> depend('ExpressUtil').wrappedGet)
