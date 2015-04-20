@@ -28,12 +28,6 @@ class ExpressUtil
   renderResponse: (req, res, data) ->
     statusCode = data?.statusCode ? 200
 
-    if data?.contentType?
-      # Result has custom content-type, don't mess with it.
-      res.set('Content-Type', data.contentType)
-      res.status(statusCode).send(data.content)
-      return
-
     if not req.accepts('html')
       # Plain JSON response
       res.set('Content-Type', 'application/json')
@@ -48,9 +42,19 @@ class ExpressUtil
     console.log('viewName = ', viewName)
 
     view = depend(viewName)(data)
+
+    if view.content? and view.contentType?
+      # Custom content type
+      res.set('Content-Type', view.contentType)
+      res.status(statusCode).send(view.content)
+      return
+
     if (not view.body?) or (not view.title?)
       throw new Error("View needs to return {body,title} (for now)")
 
+    @renderBootstrapHTML(req, res, statusCode, view)
+
+  renderBootstrapHTML: (req, res, statusCode, view) ->
     html = """
     <html>
       <head>

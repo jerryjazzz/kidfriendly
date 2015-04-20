@@ -22,4 +22,15 @@ class SearchEndpoint
       .then (places) ->
         place.toClient() for place in places
 
+    get @route, '/exceldump', (req) =>
+      {lat, long, zipcode, meters} = req.query
+      meters = meters ? @defaultSearchRange
+      searchOptions = {lat, long, zipcode, meters}
+
+      factualConsumer.geoSearch(searchOptions)
+      .then ->
+        placeSearch.search(searchOptions)
+      .then (places) ->
+        {presentation: 'view/placesCSV', places: places}
+
 provide('endpoint/api/search', SearchEndpoint)
