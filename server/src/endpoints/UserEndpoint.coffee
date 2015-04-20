@@ -67,4 +67,4 @@ class UserEndpoint
         {statusCode: 400, error: type: 'email_already_exists'}
     ###
 
-provide('UserEndpoint', UserEndpoint)
+provide('endpoint/api/user', UserEndpoint)
