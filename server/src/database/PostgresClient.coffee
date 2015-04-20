@@ -48,16 +48,14 @@ class PostgresClient
     .then =>
       connection.destroy()
 
-  sqlMigrate: =>
-    if @appConfig.roles?.dbMigration?
+  sqlMigrate: ->
+    if not @knex?
+      @log("skipping migration (no DB)")
+      return
 
-      if not @knex?
-        @log("skipping migration (no DB)")
-        return
-
-      SchemaMigration = depend('SchemaMigration')
-      migration = new SchemaMigration(this)
-      migration.start()
+    SchemaMigration = depend('SchemaMigration')
+    migration = new SchemaMigration(this)
+    migration.start()
 
   insert: (tableName, row) =>
     tableSchema = @config.schema[tableName]
