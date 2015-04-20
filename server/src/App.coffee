@@ -51,6 +51,10 @@ class App
       @db = @postgresClient.knex
       @insert = @postgresClient.insert
 
+  sqlMigrate: =>
+    if @config.appConfig.roles?.dbMigration?
+      @postgresClient.sqlMigrate()
+
   fetchCurrentGitVersion: =>
     SourceUtil.getCurrentGitCommit()
       .then (info) =>

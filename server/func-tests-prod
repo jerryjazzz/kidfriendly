@@ -1,0 +1,2 @@
+
+TARGET_SERVER=prod ./mocha-coffee functest/$1

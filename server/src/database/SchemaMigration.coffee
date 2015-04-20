@@ -38,7 +38,9 @@ class ExistingColumn
     return false
 
 class SchemaMigration
-  constructor: (@app) ->
+  constructor: ->
+    @db = depend('db')
+    @config = depend('Configs')
 
   start: ->
     @getExistingTableNames()
@@ -46,24 +48,23 @@ class SchemaMigration
     .then(@updateEveryTable)
 
   getExistingTableNames: ->
-    @app.db.select('table_name').from('information_schema.tables').where(table_schema:'public')
+    @db.select('table_name').from('information_schema.tables').where(table_schema:'public')
       .then (rows) =>
-        #console.log('existing table names = ', rows)
         @existingTableNames = (row.table_name for row in rows)
 
   updateTypes: =>
     Promise.all(\
-      for typename, details of (@app.config.schema._types ? [])
-        @app.db.select('typname').from('pg_type').where(typname:typename)
+      for typename, details of (@config.schema._types ? [])
+        @db.select('typname').from('pg_type').where(typname:typename)
         .then (existing) =>
           if not existing[0]?
-            @app.log("SchemaMigration: creating type #{typename}")
-            @app.db.raw("create type #{typename} as #{details.decl}")
+            console.log("SchemaMigration: creating type #{typename}")
+            @db.raw("create type #{typename} as #{details.decl}")
     )
 
   updateEveryTable: =>
     Promise.all(\
-      for tableName, table of @app.config.schema
+      for tableName, table of @config.schema
         if tableName == '_types'
           continue
         @updateTable(tableName, table)
@@ -72,15 +73,17 @@ class SchemaMigration
 
   updateTable: (tableName, table) ->
     if not (tableName in @existingTableNames)
+      console.log('create table: ', tableName)
       @createTable(tableName, table)
     else
+      console.log('update table: ', tableName)
       @updateExistingTable(tableName, table)
 
   createTable: (tableName, table) ->
     columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of table.columns)
     strs = (column.definitionStr() for column in columnDefinitions)
-    @app.log("SchemaMigration: creating table #{tableName}")
-    return @app.db.raw("create table #{tableName} (#{strs.join(', ')})")
+    console.log("SchemaMigration: creating table #{tableName}")
+    return @db.raw("create table #{tableName} (#{strs.join(', ')})")
 
   updateExistingTable: (tableName, table) ->
     @getExistingFields(tableName).then (existingFields) =>
@@ -107,25 +110,25 @@ class SchemaMigration
     if changeList.length == 0
       return
 
-    @app.log("SchemaMigration: updating table #{tableName}")
+    console.log("SchemaMigration: updating table #{tableName}")
 
     #console.log("table #{tableName} needs change list ", changeList)
     queries = for change in changeList
       switch change.type
         when 'add'
-          @app.log("SchemaMigration: adding column #{change.column.name} to table #{tableName}")
-          @app.db.raw("alter table #{tableName} add column #{change.column.definitionStr()}")
+          console.log("SchemaMigration: adding column #{change.column.name} to table #{tableName}")
+          @db.raw("alter table #{tableName} add column #{change.column.definitionStr()}")
 
         when 'change_type'
-          @app.log("SchemaMigration: changing type of column #{change.to.name} to #{change.to.type} on "\
+          console.log("SchemaMigration: changing type of column #{change.to.name} to #{change.to.type} on "\
             +"table #{tableName}")
 
-          @app.db.raw("alter table #{tableName} alter column #{change.to.name} type #{change.to.type}")
+          @db.raw("alter table #{tableName} alter column #{change.to.name} type #{change.to.type}")
 
     Promise.all(queries)
 
   getExistingFields: (tableName) ->
-    @app.db.select('column_name','data_type','character_maximum_length').from('information_schema.columns').where(table_name:tableName)
+    @db.select('column_name','data_type','character_maximum_length').from('information_schema.columns').where(table_name:tableName)
       .then (rows) =>
         #console.log('result from information_schema = ', rows)
         result = {}
