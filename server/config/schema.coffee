@@ -48,17 +48,14 @@ source_ver =
 
 # User table #
 
-###
 schema.users = {primary_key: 'user_id'}
 schema.users.columns = {
   user_id
   email: {type: 'varchar(255)', options: 'not null unique'}
   created_at
-  created_by_ip: {type: ip_address_type}
   updated_at
   source_ver
 }
-###
 
 # Email_signup table #
 

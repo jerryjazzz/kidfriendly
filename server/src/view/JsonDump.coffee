@@ -1,0 +1,41 @@
+
+
+React = require('react')
+{html,body,div,table,td,tr,h3,code,a,form} = React.DOM
+
+JsonTable = (data) ->
+  rows = for k,v of data
+    if ObjectUtil.isObject(v)
+      v = JSON.stringify(v)
+    tr {key:k}, (td {}, k), (td {}, v)
+  table {className: "table table-striped"}, rows
+
+getTitle = (data) ->
+  data.name ? ''
+
+getLinks = (data) ->
+  if data.type == 'Place'
+    return {
+      'Details': "/api/place/#{data.place_id}/details"
+      'Factual source': 'http://factual.com/'+data.factual_id
+    }
+  {}
+
+LinkList = (data) ->
+  items = for name, url of getLinks(data)
+    a {key:name, className: 'btn btn-default', href: url}, name
+  div {}, items
+
+Body = (data) ->
+  body({},
+    (h3 {}, "Raw JSON"),
+    (code {}, JSON.stringify(data, null, '\t')),
+    (h3 {}, "Contents"),
+    (JsonTable data),
+    (h3 {}, "Links"),
+    (LinkList data)
+  )
+
+provide 'view/jsonDump', -> (data) ->
+  title: getTitle(data)
+  body: Body(data)

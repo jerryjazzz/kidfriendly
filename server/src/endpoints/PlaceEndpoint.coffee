@@ -72,4 +72,4 @@ class PlaceEndpoint
         .then (place) ->
           {place_id:place.place_id, name: place.name, rating:place.rating}
 
-provide('PlaceEndpoint', PlaceEndpoint)
+provide('endpoint/api/place', PlaceEndpoint)

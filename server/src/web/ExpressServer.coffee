@@ -18,6 +18,7 @@ class ExpressServer
     @server.use(require('express-domain-middleware'))
     @server.use(require('cookie-parser')())
     @server.use(require('body-parser').json())
+    @server.use(require('passport').initialize())
 
     morgan = require('morgan')
     morgan.token('timestamp', (req, res) -> timestamp())
@@ -32,21 +33,15 @@ class ExpressServer
     redirect = (to) -> ((req,res) -> res.redirect(301, to))
 
     @server.get("/", staticFile('client/web/dist/index.html'))
-    @server.get("/static/RestView.js", staticFile('server/build/RestView.js'))
+    @server.get("/js/jquery.min.js", staticFile('server/node_modules/jquery/dist/jquery.min.js'))
+    @server.get("/js/jquery.min.map", staticFile('server/node_modules/jquery/dist/jquery.min.map'))
     @server.get("/index.html", redirect('/'))
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
     @server.use("/dashboard", staticDir('client/dashboard'))
-    @server.use('/api/submit', depend('SubmitEndpoint').route)
-    @server.use('/api/search', depend('SearchEndpoint').route)
-    @server.use('/api/dev', depend('DevEndpoint').route)
-    @server.use('/api/user', depend('UserEndpoint').route)
-    @server.use('/api/place', depend('PlaceEndpoint').route)
-    @server.use('/api/factual', depend('FactualEndpoint').route)
 
-    # New style endpoints
-    for endpoint in [depend('InternalEndpoint')]
-      @server.use('/api' + endpoint.defaultPath, endpoint.route)
+    for name, endpoint of depend.multi('endpoint/')
+      @server.use("/#{name}", endpoint.route)
 
     port = @expressConfig.port
     @app.log("launching Express server on port #{port}")

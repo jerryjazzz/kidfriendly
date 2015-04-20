@@ -1,3 +1,0 @@
-
-UserAppUtil =
-  appId: '***REMOVED***'

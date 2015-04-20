@@ -7,4 +7,4 @@ class DevEndpoint
     @route.get '/config', (req, res) =>
       res.send(app.config)
 
-provide('DevEndpoint', DevEndpoint)
+provide('endpoint/api/dev', DevEndpoint)
