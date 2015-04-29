@@ -13,12 +13,12 @@ class Facebook
     passportOptions =
       clientID: @appId
       clientSecret: @appSecret
-      callbackURL: "#{@configuredURL}/admin/auth/facebook/callback"
 
     passport.use new FacebookStrategy passportOptions, (accessToken, refreshToken, profile, done) =>
       @findOrCreateFromPassport(profile)
-      .then (res) =>
-        done(null, res)
+      .then (user) =>
+        user.auth.facebook_token = accessToken
+        done(null, user)
       .catch (err) =>
         console.log(err)
         done(err)

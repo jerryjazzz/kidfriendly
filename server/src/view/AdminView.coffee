@@ -15,6 +15,8 @@ provide 'view/admin/home', -> (data) ->
 
     (a {href:'/admin/auth/facebook'}, "Facebook login"),
 
+    div {}, "Your facebook token: "+data.user.facebookToken
+
     div {},
       "Get excel dump for zipcode: ",
       input {id: 'get_excel_dump_input'}
