@@ -22,6 +22,6 @@ class AdminEndpoint
     adminHome = depend('view/admin/home')
     get @route, '/', (req) ->
       presentation: 'view/admin/home'
-      user: JSON.stringify(req.user)
+      user: req.user
 
 provide('endpoint/admin', AdminEndpoint)
