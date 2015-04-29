@@ -8,13 +8,13 @@
                 </div>
             </div>
         </div>
-        <div class="row hideable-row" style="margin-top: 5%" ng-if="hasPosition">
+        <div class="row hideable-row" style="margin-top: 5%" ng-if="data.hasPosition">
             <div class="col col-100">
                 <a  href="#/search/nearby" class="button button-treatment button-block button-positive">
-                    <i class="ion-pinpoint icon-smaller"></i>Search Nearby</a>
+                    <i class="ion-pinpoint icon-smaller"></i>Search near me</a>
             </div>
         </div>
-        <div class="row hideable-row" style="margin-top: 5%" ng-if="hasPosition">
+        <div class="row hideable-row" style="margin-top: 5%" ng-if="data.hasPosition">
             <div class="col col-100 or-text">
                 - or -
             </div>
@@ -22,20 +22,18 @@
         <div class="row" style="margin-top: 5%">
             <div class="col col-100">
                 <label class="item item-input input-compact">
-                    <input type="text" ng-model="userData.postalCode" placeholder=" Postal Code">
-                    <a class="button button-treatment button-balanced" style="display:inline-block" href="#/search/{{userData.postalCode}}">
+                    <input type="text" ng-model="data.userData.postalCode" placeholder=" Postal Code">
+                    <a class="button button-treatment button-balanced" style="display:inline-block" href="#/search/{{data.userData.postalCode}}">
                         <i class="icon ion-search icon-smaller" style="margin-right: 0px"></i>
                     </a>
                 </label>
             </div>
         </div>
-        <a class="button button-treatment button-block facebook-button button-positive" ua-oauth-link="facebook" ng-hide="user.authenticated">
-            <i class="icon-smaller ion-social-facebook"></i>
-            Sign in with Facebook
-        </a>
-        <a class="button button-treatment button-block facebook-button button-positive" ng-show="user.authenticated" ua-logout>
-            <i class="icon-smaller ion-social-facebook"></i>
+        <kf-facebook-button class="facebook-button"></kf-facebook-button>
+        <div class="facebook-button">
+        <button ng-click="logout()" class="button button-treatment button-block button-positive" ng-show="data.user.authenticated">
             Sign out
-        </a>
+        </button>
+        </div>
     </ion-content>
 </ion-view>

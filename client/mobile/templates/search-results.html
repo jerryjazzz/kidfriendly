@@ -16,6 +16,6 @@
                 <kf-hours hours="result.hours"></kf-hours>
             </a>
         </ion-list>
-        <p>Sorry no results for this area.</p>
+        <p ng-hide="results.length == 0">Sorry no results for this area.</p>
     </ion-content>
 </ion-view>
