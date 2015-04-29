@@ -1,11 +1,12 @@
 'use strict'
 class StartCtrl
-  constructor: ($scope, position) ->
-    $scope.hasPosition = position?.coords?.latitude?
-    $scope.userData = {}
+  constructor: ($scope, position, userService, $window) ->
+    $scope.data = {}
+    $scope.data.hasPosition = position?.coords?.latitude?
+    $scope.data.userData = {}
+    $scope.data.user = userService.user
+    $scope.logout = ->
+      userService.logout()
 
-    $scope.searchPostal = ->
-      console.log 'hello??', $scope.userData.postalCode
-
-StartCtrl.$inject = ['$scope', 'position']
+StartCtrl.$inject = ['$scope', 'position', 'userService', '$window']
 angular.module('Mobile').controller 'StartCtrl', StartCtrl

@@ -37,13 +37,14 @@ class DetailsCtrl
 
     $scope.makeCall = (phoneNumber) ->
       analyticsService.trackEvent("Details", "Make Call")
-      $window.location.href = "tel: #{phoneNumber}"
+      $window.open("tel:#{phoneNumber}")
 
     $scope.navigate = ->
       launchnavigator.navigate [place.lat, place.long], null, ->
         analyticsService.trackEvent("Details", "directions")
 
   _calculateScores: (place) ->
+    return unless place.reviews?
     for review in place.reviews
       @placesService.calculateScore(review)
 

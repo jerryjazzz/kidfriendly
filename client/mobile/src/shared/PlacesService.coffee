@@ -15,11 +15,7 @@ class PlacesService
     url = @createUrl(keyword, position)
     @httpGet(url).success (data) =>
       @searchResults = data
-      for result in @searchResults
-        result.distance = @geolib.getDistance(position,
-          {latitude:parseFloat(result.lat, 10), longitude:parseFloat(result.long, 10)}
-        )
-        result.distance = Math.round(result.distance * 0.000621371 * 10) / 10
+      @calculateDistance(data, position) if position?
       deferred.resolve(@searchResults)
     .error (reason) ->
       deferred.resolve []
@@ -32,16 +28,20 @@ class PlacesService
     else
       "#{url}&zipcode=#{keyword}"
 
+  calculateDistance:(data, position) ->
+    for result in data
+      result.distance = @geolib.getDistance(position,
+        {latitude:parseFloat(result.lat, 10), longitude:parseFloat(result.long, 10)}
+      )
+      result.distance = Math.round(result.distance * 0.000621371 * 10) / 10
+
   calculateScore: (review) ->
-    review.score = review.score =
+    review.score =
       review.body.kidsMenu * 6 +
       review.body.healthOptions * 6 +
       review.body.accommodations * 4 +
       review.body.service * 4
-
-  getPlace: (id) ->
-    return result for result in @searchResults when result.place_id == id
-    return null
+    review
 
   getPlaceDetail:(id) ->
     deferred = @$q.defer()

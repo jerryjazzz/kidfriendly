@@ -1,23 +1,23 @@
 'use strict'
-angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova', 'ngTouch', 'angular-carousel', 'uiGmapgoogle-maps'])
-.run ($ionicPlatform, user, $state, $ionicHistory, analyticsService) ->
+angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch', 'angular-carousel', 'uiGmapgoogle-maps', 'permission'])
+.run ($ionicPlatform, $state, $ionicHistory, analyticsService, Permission, userService, $rootScope) ->
   attemptedRoute = undefined
 
+  Permission.defineRole 'authenticated', (stateParams) ->
+    userService.user.authenticated
+
   analyticsService.initAndTrackPages()
-  user.getCurrent().then (u) -> analyticsService.setUser(u.user_id)
+  analyticsService.setUser(userService.user.id) if userService.user.id?
 
-  user.init
-    appId: '***REMOVED***'
-    heartbeatInterval: 600000
-
-  user.onAuthenticationRequired (route, stateParams) =>
+  $rootScope.$on '$stateChangePermissionDenied', (event, toState, toParams) ->
+    console.log 'you shall not pass', toState, toParams
     attemptedRoute =
-      route: route
-      params: stateParams
+      route: toState
+      params: toParams
     $state.go 'login'
 
-  user.onAuthenticationSuccess =>
-    analyticsService.setUser(user.current.user_id) if user.current.authenticated
+  $rootScope.$on '$authenticationSuccess', (user)->
+    analyticsService.setUser(user.id) if user.authenticated
     analyticsService.trackEvent("Auth", "SignIn", "Success")
     if attemptedRoute?
       $ionicHistory.currentView($ionicHistory.backView());
@@ -47,21 +47,14 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     controller: 'SearchCtrl'
     resolve:
       results: resolvers.results
-    data:
-      public: true
-    public:true
 
   .state 'login',
     url: '/login'
     templateUrl: 'templates/login.html'
-    data:
-      login: true
 
   .state 'signup',
     url: '/signup'
     templateUrl: 'templates/signup.html'
-    data:
-      public: true
 
   .state 'start',
     url: '/start'
@@ -69,14 +62,17 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     controller: 'StartCtrl'
     resolve:
       position: resolvers.position
-    data:
-      public: true
-    public: true
 
   .state 'review',
     url: '/review/:placeId'
     templateUrl: 'templates/review.html'
     controller:'ReviewCtrl'
+    data: {
+      permissions: {
+        only: ['authenticated']
+        redirectTo: 'login'
+      }
+    }
 
   .state 'details',
     url:'/details/:placeId'
@@ -84,9 +80,6 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'UserApp', 'ngCordova'
     resolve:
       place: resolvers.place
     controller:'DetailsCtrl'
-    data:
-      public: true
-    public: true
 
   .state 'thankyou',
     url:'/thankyou'
