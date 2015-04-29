@@ -10,10 +10,7 @@ class AdminEndpoint
     get = depend('ExpressGet')
     @facebook = depend('Facebook')
 
-    @route.get('/auth/facebook', passport.authenticate('facebook',
-      scope: 'email'
-      callbackURL: "#{@facebook.configuredURL}/admin/auth/facebook/callback"
-    ))
+    @route.get('/auth/facebook', passport.authenticate('facebook', scope: 'email'))
 
     @route.get('/auth/facebook/callback',
       passport.authenticate('facebook', { successRedirect: '/admin', \
