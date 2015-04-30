@@ -1,6 +1,6 @@
 'use strict'
 class ReviewCtrl
-  constructor:($scope, placesService, $stateParams, user, $ionicModal, $ionicHistory, analyticsService)->
+  constructor:($scope, placesService, $stateParams, $ionicModal, $ionicHistory, analyticsService)->
     $scope.data = {}
     $scope.data.review = {}
     $scope.data.review.body =
@@ -26,17 +26,16 @@ class ReviewCtrl
       $scope.modal.remove()
 
     $scope.submit = () ->
-      name = "#{user.current.first_name} #{user.current.last_name?.substring(0, 1)}"
-      $scope.data.review.name = name
-      placesService.submitReview(user.current.user_id, $stateParams.placeId, $scope.data.review)
-      analyticsService.trackEvent("Review", "submit", 'new', placesService.calculateScore($scope.data.review))
-      $scope.modal.show()
+#      name = "#{user.current.first_name} #{user.current.last_name?.substring(0, 1)}"
+#      $scope.data.review.name = name
+#      placesService.submitReview(user.current.user_id, $stateParams.placeId, $scope.data.review)
+#      analyticsService.trackEvent("Review", "submit", 'new', placesService.calculateScore($scope.data.review))
+#      $scope.modal.show()
 
 ReviewCtrl.$inject = [
   '$scope'
   'placesService'
   '$stateParams'
-  'user'
   '$ionicModal'
   '$ionicHistory'
   'analyticsService'
