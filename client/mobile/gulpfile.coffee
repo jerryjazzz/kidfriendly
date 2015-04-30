@@ -62,7 +62,7 @@ gulp.task "tdd", ["default"], (done) ->
 gulp.task "test", (done) ->
   karma.start
     configFile: __dirname + "/karma.conf.coffee"
-    singleRun: true
+    singleRun: false
   , done
   return
 
