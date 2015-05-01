@@ -4,21 +4,62 @@ passport = require('passport')
 class AdminEndpoint
   emailWhitelist:
     'andy.fischer@gmail.com': true
+    'joe.rozek@gmail.com': true
+    'robert.clayton.bell@gmail.com': true
+    'taylor.r.bell@gmail.com': true
 
   constructor: ->
     @route = require('express')()
     get = depend('ExpressGet')
     @facebook = depend('Facebook')
 
-    @route.get('/auth/facebook', passport.authenticate('facebook', scope: 'email'))
+    @route.use(require('cookie-parser')('718473'))
+    @route.use(require('express-session')(secret: '718473', resave: false, saveUninitialized: false))
+    @route.use(require('passport').initialize())
+    @route.use(require('passport').session())
 
-    @route.get('/auth/facebook/callback',
-      passport.authenticate('facebook', { successRedirect: '/admin', \
-                                          failureRedirect: '/admin' }))
+    # These endpoints do not require login
+    get @route, '/login-required', ->
+      view: 'view/admin/login-required'
 
-    adminHome = depend('view/admin/home')
-    get @route, '/', (req) ->
-      presentation: 'view/admin/home'
-      user: req.user
+    get @route, '/email-not-on-whitelist', (req) ->
+      view: 'view/admin/email-not-on-whitelist'
+      email: req.user[0].email
+
+    get @route, '/logout', (req) ->
+      req.logout()
+      {
+        view: 'view/admin/logged-out'
+      }
+        
+    @route.get '/auth/facebook', passport.authenticate('facebook', {
+      callbackURL: '/admin/auth/facebook'
+      successRedirect: '/admin'
+      failureRedirect: '/admin'
+    })
+
+    # Enforce login and check email
+    @route.use (req, res, next) =>
+      if not req.user?
+        return res.redirect('/admin/login-required')
+
+      email = req.user[0].email
+      if not @emailWhitelist[email]
+        return res.redirect('/admin/email-not-on-whitelist')
+
+      next()
+
+    # Below here, endpoints are only reachable if user is whitelisted.
+
+    get @route, '/', (req) =>
+      user = req.user[0]
+
+      {
+        view: 'view/admin/home'
+        user: user.toClient()
+        session: req.session
+        facebookToken: @facebook.recentFacebookTokens[user.user_id]
+      }
+
 
 provide('endpoint/admin', AdminEndpoint)

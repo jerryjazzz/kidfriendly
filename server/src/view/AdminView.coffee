@@ -13,9 +13,15 @@ provide 'view/admin/home', -> (data) ->
   body: body {},
     (h1 {}, "/admin"),
 
-    (a {href:'/admin/auth/facebook'}, "Facebook login"),
+    a {href:'/admin/logout'}, "Logout"
 
-    div {}, "User data: "+JSON.stringify(data.user)
+    h3 {}, 'User info'
+
+    div {}, "Your user data: "+JSON.stringify(data.user)
+
+    div {}, "Your Facebook token: "+data.facebookToken
+
+    h3 {}, 'Tools'
 
     div {},
       "Get excel dump for zipcode: ",
@@ -26,3 +32,22 @@ provide 'view/admin/home', -> (data) ->
         if e.keyCode == 13
           zipcode = $('#get_excel_dump_input')[0].value
           window.location = '/api/search/exceldump?zipcode=' + zipcode
+
+provide 'view/admin/login-required', -> (data) ->
+  title: 'Error'
+  body: body {},
+    (h3 {}, "Login Required"),
+    (a {href:'/admin/auth/facebook'}, "Login with Facebook")
+
+provide 'view/admin/email-not-on-whitelist', -> (data) ->
+  title: 'Error'
+  body: body {},
+    h3 {}, "Email not on whitelist"
+    div {}, data.email
+    a {href:'/admin/logout'}, "Logout"
+
+provide 'view/admin/logged-out', -> (data) ->
+  title: 'Logged out'
+  body: body {},
+    h3 {}, "Logged out"
+    (a {href:'/admin/auth/facebook'}, "Login with Facebook")
