@@ -10,6 +10,7 @@ class Facebook
 
   constructor: ->
     @userDao = depend('UserDAO')
+    @http = depend('http')
 
     passportOptions =
       clientID: @appId
@@ -47,5 +48,21 @@ class Facebook
     @userDao.insert
       email: email
       created_at: timestamp()
+
+  validateToken: (token) ->
+    url = "https://graph.facebook.com/me?access_token=#{token}"
+    @http.request(url: url)
+    .then (body) ->
+      console.log(body)
+      return true
+
+      if body.statusCode != 200
+        return false
+
+      data = JSON.parse(body)
+
+    .catch (err) ->
+      console.log('Facebook.validateToken err: ', err)
+      return false
 
 provide('Facebook', Facebook)
