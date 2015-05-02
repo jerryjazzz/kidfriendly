@@ -14,6 +14,7 @@ class FactualConsumer
   geoSearch: (options) ->
     @factualService.geoSearch(options)
     .then (factualPlaces) =>
+      #console.log("factual returned #{factualPlaces.length} places")
       @correlateFactualPlaces(factualPlaces)
 
   correlateFactualPlaces: (factualPlaces) ->
@@ -32,6 +33,9 @@ class FactualConsumer
         foundPlace = foundPlaces[factualPlace.factual_id]
         if foundPlace?
           @app.log("updating place #{foundPlace.place_id} with factual #{factualPlace.factual_id}")
+
+          #console.log('factualPlace = ', JSON.stringify(factualPlace))
+          #console.log('foundPlace = ', JSON.stringify(foundPlace))
 
           # TODO: use PlaceDAO.modify instead.
           place = foundPlace.startPatch()
@@ -81,7 +85,7 @@ class FactualConsumer
     @factualRating.recalculateFactualBasedRating(place)
 
   refreshOnePlace: (place) =>
-    console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
+    #console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
     @factualService.singlePlace(place.factual_id)
     .then (factualPlace) =>
       @updatePlaceWithFactualData(place, factualPlace)
