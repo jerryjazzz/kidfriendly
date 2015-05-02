@@ -1,5 +1,6 @@
 
 Promise = require('bluebird')
+querystring = require('querystring')
 
 class FactualService
   queryLimit: 50 # max allowed by factual
@@ -25,26 +26,35 @@ class FactualService
         else
           resolve(res)
 
-  geoSearch: (searchOptions) ->
-    @placeSearch.resolveZipcode(searchOptions)
-    {lat, long, meters} = searchOptions
+  factualOptions: ({lat, long, meters}) ->
     Assert.notNull(lat, 'lat')
     Assert.notNull(long, 'long')
     Assert.notNull(meters, 'meters')
 
-    options =
+    {
       filters:
         category_ids: {'$includes': 347} # restaurants
       geo:
         $circle:
           $center: [lat, long]
           $meters: meters
-          $meters: meters
       limit: @queryLimit
+    }
 
-    @_apiGet('/t/restaurants-us', options)
+  geoSearch: (searchOptions) ->
+    @_apiGet('/t/restaurants-us', @factualOptions(searchOptions))
       .then (result) =>
         result.data
+
+  getUrl: (searchOptions) ->
+    factualOptions = @factualOptions(searchOptions)
+    params = {}
+    for k,v of factualOptions
+      params[k] = JSON.stringify(v)
+    params.KEY = @key
+    return {
+      url: "http://api.v3.factual.com/t/restaurants-us?#{querystring.stringify(params)}"
+    }
 
   singlePlace: (factual_id) ->
     @_apiGet('/t/restaurants-us/' + factual_id)

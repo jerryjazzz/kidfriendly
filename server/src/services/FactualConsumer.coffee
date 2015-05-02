@@ -81,7 +81,7 @@ class FactualConsumer
     @factualRating.recalculateFactualBasedRating(place)
 
   refreshOnePlace: (place) =>
-    console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
+    #console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
     @factualService.singlePlace(place.factual_id)
     .then (factualPlace) =>
       @updatePlaceWithFactualData(place, factualPlace)
