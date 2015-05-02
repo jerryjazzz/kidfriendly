@@ -1,4 +1,5 @@
 
+fs = require('fs')
 path = require('path')
 
 class ExpressServer
@@ -44,8 +45,21 @@ class ExpressServer
       @server.use("/#{name}", endpoint.route)
 
     port = @expressConfig.port
-    @app.log("launching Express server on port #{port}")
-    @server.listen(port)
+
+    if process.env.KFLY_DEV_SSL
+      @app.log("launching Express server on port #{port} (using dev-mode SSL)")
+
+      # Dev SSL mode. In prod, nginx handles SSL instead, and we use a real cert.
+      https = require('https')
+      options =
+        key: fs.readFileSync('server/etc/self-signed-key.pem')
+        cert: fs.readFileSync('server/etc/self-signed-cert.pem')
+      https.createServer(options, @server).listen(port)
+
+    else
+      @app.log("launching Express server on port #{port}")
+      @server.listen(port)
+
     return
 
   helpers: (req, res, next) =>

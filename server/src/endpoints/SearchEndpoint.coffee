@@ -31,6 +31,6 @@ class SearchEndpoint
       .then ->
         placeSearch.search(searchOptions)
       .then (places) ->
-        {presentation: 'view/placesCSV', places: places}
+        {view: 'view/placesCSV', places: places}
 
 provide('endpoint/api/search', SearchEndpoint)
