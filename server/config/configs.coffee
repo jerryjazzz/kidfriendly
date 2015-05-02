@@ -4,8 +4,8 @@ module.exports = configs =
       adminPort: 3500
     postgres:
       host: '/tmp'
-      debugConnection: false
-      database: 'kidfriendly'
+      debugConnection: process.env.KFLY_DEBUG_DATABASE ? false
+      database: process.env.KFLY_DATABASE ? 'kidfriendly'
 
   apps:
     web:

@@ -32,26 +32,31 @@ class PlaceSearch
 
     @placeDao.get (query) =>
       # Filter to nearest rectangle
-      query.orWhere('lat', '>', bounds.lat1)
-      query.orWhere('lat', '<', bounds.lat2)
-      query.orWhere('long', '>', bounds.long1)
-      query.orWhere('long', '<', bounds.long2)
+      query.andWhere('lat', '>', bounds.lat1)
+      query.andWhere('lat', '<', bounds.lat2)
+      query.andWhere('long', '>', bounds.long1)
+      query.andWhere('long', '<', bounds.long2)
 
       query.orderBy('rating', 'desc')
 
       query.limit(@SearchLimit)
 
     .then (places) =>
+      #console.log("sql gave #{places.length} places")
       @checkDistance(places, searchOptions)
     .then (places) =>
+      #console.log("after checkdistance, have #{places.length} places")
       @computeSortOrder(places)
 
   checkDistance: (places, searchOptions) ->
     # Store 'distance' on each result, and filter out places that are too far.
 
     for place in places
+      #console.log("distance from: ", {latitude: place.lat, longitude: place.long})
+      #console.log("distance to: ", {latitude: searchOptions.lat, longitude: searchOptions.long})
       place.context.distance = Geolib.getDistance({latitude: place.lat, longitude: place.long},
           {latitude: searchOptions.lat, longitude: searchOptions.long})
+      #console.log("is ", place.context.distance)
 
     return places.filter (place) -> place.context.distance < searchOptions.meters
 

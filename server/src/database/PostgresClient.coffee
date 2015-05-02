@@ -18,8 +18,10 @@ class PostgresClient
 
   connect: =>
 
+    knexOptions = @getKnexOptions()
+
     depend('PromiseUtil').retry (retry) =>
-      @knex = require('knex')(@getKnexOptions())
+      @knex = require('knex')(knexOptions)
 
       # connection test
       @knex.raw('select 1')
@@ -31,7 +33,8 @@ class PostgresClient
           @createDatabase().then -> retry
           
     .then =>
-      @app.log("postgres connected")
+      @app.log("postgres connected to: " + knexOptions.connection.database)
+
     .catch (e) =>
       @app.log("[ERROR] postgres connection: " + e)
       @knex = null
