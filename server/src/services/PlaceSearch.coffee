@@ -5,23 +5,29 @@ Cities = require('cities')
 
 class PlaceSearch
   SearchLimit: 100
+  DefaultSearchRange: 16000
 
   constructor: ->
     @placeDao = depend('PlaceDAO')
     @geom = depend('GeomUtil')
 
-  resolveZipcode: (searchOptions) ->
-    if searchOptions.zipcode?
-      cityLookup = Cities.zip_lookup(searchOptions.zipcode)
-      if not cityLookup?
-        throw new Error("zipcode not found: " + searchOptions.zipcode)
-      [searchOptions.lat, searchOptions.long] = [cityLookup.latitude, cityLookup.longitude]
+  resolveSearchQuery: (query) ->
+    options = {lat, long, zipcode, meters, miles} = query
 
-    return searchOptions
+    if options.miles? and not options.meters?
+      options.meters = options.miles * 1609.34
+
+    options.meters = options.meters ? @DefaultSearchRange
+
+    if options.zipcode?
+      cityLookup = Cities.zip_lookup(options.zipcode)
+      if not cityLookup?
+        throw new Error("zipcode not found: " + options.zipcode)
+      [options.lat, options.long] = [cityLookup.latitude, cityLookup.longitude]
+
+    return options
 
   search: (searchOptions) ->
-    @resolveZipcode(searchOptions)
-
     bounds = @geom.getBounds(searchOptions)
 
     @placeDao.get (query) =>
