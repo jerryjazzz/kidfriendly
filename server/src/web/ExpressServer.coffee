@@ -13,7 +13,7 @@ class ExpressServer
     express = require('express')
     @server = express()
 
-    @server.use(@helpers)
+    @server.use(@add_stuff_to_request)
 
     # Middleware
     @server.use(require('express-domain-middleware'))
@@ -62,7 +62,7 @@ class ExpressServer
 
     return
 
-  helpers: (req, res, next) =>
+  add_stuff_to_request: (req, res, next) =>
     req.get_ip = ->
       this.headers['x-real-ip'] or this.connection.remoteAddress
 
