@@ -1,0 +1,25 @@
+
+# How to test using production data #
+
+- Set up a new empty database
+
+    psql
+    create database kfprod
+
+- Transfer data with pgdump
+
+    ssh kfly-1 pg_dump kidfriendly | psql -d kfprod
+
+    (This will give a bunch of errors about non-existant users, those errors
+    can be ignored)
+
+- Launch site with alternate database, using the KFLY_DATABASE envvar
+
+    KFLY_DATABASE=kfprod node forever web
+
+- Test, etc
+
+- Clean up
+
+    psql
+    drop database kfprod
