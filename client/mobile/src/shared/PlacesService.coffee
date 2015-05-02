@@ -24,9 +24,10 @@ class PlacesService
   createUrl:(keyword, position) ->
     url = "/api/search/nearby?type=restaurant"
     if keyword == 'nearby'
-      "#{url}&lat=#{position.latitude}&long=#{position.longitude}"
+      url = "#{url}&lat=#{position.latitude}&long=#{position.longitude}"
     else
-      "#{url}&zipcode=#{keyword}"
+      url = "#{url}&zipcode=#{keyword}"
+#    "#{url}&meters=#{10000}"
 
   calculateDistance:(data, position) ->
     for result in data
