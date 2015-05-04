@@ -17,14 +17,23 @@ getLinks = (data) ->
   if data.type == 'Place'
     return {
       'Details': "/api/place/#{data.place_id}/details"
+      'Reviews': "/api/place/#{data.place_id}/details/reviews"
       'Factual source': 'http://factual.com/'+data.factual_id
     }
   {}
 
-LinkList = (data) ->
-  items = for name, url of getLinks(data)
+LinkSection = (data) ->
+  links = getLinks(data)
+
+  items = for name, url of links
     a {key:name, className: 'btn btn-default', href: url}, name
-  div {}, items
+
+  if items.length == 0
+    return div()
+
+  div {},
+    (h3 {}, "Links"),
+    div {}, items
 
 Body = (data) ->
   body({},
@@ -32,8 +41,7 @@ Body = (data) ->
     (code {}, JSON.stringify(data, null, '\t')),
     (h3 {}, "Contents"),
     (JsonTable data),
-    (h3 {}, "Links"),
-    (LinkList data)
+    (LinkSection data)
   )
 
 provide 'view/jsonDump', -> (data) ->

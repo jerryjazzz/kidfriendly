@@ -21,6 +21,7 @@ provide 'view/admin/home', -> (data) ->
 
     div {}, "Your Facebook token: "+data.facebookToken
 
+
     h3 {}, 'Tools'
 
     div {},
@@ -33,6 +34,12 @@ provide 'view/admin/home', -> (data) ->
           zipcode = $('#get_excel_dump_input')[0].value
           window.location = '/api/search/exceldump?zipcode=' + zipcode
 
+    h3 {}, 'Browse'
+
+    div {}, a {href:'/api/place/any'}, '/place/any'
+
+    div {}, a {href:"/api/user/me?facebook_token=#{data.facebookToken}"}, '/user/me'
+
 provide 'view/admin/login-required', -> (data) ->
   title: 'Error'
   body: body {},
@@ -42,8 +49,8 @@ provide 'view/admin/login-required', -> (data) ->
 provide 'view/admin/email-not-on-whitelist', -> (data) ->
   title: 'Error'
   body: body {},
-    h3 {}, "Email not on whitelist"
-    div {}, data.email
+    h3 {}, "Login error"
+    div {}, "Email not on whitelist: #{data.email}"
     a {href:'/admin/logout'}, "Logout"
 
 provide 'view/admin/logged-out', -> (data) ->

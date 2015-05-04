@@ -30,7 +30,7 @@ class PlaceSearch
   search: (searchOptions) ->
     bounds = @geom.getBounds(searchOptions)
 
-    @placeDao.get (query) =>
+    @placeDao.find (query) =>
       # Filter to nearest rectangle
       query.andWhere('lat', '>', bounds.lat1)
       query.andWhere('lat', '<', bounds.lat2)

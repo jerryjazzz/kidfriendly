@@ -1,4 +1,6 @@
 
+Promise = require('bluebird')
+
 class UserEndpoint
   constructor: ->
     @app = depend('App')
@@ -6,65 +8,58 @@ class UserEndpoint
     get = depend('ExpressGet')
     post = depend('ExpressPost')
     @route = require('express')()
+    facebook = depend('Facebook')
+
+    getValidatedUser = (req) ->
+      user_id = req.params.user_id
+      facebook_token = req.query.facebook_token
+
+      if not facebook_token?
+        return Promise.reject("facebook_token is required")
+
+      facebook.validateToken(facebook_token)
+      .then (validatedUser) ->
+        if user_id != 'me' and validatedUser.user_id != user_id
+          return Promise.reject("Facebook token is for a different user")
+
+        validatedUser
+
+    @route.use '/:user_id*', (req, res, next) =>
+      getValidatedUser(req)
+      .then (user) ->
+        req.user = user
+        next()
+      .catch (err) ->
+        console.log("getValidatedUser error: #{err}")
+        res.sendRendered({error: err})
+
+    get @route, '/:user_id', (req) =>
+      req.user.toClient()
+
+    get @route, '/:user_id/reviews', (req) =>
+      user_id = req.user.user_id
+      @reviewDao.find((query) -> query.where({user_id}))
+      .then (reviews) ->
+        review.toClient() for review in reviews
 
     get @route, '/:user_id/place/:place_id/review', (req) =>
-      # SECURITY_TODO: Check auth token
-
-      {user_id, place_id, token} = req.params
-
-      ###
-      if not token?
-        {statusCode: 400, error: message: 'Token is required'}
-
-      check = new UserAppCheckToken(@app)
-      check.start(token)
-      ###
-
-      @app.db.select('review_id','place_id','body').from('review').where({user_id,place_id})
-        .then (response) ->
-          response[0] ? null
+      user_id = req.user.user_id
+      place_id = req.params.place_id
+      @reviewDao.findOne((query) -> query.where({user_id,place_id}))
+      .then (place) -> place.toClient()
 
     post @route, '/:user_id/place/:place_id/review', (req) =>
-      # TODO: Should check that user_id and place_id actually exist.
-      # SECURITY_TODO: Check auth token
 
-      {user_id, place_id, token} = req.params
+      user_id = req.user.user_id
+      place_id = req.params.place_id
 
-      manualId = req.body.review_id # usually null
+      where = (query) -> query.where({user_id, place_id})
 
-      whereFunc = (query) -> query.where({user_id, place_id})
-      modifyFunc = (review) ->
+      @reviewDao.modifyOrInsert where, (review) ->
         review.review_id = manualId
         review.body = JSON.stringify(req.body.review)
         review.user_id = user_id
         review.place_id = place_id
         review.reviewer_name = req.body.review.name
-
-      @reviewDao.modify(whereFunc, modifyFunc, {allowInsert:true})
-
-    ###
-    @route.post '/:user_id/delete', wrap (req) =>
-      # SECURITY_TODO: Verify permission to delete
-      @app.db('users').where(user_id:req.params.user_id).delete()
-        .then(-> {})
-
-    @route.post '/new', wrap (req) =>
-
-      if not req.body.email?
-        return {statusCode: 400, message: "email is missing from body"}
-
-      manualId = req.body.user_id # usually null
-
-      row =
-        user_id: manualId
-        email: req.body.email
-        created_at: timestamp()
-        created_by_ip: req.get_ip()
-        source_ver: @app.sourceVersion
-
-      @app.insert('users', row)
-      .catch Database.existingKeyError('email'), ->
-        {statusCode: 400, error: type: 'email_already_exists'}
-    ###
 
 provide('endpoint/api/user', UserEndpoint)

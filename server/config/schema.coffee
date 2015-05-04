@@ -52,6 +52,7 @@ schema.users = {primary_key: 'user_id'}
 schema.users.columns = {
   user_id
   email: {type: 'varchar(255)', options: 'not null unique'}
+  facebook_id: {type: 'varchar(20)'}
   created_at
   updated_at
   source_ver
