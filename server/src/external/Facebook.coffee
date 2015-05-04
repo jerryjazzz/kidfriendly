@@ -6,7 +6,11 @@ class Facebook
   appId: '***REMOVED***'
   appSecret: '***REMOVED***'
 
-  recentFacebookTokens: {}
+  # map of user_id -> facebook token. These are tokens that we've received through passport
+  # oauth. Used for displaying on /admin page
+  recentTokenForUser: {}
+
+  tokenValidateCache: {}
 
   constructor: ->
     @userDao = depend('UserDAO')
@@ -19,7 +23,7 @@ class Facebook
     passport.use new FacebookStrategy passportOptions, (accessToken, refreshToken, profile, done) =>
       @findOrCreateFromPassport(profile)
       .then (user) =>
-        @recentFacebookTokens[user.user_id] = accessToken
+        @recentTokenForUser[user.user_id] = accessToken
         done(null, user)
       .catch (err) =>
         done(err)
@@ -40,29 +44,49 @@ class Facebook
     @userDao.find((query) -> query.where({email}))
     .then (users) =>
       if users.length == 0
-        return @createFromPassport(email, profile)
-
-      return users[0]
-
-  createFromPassport: (email, profile) ->
-    @userDao.insert
-      email: email
-      created_at: timestamp()
+        @userDao.insert
+          email: email
+          created_at: timestamp()
+      else
+        return users[0]
 
   validateToken: (token) ->
     url = "https://graph.facebook.com/me?access_token=#{token}"
     @http.request(url: url)
-    .then (body) ->
-      console.log(body)
-      return true
+    .then (data) =>
+      console.log('validateToken got: ', data)
 
-      if body.statusCode != 200
-        return false
+      if data.error?
+        throw data.error
 
-      data = JSON.parse(body)
+      @findOrCreateFromToken(data)
 
-    .catch (err) ->
-      console.log('Facebook.validateToken err: ', err)
-      return false
+  findOrCreateFromToken: (data) ->
+    @userDao.find((query) -> query.where({facebook_id:data.id}))
+    .then (users) =>
+      existing = users[0]
+
+      if existing?
+        # TODO: Could update user's email here
+        return existing
+
+      # No user with matching facebook_id
+      # See if we can link it with an existing email
+
+      @userDao.find((query) -> query.where({email:data.email}))
+      .then (users) =>
+        existing = users[0]
+        if existing?
+          # Link with existing user
+          query = (query) -> query.where(user_id:existing.user_id)
+          @userDao.modify query, (user) ->
+            user.facebook_id = data.facebook_id
+
+        else
+          # Didn't find with email, create new user
+          @userDao.insert
+            email: data.email
+            facebook_id: data.id
+            created_at: timestamp()
 
 provide('Facebook', Facebook)

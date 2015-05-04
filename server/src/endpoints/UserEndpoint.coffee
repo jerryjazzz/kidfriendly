@@ -1,4 +1,6 @@
 
+Promise = require('bluebird')
+
 class UserEndpoint
   constructor: ->
     @app = depend('App')
@@ -6,6 +8,24 @@ class UserEndpoint
     get = depend('ExpressGet')
     post = depend('ExpressPost')
     @route = require('express')()
+    facebook = depend('Facebook')
+
+    getValidatedUser = (req) ->
+      user_id = req.params.user_id
+      facebook_token = req.query.facebook_token
+
+      if not facebook_token?
+        return Promise.reject("facebook_token is required")
+
+      facebook.validateToken(facebook_token)
+      .then (validatedUser) ->
+        if user_id != 'me' and validatedUser.user_id != user_id
+          throw new Error("Facebook token is for different user")
+
+        validatedUser
+
+    get @route, '/:user_id', (req) =>
+      getValidatedUser(req)
 
     get @route, '/:user_id/place/:place_id/review', (req) =>
       # SECURITY_TODO: Check auth token
@@ -41,30 +61,5 @@ class UserEndpoint
         review.reviewer_name = req.body.review.name
 
       @reviewDao.modify(whereFunc, modifyFunc, {allowInsert:true})
-
-    ###
-    @route.post '/:user_id/delete', wrap (req) =>
-      # SECURITY_TODO: Verify permission to delete
-      @app.db('users').where(user_id:req.params.user_id).delete()
-        .then(-> {})
-
-    @route.post '/new', wrap (req) =>
-
-      if not req.body.email?
-        return {statusCode: 400, message: "email is missing from body"}
-
-      manualId = req.body.user_id # usually null
-
-      row =
-        user_id: manualId
-        email: req.body.email
-        created_at: timestamp()
-        created_by_ip: req.get_ip()
-        source_ver: @app.sourceVersion
-
-      @app.insert('users', row)
-      .catch Database.existingKeyError('email'), ->
-        {statusCode: 400, error: type: 'email_already_exists'}
-    ###
 
 provide('endpoint/api/user', UserEndpoint)

@@ -1,30 +1,23 @@
 
 class PlaceDAO
   constructor: ->
-    @app = depend('App')
-    @UpdateableFields = ['name','lat','long','rating','factual_id','details','factual_consume_ver']
-    @InsertableFields = @UpdateableFields.concat(['place_id'])
-    @ReadableFields = @InsertableFields
-    @modelClass = depend('Place')
+    @db = depend('db')
+    @dbInsert = depend('db.insert')
 
-  get: (queryFunc) ->
-    # queryFunc is a func that takes a Knex query object, and hopefully adds a 'where'
-    # clause or something.
-    query = @app.db.select.apply(@ReadableFields).from('place')
-    queryFunc(query)
-    query.then (rows) =>
-      places = for row in rows
-        @modelClass.fromDatabase(row)
-      places
+    @dao = depend('newDAO')(
+      tableName: 'place'
+      fieldsToInsert: 'place_id'
+      fieldsToUpdate: ['name','lat','long','rating','factual_id','details','factual_consume_ver']
+      modelClass: depend('Place')
+    )
 
-  getId: (id) ->
-    @get((query) -> query.where(place_id:id))
-    .then (places) -> places[0]
+    this.find = dao.find
+    this.findById = dao.findById
 
   getWithReviews:(placeId) ->
     Review = depend('Review')
 
-    query = @app.db.select('place.place_id','name','lat','long','rating','factual_id','details',
+    query = @db.select('place.place_id','name','lat','long','rating','factual_id','details',
     'reviewer_name', 'body', 'review_id', 'review.created_at', 'review.updated_at').from('place')
     .leftOuterJoin('review', 'place.place_id', 'review.place_id').where('place.place_id', placeId)
     query.toSQL()
@@ -43,7 +36,7 @@ class PlaceDAO
         fields[k] = v
     fields.details = JSON.stringify(place.details)
 
-    @app.insert('place', fields)
+    @dbInsert('place', fields)
     .then (res) =>
       {place_id: res.place_id, name: place.name}
 
@@ -78,18 +71,5 @@ class PlaceDAO
       @save(modified)
       .then ->
         return modified
-
-  modifyMulti: (queryFunc, modifyFunc) ->
-    # Fetch a list of place_ids
-
-    modifyOne = (place_id) =>
-      @modify(place_id, modifyFunc)
-
-    query = @app.db.select(['place_id']).from('place')
-    queryFunc(query)
-    query.then (results) ->
-      for result in results
-        result.place_id
-    .map(modifyOne, {concurrency: 1})
 
 provide('PlaceDAO', PlaceDAO)

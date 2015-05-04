@@ -3,7 +3,7 @@ class UserDAO
   constructor: ->
     dao = depend('DAO').make
       table: 'users'
-      fieldsToInsert: ['user_id', 'email', 'created_at']
+      fieldsToInsert: ['user_id', 'email', 'facebook_id', 'created_at']
       fieldsToUpdate: ['updated_at']
       modelClass: depend('User')
 

@@ -58,7 +58,7 @@ class AdminEndpoint
         view: 'view/admin/home'
         user: user.toClient()
         session: req.session
-        facebookToken: @facebook.recentFacebookTokens[user.user_id]
+        facebookToken: @facebook.recentTokenForUser[user.user_id]
       }
 
 
