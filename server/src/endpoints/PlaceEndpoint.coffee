@@ -5,6 +5,7 @@ class PlaceEndpoint
   constructor: ->
     @app = depend('App')
     @placeDao = depend('PlaceDAO')
+    @placeReviews = depend('PlaceReviews')
     @factualRating = depend('FactualRating')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
@@ -13,7 +14,7 @@ class PlaceEndpoint
 
     get @route, '/:place_id/explain', (req) =>
       {place_id} = req.params
-      @placeDao.getId(place_id)
+      @placeDao.findById(place_id)
       .then (place) ->
         if not place?
           return {error: "Place not found", place_id: place_id}
@@ -23,7 +24,7 @@ class PlaceEndpoint
 
     get @route, '/:place_id/details', (req) =>
       {place_id} = req.params
-      @placeDao.getId(place_id)
+      @placeDao.findById(place_id)
       .then (place) ->
         if not place?
           return {error: "Place not found", place_id: place_id}
@@ -31,7 +32,7 @@ class PlaceEndpoint
 
     get @route, '/:place_id/details/reviews', (req) =>
       {place_id} = req.params
-      @placeDao.getWithReviews(place_id)
+      @placeReviews.getWithReviews(place_id)
       .then (place) ->
         if place?
           place.toClient()
@@ -39,7 +40,7 @@ class PlaceEndpoint
           {error: "Place not found", place_id: place_id}
 
     get @route, '/any', (req) =>
-      @placeDao.get((query) -> query.limit(1))
+      @placeDao.find((query) -> query.limit(1))
       .then (places) ->
         places[0].toClient()
 

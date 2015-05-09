@@ -17,6 +17,17 @@ class Place
     # location search.
     @context = {}
 
+  @tableName: 'place'
+
+  @fields:
+    name: {}
+    lat: {}
+    long: {}
+    rating: {}
+    factual_id: {}
+    details: {}
+    factual_consume_ver: {}
+
   @fromDatabase: (fields) ->
     place = new Place(fields)
     place.dataSource = 'db'
@@ -36,6 +47,12 @@ class Place
     place.original = this
     place.dataSource = 'local'
     return place
+
+  toDatabase: ->
+    fields = {}
+    for k in ['name','lat','long','rating','factual_id','factual_consume_ver']
+      fields[k] = this[k]
+    fields
 
   toClient: ->
     # Return this place in a format for client usage.

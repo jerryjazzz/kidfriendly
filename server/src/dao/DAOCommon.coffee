@@ -1,4 +1,5 @@
 
+###
 Promise = require('bluebird')
 
 class DAOCommon
@@ -32,3 +33,4 @@ class DAOCommon
         dao.insert(modified)
 
 provide('DAOCommon', DAOCommon)
+###

@@ -19,37 +19,12 @@ class FactualConsumer
 
   correlateFactualPlaces: (factualPlaces) ->
     Assert.type(factualPlaces, Array)
-   
-    @placeDao.get (query) ->
-      for factualPlace in factualPlaces
-        factual_id = factualPlace.factual_id
-        Assert.notNull(factual_id)
-        query.orWhere({factual_id})
 
-    .then (places) =>
-      foundPlaces = Map.fromList(places, 'factual_id')
-
-      ops = for factualPlace in factualPlaces
-        foundPlace = foundPlaces[factualPlace.factual_id]
-        if foundPlace?
-          @app.log("updating place #{foundPlace.place_id} with factual #{factualPlace.factual_id}")
-
-          #console.log('factualPlace = ', JSON.stringify(factualPlace))
-          #console.log('foundPlace = ', JSON.stringify(foundPlace))
-
-          # TODO: use PlaceDAO.modify instead.
-          place = foundPlace.startPatch()
-          @updatePlaceWithFactualData(place, factualPlace)
-          @placeDao.save(place)
-          {place_id: place.place_id, name: factualPlace.name}
-
-        else
-          @app.log("adding missing factual place: #{factualPlace.factual_id}")
-          place = depend('newPlace')({})
-          @updatePlaceWithFactualData(place, factualPlace)
-          @placeDao.insert(place)
-
-      Promise.all(ops)
+    Promise.all factualPlaces.map (factualPlace) =>
+      where = (query) -> query.where({factual_id: factualPlace.factual_id})
+      where.factual_id = factualPlace.factual_id
+      @placeDao.modifyOrInsert where, (place) =>
+        @updatePlaceWithFactualData(place, factualPlace)
 
   updatePlaceWithFactualData: (place, factualPlace) ->
     place.factual_consume_ver = @CurrentVersion

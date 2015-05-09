@@ -5,6 +5,7 @@ path = require('path')
 class ExpressServer
   constructor: (@app, @expressConfig) ->
     @server = null
+    @expressUtil = depend('ExpressUtil')
 
   start: ->
     if not @expressConfig.port?
@@ -65,6 +66,9 @@ class ExpressServer
   add_stuff_to_request: (req, res, next) =>
     req.get_ip = ->
       this.headers['x-real-ip'] or this.connection.remoteAddress
+
+    res.sendRendered = (data) =>
+      @expressUtil.renderResponse(req, res, data)
 
     next()
 

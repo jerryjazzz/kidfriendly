@@ -24,7 +24,7 @@ class AdminEndpoint
 
     get @route, '/email-not-on-whitelist', (req) ->
       view: 'view/admin/email-not-on-whitelist'
-      email: req.user[0].email
+      email: req.user?.email
 
     get @route, '/logout', (req) ->
       req.logout()
@@ -43,7 +43,7 @@ class AdminEndpoint
       if not req.user?
         return res.redirect('/admin/login-required')
 
-      email = req.user[0].email
+      email = req.user?.email
       if not @emailWhitelist[email]
         return res.redirect('/admin/email-not-on-whitelist')
 
@@ -52,13 +52,13 @@ class AdminEndpoint
     # Below here, endpoints are only reachable if user is whitelisted.
 
     get @route, '/', (req) =>
-      user = req.user[0]
+      user = req.user
 
       {
         view: 'view/admin/home'
         user: user.toClient()
         session: req.session
-        facebookToken: @facebook.recentFacebookTokens[user.user_id]
+        facebookToken: @facebook.recentTokenForUser[user.user_id]
       }
 
 

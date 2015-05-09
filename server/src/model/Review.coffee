@@ -13,6 +13,23 @@ class Review
     # location search.
     @context = {}
 
+  @tableName: 'review'
+
+  @fields:
+    review_id: {}
+    place_id: {}
+    user_id: {}
+    body: {}
+    reviewer_name: {}
+    created_at: {}
+    updated_at: {}
+
+  toDatabase: ->
+    fields = {}
+    for k in ['review_id', 'place_id', 'user_id', 'body', 'reviewer_name']
+      fields[k] = this[k]
+    fields
+
   @fromDatabase: (fields) ->
     review = new Review(fields)
     review.dataSource = 'db'

@@ -1,4 +1,5 @@
 
+###
 class ReviewDAO
   constructor: ->
     @app = depend('App')
@@ -44,3 +45,4 @@ class ReviewDAO
     @daoCommon.modify(this, whereFunc, modifyFunc, options)
 
 provide('ReviewDAO', ReviewDAO)
+###

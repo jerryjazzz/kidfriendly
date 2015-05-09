@@ -60,47 +60,6 @@ class PostgresClient
     migration = new SchemaMigration(this)
     migration.start()
 
-  insert: (tableName, row) =>
-    tableSchema = @config.schema[tableName]
-    idColumn = tableSchema.primary_key
-
-    if not row.created_at? and tableSchema.columns.created_at?
-      row.created_at = timestamp()
-
-    if not row.source_ver? and tableSchema.columns.source_ver?
-      row.source_ver = @sourceVersion
-
-    # Check to auto-generate an ID. This involves some retry logic on the (unlikely)
-    # chance that our random ID is taken.
-
-    if not idColumn?
-      # no ID column
-      return @knex(tableName).insert(row).then(-> row)
-
-    if row[idColumn]?
-      # new row already has an ID
-      successResult = {}
-      successResult[idColumn] = row[idColumn]
-      return @knex(tableName).insert(row).then(-> successResult)
-
-    new Promise (resolve, reject) =>
-      attempt = (numAttempts) =>
-        if numAttempts > 5
-          return reject(msg: "failed to generate ID after 5 attempts")
-
-        row[idColumn] = @databaseUtil.randomId()
-        @knex(tableName).insert(row)
-        .then ->
-          result = {}
-          result[idColumn] = row[idColumn]
-          resolve(result)
-        .catch @databaseUtil.existingKeyError(idColumn), (err) ->
-          attempt(numAttempts + 1)
-        .catch (otherErr) ->
-          reject(otherErr)
-
-      attempt(0)
 
 provide('PostgresClient', PostgresClient)
 provide('db', -> depend('PostgresClient').knex)
-provide('db.insert', -> depend('PostgresClient').insert)
