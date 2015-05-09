@@ -78,7 +78,7 @@ class Facebook
           # Link with an existing user. At the time of this writing (may 2015), linking with an
           # existing user is very rare, it can only happen for users created by using the /admin
           # page. 99% of users will be created with a facebook id.
-          console.log("facebook: linking existing user #{original.user_id} to facebook id #{data.id}")
+          console.log("facebook: linking existing user #{user.original.user_id} to facebook id #{data.id}")
           user.facebook_id = data.id
         else
           console.log("facebook: creating new user for facebook id #{data.id}")
