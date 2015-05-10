@@ -72,14 +72,17 @@ class FactualRating
       kids_goodfor: cond(factual_raw.kids_goodfor, 2, 0)
       kids_menu: cond(factual_raw.kids_menu, 2, 0)
       is_chain: cond(factual_raw.chain_id?, -10, 0)
-      random_adjustment: randomAdjustment
 
     overallRating = 0
     for k,v of factors
       overallRating += v
 
-    overallRating = Math.min(overallRating, 100)
+    # Cap at 97, then add the random adjustment which might take it up to 100.
+    overallRating = Math.min(overallRating, 97)
     overallRating = Math.max(overallRating, 0)
+
+    overallRating += randomAdjustment * 3
+
     overallRating = Math.round(overallRating)
 
     return { detailedRatings, detailedRatingsTotal, randomAdjustment, factors, overallRating }
