@@ -46,7 +46,9 @@ class DAO
 
     if not idColumn?
       # no ID column
+      console.log('no id column')
       return @db(@tableName).insert(row).then(-> row)
+    console.log('yes id column')
 
     if row[idColumn]?
       # new row already has an ID
@@ -72,6 +74,7 @@ class DAO
       attempt(0)
 
   update: (object) =>
+    console.log('update: ', object)
     if object.dataSource != 'local' or not object.original?
       throw new Error("DAO.update must be called on patch data: "+ object)
 
@@ -79,6 +82,14 @@ class DAO
     where[@idColumn] = object[@idColumn]
     fields = object.toDatabase()
     @db(@tableName).update(fields).where(where)
+    .then -> object
+    
+  update2: (whereFunc, object) =>
+    if object.dataSource != 'local' or not object.original?
+      throw new Error("DAO.update must be called on patch data: "+ object)
+
+    fields = object.toDatabase()
+    @db(@tableName).update(fields).where(whereFunc)
     .then -> object
 
   modify: (whereFunc, modifyFunc, {allowInsert} = {}) =>
@@ -103,7 +114,7 @@ class DAO
       modifyFunc(modified)
 
       if original?
-        @update(modified).then -> modified
+        @update2(whereFunc, modified).then -> modified
       else
         @insert(modified).then -> modified
 
@@ -114,11 +125,14 @@ class DAO
     # Fetch a list of ids, then map them to @modify.
 
     modifyOne = (id) =>
-      @modify(id, modifyFunc)
+      where = {}
+      where[@idColumn] = id
+      oneWhereFunc = (query) -> query.where(where)
+      @modify(oneWhereFunc, modifyFunc)
 
-    query = @app.db.select([@idColumn]).from(@tableName)
+    query = @db.select([@idColumn]).from(@tableName)
     whereFunc(query)
-    query.then (results) ->
+    query.then (results) =>
       for result in results
         result[@idColumn]
     .map(modifyOne, {concurrency: 1})
@@ -126,6 +140,7 @@ class DAO
   @make: (args) ->
     new DAO(args)
 
+provide('newDAO', -> DAO.make)
 provide('UserDAO', -> new DAO(modelClass: depend('User')))
 provide('ReviewDAO', -> new DAO(modelClass: depend('Review')))
 provide('PlaceDAO', -> new DAO(modelClass: depend('Place')))

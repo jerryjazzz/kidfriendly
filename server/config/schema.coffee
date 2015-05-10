@@ -134,3 +134,8 @@ schema.source_feature_delta.columns = {
   change_type: {type: 'add_or_remove'}
 }
 
+schema.tweak_values = {}
+schema.tweak_values.columns = {
+  name: {type: 'varchar(40)', options: 'not null unique'}
+  value: {type: 'json'}
+}

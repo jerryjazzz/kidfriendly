@@ -19,3 +19,7 @@ timestamp = (value=null) ->
 
 exports.timestamp = timestamp
 global.timestamp = timestamp
+
+global.MilesToMeters = (miles) -> miles * 1609.34
+global.MetersToMiles = (meters) -> meters / 1609.34
+  

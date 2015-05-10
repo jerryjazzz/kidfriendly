@@ -1,5 +1,6 @@
 
 Factual = require('factual-api')
+Promise = require('bluebird')
 
 class PlaceEndpoint
   constructor: ->
@@ -58,19 +59,13 @@ class PlaceEndpoint
 
     get @route, '/:place_id/rerank', (req) =>
 
-      placeIds = switch
+      where = switch
         when req.params.place_id == 'all'
-          @app.db.select('place_id').from('place')
-          .then (rows) ->
-            row.place_id for row in rows
+          ->
         else
-          [req.params.place_id]
+          (query) -> query.where(place_id: req.params.place_id)
 
-      Promise.resolve(placeIds)
-      .map (placeId) =>
-        @placeDao.modify placeId, (place) =>
-          @factualRating.recalculateFactualBasedRating(place)
-        .then (place) ->
-          {place_id:place.place_id, name: place.name, rating:place.rating}
+      @placeDao.modifyMulti where, (place) =>
+        @factualRating.recalculateFactualBasedRating(place)
 
 provide('endpoint/api/place', PlaceEndpoint)
