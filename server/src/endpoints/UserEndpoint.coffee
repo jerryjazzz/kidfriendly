@@ -56,10 +56,9 @@ class UserEndpoint
       where = (query) -> query.where({user_id, place_id})
 
       @reviewDao.modifyOrInsert where, (review) ->
-        review.review_id = manualId
         review.body = JSON.stringify(req.body.review)
         review.user_id = user_id
         review.place_id = place_id
-        review.reviewer_name = req.body.review.name
+        review.reviewer_name = req.body.review?.name
 
 provide('endpoint/api/user', UserEndpoint)

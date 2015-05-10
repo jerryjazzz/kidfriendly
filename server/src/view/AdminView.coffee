@@ -21,7 +21,6 @@ provide 'view/admin/home', -> (data) ->
 
     div {}, "Your Facebook token: "+data.facebookToken
 
-
     h3 {}, 'Tools'
 
     div {},
@@ -37,8 +36,8 @@ provide 'view/admin/home', -> (data) ->
     h3 {}, 'Browse'
 
     div {}, a {href:'/api/place/any'}, '/place/any'
-
     div {}, a {href:"/api/user/me?facebook_token=#{data.facebookToken}"}, '/user/me'
+    div {}, a {href:"/api/user/me/reviews?facebook_token=#{data.facebookToken}"}, '/user/me/reviews'
 
 provide 'view/admin/login-required', -> (data) ->
   title: 'Error'
