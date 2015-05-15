@@ -56,6 +56,7 @@ class FactualRating
       kids_goodfor: cond(factual_raw.kids_goodfor, @tweaks.get('rating.points.kids_goodfor'), 0)
       kids_menu: cond(factual_raw.kids_menu, @tweaks.get('rating.points.kids_menu'), 0)
       is_chain: cond(factual_raw.chain_id?, @tweaks.get('rating.points.is_chain'), 0)
+      takes_reservations: cond(factual_raw.takes_reservations, @tweaks.get('rating.points.takes_reservations'), 0)
 
     overallRating = 0
     for k,v of factors

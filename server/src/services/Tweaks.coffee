@@ -6,11 +6,15 @@ provide 'Tweaks', class Tweaks
     @loadAll()
 
   defaults:
+    'search.db_limit': 25
+    'search.count': 15
+    'search.distance_mi': 3
+    'sort.penalty_points_per_10mi': 0
     'rating.points.randomAdjustment': 3
-    'sort.penalty_points_per_10mi': 10
     'rating.points.kids_goodfor': 2
     'rating.points.kids_menu': 2
     'rating.points.is_chain': -10
+    'rating.points.takes_reservations': -10
 
   loadAll: ->
     @tweakValueDAO.find(->).then (rows) =>
@@ -32,7 +36,6 @@ provide 'Tweaks', class Tweaks
     out
 
   set: (name, value) ->
-    console.log('value = ', value)
     where = (query) -> query.where({name})
     @tweakValueDAO.modifyOrInsert where, (tweak) =>
       tweak.name = name

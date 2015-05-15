@@ -4,9 +4,6 @@ Geolib = require('geolib')
 Cities = require('cities')
 
 class PlaceSearch
-  SearchLimit: 50
-  DefaultSearchRange: 16000
-
   constructor: ->
     @placeDao = depend('PlaceDAO')
     @geom = depend('GeomUtil')
@@ -18,7 +15,8 @@ class PlaceSearch
     if options.miles? and not options.meters?
       options.meters = MilesToMeters(options.miles)
 
-    options.meters = options.meters ? @DefaultSearchRange
+    if not options.meters?
+      options.meters = MilesToMeters(@tweaks.get('search.distance_mi'))
 
     if options.zipcode?
       cityLookup = Cities.zip_lookup(options.zipcode)
@@ -30,7 +28,7 @@ class PlaceSearch
 
   search: (searchOptions) ->
     bounds = @geom.getBounds(searchOptions)
-
+    
     @placeDao.find (query) =>
       # Filter to nearest rectangle
       query.andWhere('lat', '>', bounds.lat1)
@@ -40,7 +38,7 @@ class PlaceSearch
 
       query.orderBy('rating', 'desc')
 
-      query.limit(@SearchLimit)
+      query.limit(@tweaks.get('search.db_limit'))
 
     .then (places) =>
       #console.log("sql gave #{places.length} places")
@@ -48,6 +46,10 @@ class PlaceSearch
     .then (places) =>
       #console.log("after checkdistance, have #{places.length} places")
       @sortPlaces(places)
+    .then (places) =>
+      places.filter((place) -> not place.details?.factual_raw?.chain_id)
+    #.then (places) =>
+    #  places.slice(0, 15)
 
   checkDistance: (places, searchOptions) ->
     # Store 'distance' on each result, and filter out places that are too far.
@@ -62,16 +64,17 @@ class PlaceSearch
     return places.filter (place) -> place.context.distance < searchOptions.meters
 
   sortPlaces: (places) ->
-    penaltyPerMile = @tweaks.get('sort.penalty_points_per_10mi') / 10
+    #penaltyPerMile = @tweaks.get('sort.penalty_points_per_10mi') / 10
 
     for place in places
       distance = place.context.distance
-      place.context.adjustedRating = place.rating \
-        - MetersToMiles(distance) * penaltyPerMile
+      #place.context.adjustedRating = place.rating \
+      # - MetersToMiles(distance) * penaltyPerMile
+
+      # ignore rating
+      place.context.adjustedRating = -distance
 
     places.sort((a,b) -> b.context.adjustedRating - a.context.adjustedRating)
     return places
-
-  pointsForDistance: (meters) ->
 
 provide('PlaceSearch', PlaceSearch)

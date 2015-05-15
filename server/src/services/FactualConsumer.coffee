@@ -56,6 +56,7 @@ class FactualConsumer
         options_organic: factualPlace.options_organic
         options_healthy: factualPlace.options_healthy
         price: factualPlace.price
+        takes_reservations: factualPlace.reservations
 
     @factualRating.recalculateFactualBasedRating(place)
 
