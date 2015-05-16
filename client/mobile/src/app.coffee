@@ -5,9 +5,10 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch'
 
   Permission.defineRole 'authenticated', (stateParams) ->
     userService.user.authenticated
-
   analyticsService.initAndTrackPages()
-  analyticsService.setUser(userService.user.id) if userService.user.id?
+  userService.getUser().then (user) =>
+    console.log 'user', user
+    analyticsService.setUser(user.id) if user.id?
 
   $rootScope.$on '$stateChangePermissionDenied', (event, toState, toParams) ->
     console.log 'you shall not pass', toState, toParams

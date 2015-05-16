@@ -1,6 +1,6 @@
 'use strict'
 class DetailsCtrl
-  constructor:($scope, place, @placesService, analyticsService, $window)->
+  constructor:($scope, place, @placesService, analyticsService, $window, $document)->
     @_calculateScores(place)
     place.photos = ['img/no-image.jpg'] unless place.photos?
     analyticsService.trackEvent("Details", "View", place.name, place.rating)
@@ -36,8 +36,11 @@ class DetailsCtrl
       analyticsService.trackEvent("Details", "Toggle Map", mapVisible)
 
     $scope.makeCall = (phoneNumber) ->
+#      $document.location.href = "tel:#{phoneNumber}"
       analyticsService.trackEvent("Details", "Make Call")
-      $window.open("tel:#{phoneNumber}")
+#      $window.open("tel:#{phoneNumber}")
+      phoneNumber = phoneNumber.replace(/\W/g, "")
+      $window.open("tel:#{phoneNumber}", '_system')
 
     $scope.navigate = ->
       launchnavigator.navigate [place.lat, place.long], null, ->
@@ -48,5 +51,5 @@ class DetailsCtrl
     for review in place.reviews
       @placesService.calculateScore(review)
 
-DetailsCtrl.$inject = ['$scope', 'place', 'placesService', 'analyticsService', '$window']
+DetailsCtrl.$inject = ['$scope', 'place', 'placesService', 'analyticsService', '$window', '$document']
 angular.module('Mobile').controller 'DetailsCtrl', DetailsCtrl
