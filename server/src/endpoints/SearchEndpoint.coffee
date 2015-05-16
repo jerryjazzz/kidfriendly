@@ -10,6 +10,7 @@ class SearchEndpoint
     get = depend('ExpressGet')
 
     get @route, '/nearby', (req) =>
+
       options = placeSearch.resolveSearchQuery(req.query)
 
       # Just for beta purposes, first do a Factual pull for this range.

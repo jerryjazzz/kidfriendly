@@ -4,7 +4,7 @@ React = require('react')
 {html,body,div,table,td,tr,h3,code,a,form} = React.DOM
 
 JsonTable = (data) ->
-  rows = for k,v of data
+  rows = for own k,v of data
     if ObjectUtil.isObject(v)
       v = JSON.stringify(v)
     tr {key:k}, (td {}, k), (td {}, v)

@@ -1,6 +1,8 @@
 
 class FactualRating
   constructor: ->
+    @tweaks = depend('Tweaks')
+
   getExtendedRating: (place) ->
 
     factual_raw = place.details?.factual_raw ? {}
@@ -49,37 +51,25 @@ class FactualRating
     detailedRatingsTotal = (detailedRatings.kidsMenu + detailedRatings.healthyOptions \
       + detailedRatings.speedAndService + detailedRatings.tableActivities)
 
-    ###
-    overallRating = 0
-
-    # List of factors in the overall rating, with weighting.
-    factors =
-      goodforkids: cond3(factual_raw.kids_goodfor, 1.0, 0, 0.5) * 35
-      kidsmenu: cond3(factual_raw.kids_menu, 1.0, 0, 0.5) * 15
-      detailedRatingsTotal: (detailedRatingsTotal / 20.0) * 25
-      factualGenericRating: (parseFloat(factual_raw.rating ? 3.5) / 5) * 26
-      randomAdjustment: randomAdjustment * 6 - 3
-
-    # Now the final rating, with weighting
-    overallRating = 0
-    for k,v of factors
-      overallRating += v
-    ###
-
-    # Rating algorithm discussed in a meeting in Feb 2015
     factors =
       factual_base: (factual_raw.rating ? 4) / 5 * 100
-      kids_goodfor: cond(factual_raw.kids_goodfor, 2, 0)
-      kids_menu: cond(factual_raw.kids_menu, 2, 0)
-      is_chain: cond(factual_raw.chain_id?, -10, 0)
-      random_adjustment: randomAdjustment
+      kids_goodfor: cond(factual_raw.kids_goodfor, @tweaks.get('rating.points.kids_goodfor'), 0)
+      kids_menu: cond(factual_raw.kids_menu, @tweaks.get('rating.points.kids_menu'), 0)
+      is_chain: cond(factual_raw.chain_id?, @tweaks.get('rating.points.is_chain'), 0)
+      takes_reservations: cond(factual_raw.takes_reservations, @tweaks.get('rating.points.takes_reservations'), 0)
 
     overallRating = 0
     for k,v of factors
       overallRating += v
 
-    overallRating = Math.min(overallRating, 100)
+    # Cap at 97, then add the random adjustment which might take it up to 100.
+    randomPoints = @tweaks.get('rating.points.randomAdjustment')
+
+    overallRating = Math.min(overallRating, 100 - randomPoints)
     overallRating = Math.max(overallRating, 0)
+
+    overallRating += randomAdjustment * randomPoints
+
     overallRating = Math.round(overallRating)
 
     return { detailedRatings, detailedRatingsTotal, randomAdjustment, factors, overallRating }
