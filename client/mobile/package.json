@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "mobile: An Ionic project",
   "dependencies": {
+    "ionic": "^1.2.8"
+  },
+  "devDependencies": {
     "gulp": "^3.5.6",
+    "yargs": "^3.1.0",
     "gulp-coffee": "^2.1.1",
     "gulp-concat": "^2.2.0",
     "gulp-minify-css": "^0.3.0",
@@ -11,10 +15,6 @@
     "gulp-replace-task": "^0.1.0",
     "gulp-sass": "^0.7.1",
     "gulp-sourcemaps": "1.2.4",
-    "ionic": "^1.2.8",
-    "yargs": "^3.1.0"
-  },
-  "devDependencies": {
     "bower": "^1.3.3",
     "coffee-script": "~1.8.0",
     "gulp-util": "^2.2.14",
@@ -34,6 +34,9 @@
     {
       "id": "com.phonegap.plugins.facebookconnect",
       "locator": "../../../phonegap-facebook-plugin"
-    }
-  ]
+    },
+    "org.apache.cordova.console",
+    "uk.co.workingedge.phonegap.plugin.LaunchNavigator"
+  ],
+  "cordovaPlatforms": []
 }

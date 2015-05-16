@@ -5,7 +5,7 @@ class LocationService
   fetchPosition: ->
     deferred = @$q.defer()
     @$ionicPlatform.ready =>
-      @$cordovaGeolocation.getCurrentPosition({timeout:5000, maximumAge:60000}).then (position) =>
+      @$cordovaGeolocation.getCurrentPosition({timeout:30000, maximumAge:60000}).then (position) =>
         console.log 'position', position
         deferred.resolve(position)
       , (reason) =>
