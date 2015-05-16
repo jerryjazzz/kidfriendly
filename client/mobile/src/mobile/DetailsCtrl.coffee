@@ -1,6 +1,7 @@
 'use strict'
 class DetailsCtrl
   constructor:($scope, place, @placesService, analyticsService, $window, $document)->
+    console.log 'place', place
     @_calculateScores(place)
     place.photos = ['img/no-image.jpg'] unless place.photos?
     analyticsService.trackEvent("Details", "View", place.name, place.rating)
@@ -36,9 +37,7 @@ class DetailsCtrl
       analyticsService.trackEvent("Details", "Toggle Map", mapVisible)
 
     $scope.makeCall = (phoneNumber) ->
-#      $document.location.href = "tel:#{phoneNumber}"
       analyticsService.trackEvent("Details", "Make Call")
-#      $window.open("tel:#{phoneNumber}")
       phoneNumber = phoneNumber.replace(/\W/g, "")
       $window.open("tel:#{phoneNumber}", '_system')
 

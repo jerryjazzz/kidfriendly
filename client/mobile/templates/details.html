@@ -7,7 +7,7 @@
     <ion-content>
         <kf-rating banner-class="'rating-banner'" rating="data.place.rating">
             <p class="rating-text">{{data.place.rating}}</p>
-            <p class="rating-text-small">{{data.place.distance}}1.5 mi</p>
+            <p class="rating-text-small">{{data.place.distance}} mi</p>
         </kf-rating>
         <ul ng-if="data.place.photos.length > 1" rn-carousel class="photo-container">
             <li ng-repeat="photo in data.place.photos">
@@ -17,7 +17,6 @@
         <img ng-if="data.place.photos.length <= 1" class="photo-container center-cropped" ng-src="{{data.place.photos[0]}}">
         <p class="detail-name">{{data.place.name}}</p>
         <p class="detail-address">{{data.place.address}}</p>
-        <!--<kf-price-level level="data.place.price_level"></kf-price-level>-->
         <div class="card">
             <div class="row">
                 <div class="col col-center">
@@ -37,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <div class="card" ng-if="data.mapVisible">
+        <div class="card" ng-show="data.mapVisible">
             <div class="row">
                 <div class="col col-center">
                 <ui-gmap-google-map center='map.center' zoom="14" options="map.options">

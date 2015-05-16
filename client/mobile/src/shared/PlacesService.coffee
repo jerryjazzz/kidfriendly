@@ -15,7 +15,7 @@ class PlacesService
     url = @createUrl(keyword, position)
     @httpGet(url).success (data) =>
       @searchResults = data
-      @calculateDistance(data, position) if position?
+      @calculateDistances(data, position) if position?
       deferred.resolve(@searchResults)
     .error (reason) ->
       deferred.resolve []
@@ -29,12 +29,14 @@ class PlacesService
       url = "#{url}&zipcode=#{keyword}"
 #    "#{url}&meters=#{10000}"
 
-  calculateDistance:(data, position) ->
-    for result in data
-      result.distance = @geolib.getDistance(position,
-        {latitude:parseFloat(result.lat, 10), longitude:parseFloat(result.long, 10)}
-      )
-      result.distance = Math.round(result.distance * 0.000621371 * 10) / 10
+  calculateDistances:(data, position) ->
+    @calculateSingleDistance(result, position) for result in data
+
+  calculateSingleDistance: (result, position) ->
+    result.distance = @geolib.getDistance(position,
+      {latitude:parseFloat(result.lat, 10), longitude:parseFloat(result.long, 10)}
+    )
+    result.distance = Math.round(result.distance * 0.000621371 * 10) / 10
 
   calculateScore: (review) ->
     review.score =
@@ -44,9 +46,10 @@ class PlacesService
       review.body.service * 4
     review
 
-  getPlaceDetail:(id) ->
+  getPlaceDetail:(id, position) ->
     deferred = @$q.defer()
     @httpGet("/api/place/#{id}/details/reviews").success (data) =>
+      @calculateSingleDistance(data, position)
       @currentPlace = data
       deferred.resolve(data)
     deferred.promise
@@ -58,6 +61,7 @@ class PlacesService
     deferred = @$q.defer()
     @httpPost("/api/user/#{userId}/place/#{placeId}/review", {review:review})
     .success (data) =>
+      @calculateSingleDistance(data, position) if position?
       deferred.resolve()
     .error (error) =>
       deferred.reject("Error saving review")
