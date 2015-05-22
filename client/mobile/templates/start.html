@@ -35,7 +35,7 @@
         
         <kf-facebook-button class="facebook-button"></kf-facebook-button>
         <div class="facebook-button">
-        <button ng-click="logout()" class="button button-treatment button-block button-positive" ng-show="data.user.authenticated">
+        <button ng-click="logout()" class="button button-treatment button-block button-positive" ng-show="data.user.isAuthenticated()">
             Sign out
         </button>
         </div>

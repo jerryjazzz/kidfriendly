@@ -3,22 +3,18 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch'
 .run ($ionicPlatform, $state, $ionicHistory, analyticsService, Permission, userService, $rootScope) ->
   attemptedRoute = undefined
 
-  Permission.defineRole 'authenticated', (stateParams) ->
-    userService.user.authenticated
+  Permission.defineRole 'authenticated', (stateParams) -> userService.user.isAuthenticated()
   analyticsService.initAndTrackPages()
-  userService.getUser().then (user) =>
-    console.log 'user', user
-    analyticsService.setUser(user.id) if user.id?
+  userService.getUser().then (user) => analyticsService.setUser(user.id) if user.isAuthenticated()
 
   $rootScope.$on '$stateChangePermissionDenied', (event, toState, toParams) ->
-    console.log 'you shall not pass', toState, toParams
     attemptedRoute =
       route: toState
       params: toParams
     $state.go 'login'
 
   $rootScope.$on '$authenticationSuccess', (user)->
-    analyticsService.setUser(user.id) if user.authenticated
+    analyticsService.setUser(user.id)
     analyticsService.trackEvent("Auth", "SignIn", "Success")
     if attemptedRoute?
       $ionicHistory.currentView($ionicHistory.backView());

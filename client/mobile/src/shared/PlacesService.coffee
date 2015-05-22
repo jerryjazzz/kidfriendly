@@ -1,14 +1,14 @@
 'use strict'
 class PlacesService
-  constructor:(@$http, @$q, @$timeout, @locationService, @kfUri, @geolib)->
+  constructor:(@$http, @$q, @$timeout, @locationService, @kfUri, @geolib, @userService)->
 
   httpGet: (path) ->
     url = "http://#{@kfUri}" + path
     @$http.get(url, headers: {Accept: 'application/json'})
 
-  httpPost: (path) ->
-    url = "http://#{@kfUri}" + path
-    @$http.post(url, headers: {Accept: 'application/json'})
+  httpPost: (path, body) ->
+    url = "https://#{@kfUri}" + path
+    @$http.post(url, body, headers: {Accept: 'application/json'})
 
   search:(keyword, position) ->
     deferred = @$q.defer()
@@ -49,7 +49,7 @@ class PlacesService
   getPlaceDetail:(id, position) ->
     deferred = @$q.defer()
     @httpGet("/api/place/#{id}/details/reviews").success (data) =>
-      @calculateSingleDistance(data, position)
+      @calculateSingleDistance(data, position) if position
       @currentPlace = data
       deferred.resolve(data)
     deferred.promise
@@ -57,14 +57,23 @@ class PlacesService
   getCurrentPlace:->
     @currentPlace
 
-  submitReview: (userId, placeId, review) ->
+  submitReview: (placeId, review) ->
     deferred = @$q.defer()
-    @httpPost("/api/user/#{userId}/place/#{placeId}/review", {review:review})
-    .success (data) =>
-      @calculateSingleDistance(data, position) if position?
-      deferred.resolve()
-    .error (error) =>
-      deferred.reject("Error saving review")
+    @userService.getUser().then (user) =>
+      console.log 'what do we have here', user
+      if user.isAuthenticated()
+        console.log 'user is authed read to submit review'
+        @httpPost("/api/user/me/place/#{placeId}/review?facebook_token=#{user.accessToken}", {review:review})
+        .success (data) =>
+          console.log 'success', data
+          deferred.resolve()
+        .error (error) =>
+          console.log 'error', error
+          deferred.reject("Error saving review")
+      else
+        console.log 'user not authed'
+        deferred.reject("User not authenticated")
+    deferred.promise
 
-PlacesService.$inject = ['$http', '$q', '$timeout', 'locationService', 'kfUri', 'geolib']
+PlacesService.$inject = ['$http', '$q', '$timeout', 'locationService', 'kfUri', 'geolib', 'userService']
 angular.module('kf.shared').service 'placesService', PlacesService
