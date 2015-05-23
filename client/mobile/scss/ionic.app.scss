@@ -21,7 +21,7 @@ $balanced: #86DB4E !default;
 $energized: #EBDF0C;
 $assertive:#DB4E4E;
 $dark: #444 !default;
-$stable:#777 !default;
+$stable:#f8f8f8 !default;
 $bright:#999 !default;
 
 //$padding-large-horizontal:8px !default;
@@ -42,6 +42,18 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
   -webkit-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
+}
+
+.thumbs-up {
+  color: $balanced;
+}
+
+.thumbs-down {
+  color: $assertive;
+}
+
+.thumbs-alpha {
+  opacity: 0.5;
 }
 
 .input-compact {
@@ -239,9 +251,9 @@ h2 {
 }
 
 /* Ionic Overrides*/
-.item-content {
-  padding: 0px !important;
-}
+//.item-content {
+//  padding: 0px !important;
+//}
 
 .cash-icon {
   color:#009900;

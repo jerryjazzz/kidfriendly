@@ -1,21 +1,23 @@
 <ion-view>
     <ion-content class="has-header">
-        <ion-list class="list">
-            <a style="padding-top: 12px;" class="item item-thumbnail-left" ng-click="goToDetails(result.place_id, $index)" ng-repeat="result in results">
+        <ion-list class="list" can-swipe-items="false">
+            <ion-item class="item item-thumbnail-left" ng-click="goToDetails(result.place_id, $index)" ng-repeat="result in results">
                 <img src="img/no-image-thumb.png">
                 <kf-rating banner-class="'results-rating-stripe'" rating="result.rating"></kf-rating>
-                <div style="width:100%">
-                    <h2 class="results-restaurant-name">{{result.name}}</h2>
-                    <span class="distance-text">{{result.distance}} mi</span>
-                </div>
-                <div style="width:100%">
-                    <kf-rating style="display:inline-block" banner-class="'results-rating-banner'" rating="result.rating">{{result.rating}}</kf-rating>
-                    <kf-price-level style="position:absolute; right:6px" level="result.price"></kf-price-level>
-                </div>
+                <h2 class="results-restaurant-name">{{result.name}}</h2>
+                <span class="distance-text">{{result.distance}} mi</span>
+                <!--<kf-rating style="display:inline-block" banner-class="'results-rating-banner'" rating="result.rating">{{result.rating}}</kf-rating>-->
+                <kf-price-level style="position:absolute; right:6px; top:20px" level="result.price"></kf-price-level>
                 <p>{{result.address}}</p>
                 <kf-hours hours="result.hours"></kf-hours>
-            </a>
+                <ion-option-button class="button-stable" ng-click="up($event, result)">
+                      <i class="ion-thumbsup thumbs-up" ng-class="{'thumbs-alpha':!result.thumbsUp}" style="font-size:60px;"></i>
+                </ion-option-button>
+                <ion-option-button class="button-stable" ng-click="down($event, result)">
+                    <i class="ion-thumbsdown thumbs-down" ng-class="{'thumbs-alpha':!result.thumbsDown}" style="font-size:60px"></i>
+                </ion-option-button>
+            </ion-item>
         </ion-list>
-        <p ng-show="noResults">Sorry no results for this area.</p>
+        <p ng-show="noResults" style="margin-top: 15px">Sorry no results for this area.</p>
     </ion-content>
 </ion-view>

@@ -31,7 +31,8 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch'
       # org.apache.cordova.statusbar required
       StatusBar.styleDefault()
 
-.config ($stateProvider, $urlRouterProvider, resolvers, uiGmapGoogleMapApiProvider) ->
+.config ($stateProvider, $urlRouterProvider, resolvers, uiGmapGoogleMapApiProvider, $ionicConfigProvider) ->
+  $ionicConfigProvider.views.swipeBackEnabled(false)
   uiGmapGoogleMapApiProvider.configure
     key: 'AIzaSyC0wntPebMoKnIwbpa82NzLPbwEIlvZvlM'
     v: '3.17'
