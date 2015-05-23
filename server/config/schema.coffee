@@ -90,6 +90,8 @@ schema.place.columns = {
   long: {type: 'real'}
   rating: {type: 'integer'}
   factual_consume_ver: {type: 'integer'}
+  upvote_count: {type: 'integer'}
+  downvote_count: {type: 'integer'}
   created_at
   updated_at
   source_ver
@@ -138,4 +140,11 @@ schema.tweak_values = {}
 schema.tweak_values.columns = {
   name: {type: 'varchar(40)', options: 'not null unique'}
   value: {type: 'json'}
+}
+
+schema.user_vote = {}
+schema.user_vote.columns = {
+  user_id: {type: id_type}
+  place_id: {type: id_type}
+  vote: {type: 'integer'}
 }
