@@ -1,61 +1,77 @@
 'use strict'
 class UserService
   constructor: (@$http, @$q, @$cordovaFacebook, @$window, @kfUri, @$rootScope, @$timeout)->
-    @user = angular.fromJson @$window.localStorage.getItem("user")
-    if not @user? then @user = {authenticated:no}
+    @user = @_userFromLocalStorage()
 
   httpGet: (path) ->
     url = "http://#{@kfUri}" + path
     @$http.get(url, headers: {Accept: 'application/json'})
 
+  _userFromLocalStorage: ->
+    usr = angular.fromJson @$window.localStorage.getItem("user")
+    console.log usr
+    if usr?
+      @user = new User(usr)
+    else
+      @user = new User({})
+
   getUser: ->
     defer = @$q.defer()
-    if @user?.facebookToken?
-      @httpGet("/api/user/me?facebook_token=#{token}").success (data) =>
-        console.log 'data', data
-        defer.resolve(data)
-      .error (error) =>
-        console.log 'error', error
-        defer.resolve(@user)
-    else
+    if not @user? then @$timeout =>
+      console.log 'user not defined'
+      defer.resolve(@user)
+    if @user.isAuthenticated()
+      console.log 'user is authenticated'
       @$timeout => defer.resolve(@user)
+    else
+      console.log 'going to try and get the user'
+      @getUserForToken(@user.accessToken).then (user) =>
+        defer.resolve
+
     defer.promise
 
   getUserForToken: (token) ->
     defer = @$q.defer()
-    @httpGet("/api/user/me?facebook_token=#{token}").success (data) =>
-      console.log 'data', data
-      defer.resolve(data)
+    @httpGet("/api/user/me?facebook_token=#{token}").success (kfUser) =>
+      console.log 'kfuser', kfUser
+      @user.userId = kfUser.user_id
+      @user.email = kfUser.email
+      @$window.localStorage.setItem('user', angular.toJson(@user))
+      @$rootScope.$broadcast '$authenticationSuccess', @user
+      defer.resolve @user
     .error (error) =>
       console.log 'error', error
-      defer.reject(error)
+      defer.reject error
     defer.promise
 
   loginOrSignUp: ->
     defer = @$q.defer()
     @$cordovaFacebook.login (["public_profile", "email", "user_friends"])
     .then (success) =>
-      console.log 'success: ', success
-      @getUserForToken(success.authResponse.accessToken)
-      @user.id = success.authResponse.userID
-      @user.authenticated = yes
-      @$window.localStorage.setItem('user', angular.toJson @user)
-      @$rootScope.$broadcast '$authenticationSuccess', @user
-      defer.resolve @user
-
+      @user.accessToken = success.authResponse.accessToken
+      @user.setExpiryDate(success.authResponse.expiresIn)
+      @getUserForToken(success.authResponse.accessToken).then (kfUser) =>
+        defer.resolve @user
     , (error) =>
-      console.log error
       defer.reject(error)
     defer.promise
 
   logout: ->
     @$window.localStorage.removeItem('user')
-    @user.firstName = undefined
-    @user.lastName = undefined
+    @user.email = undefined
     @user.accessToken = undefined
-    @user.id = undefined
-    @user.authenticated = no
+    @user.userId = undefined
+    @user.expiryDate = undefined
 
+  class User
+    constructor:({@email, @userId, @accessToken, @expiryDate})->
+      @expiryDate = new Date(@expiryDate)
+
+    isAuthenticated: -> @userId? and @accessToken? and @expiryDate?.getTime() > Date.now()
+
+    setExpiryDate:(seconds) ->
+      now = Date.now() + seconds * 1000
+      @expiryDate = new Date(now)
 
 UserService.$inject = ['$http', '$q', '$cordovaFacebook', '$window', 'kfUri', '$rootScope', '$timeout']
 angular.module('kf.shared').service 'userService', UserService

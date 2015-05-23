@@ -28,9 +28,9 @@ class ReviewCtrl
     $scope.submit = () ->
 #      name = "#{user.current.first_name} #{user.current.last_name?.substring(0, 1)}"
 #      $scope.data.review.name = name
-#      placesService.submitReview(user.current.user_id, $stateParams.placeId, $scope.data.review)
+      placesService.submitReview($stateParams.placeId, $scope.data.review)
 #      analyticsService.trackEvent("Review", "submit", 'new', placesService.calculateScore($scope.data.review))
-#      $scope.modal.show()
+      $scope.modal.show()
 
 ReviewCtrl.$inject = [
   '$scope'
