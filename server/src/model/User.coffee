@@ -16,7 +16,7 @@ class User
 
   toDatabase: ->
     fields = {}
-    for k in ['email','facebook_id']
+    for k in ['user_id','email','facebook_id']
       fields[k] = this[k]
     fields
 

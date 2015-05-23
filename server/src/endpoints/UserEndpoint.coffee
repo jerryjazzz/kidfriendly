@@ -5,13 +5,23 @@ class UserEndpoint
   constructor: ->
     @app = depend('App')
     @reviewDao = depend('ReviewDAO')
+    @testUser = depend('TestUser')
+    @voteDao = depend('VoteDAO')
+    @voteService = depend('VoteService')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
     @route = require('express')()
     facebook = depend('Facebook')
 
-    getValidatedUser = (req) ->
+    getValidatedUser = (req) =>
       user_id = req.params.user_id
+
+      if req.query.token?
+        if req.query.token == @testUser.token
+          return @testUser.findOrCreate()
+        else
+          return Promise.reject("'token' not supported yet'")
+
       facebook_token = req.query.facebook_token
 
       if not facebook_token?
@@ -60,5 +70,30 @@ class UserEndpoint
         review.user_id = user_id
         review.place_id = place_id
         review.reviewer_name = req.body.review?.name
+
+    post @route, '/:user_id/place/:place_id/vote', (req) =>
+
+      user_id = req.user.user_id
+      place_id = req.params.place_id
+      vote = req.body.vote
+
+      if not vote?
+        throw new Error("'vote' is required")
+
+      vote = parseInt(vote)
+
+      if not (vote in [0,1,-1])
+        throw new Error("'vote' can only be -1, 0, or 1")
+
+      where = (query) -> query.where({user_id, place_id})
+
+      @voteDao.modifyOrInsert where, (row) ->
+        row.user_id = user_id
+        row.place_id = place_id
+        row.vote = vote
+        console.log('row = ', row)
+      .then =>
+        @voteService.recalculateForPlace(place_id)
+
 
 provide('endpoint/api/user', UserEndpoint)
