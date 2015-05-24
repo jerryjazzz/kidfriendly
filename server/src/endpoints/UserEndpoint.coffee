@@ -5,6 +5,7 @@ class UserEndpoint
   constructor: ->
     @app = depend('App')
     @reviewDao = depend('ReviewDAO')
+    @userDao = depend('UserDAO')
     @testUser = depend('TestUser')
     @voteDao = depend('VoteDAO')
     @voteService = depend('VoteService')
