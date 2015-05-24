@@ -20,4 +20,7 @@ class TestEndpoint
     post @route, '/cleanup', (req) =>
       @testUser.deleteAllVotes()
 
+    post @route, '/delete-votes', (req) =>
+      @testUser.deleteAllVotes()
+
 provide.class('endpoint/api/test', TestEndpoint)

@@ -6,40 +6,27 @@ class UserEndpoint
     @app = depend('App')
     @reviewDao = depend('ReviewDAO')
     @userDao = depend('UserDAO')
-    @testUser = depend('TestUser')
     @voteDao = depend('VoteDAO')
     @voteService = depend('VoteService')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
     @route = require('express')()
-    facebook = depend('Facebook')
-
-    getValidatedUser = (req) =>
-      user_id = req.params.user_id
-
-      if req.query.token?
-        if req.query.token == @testUser.token
-          return @testUser.findOrCreate()
-        else
-          return Promise.reject("'token' not supported yet'")
-
-      facebook_token = req.query.facebook_token
-
-      if not facebook_token?
-        return Promise.reject("facebook_token is required")
-
-      facebook.validateToken(facebook_token)
-      .then (validatedUser) ->
-        if user_id != 'me' and validatedUser.user_id != user_id
-          return Promise.reject("Facebook token is for a different user")
-
-        validatedUser
+    @userAuthentication = depend('UserAuthentication')
 
     @route.use '/:user_id*', (req, res, next) =>
-      getValidatedUser(req)
+      user_id = req.params.user_id
+
+      @userAuthentication.userFromRequest(req)
       .then (user) ->
+        if not user?
+          return Promise.reject("no user token")
+
+        if user_id != 'me' and user.user_id != user_id
+          return Promise.reject('Token is for a different user')
+
         req.user = user
         next()
+
       .catch (err) ->
         console.log("getValidatedUser error: #{err}")
         res.sendRendered({error: err})
