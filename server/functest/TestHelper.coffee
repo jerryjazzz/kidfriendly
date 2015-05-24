@@ -3,8 +3,6 @@ Request = require('request')
 Promise = require('bluebird')
 {expect} = require('chai')
 
-require('mocha-as-promised')()
-
 baseUrl = switch process.env['TARGET_SERVER']
   when 'local'
     'http://localhost:3000'
@@ -43,12 +41,44 @@ Api =
       url: '/api/search/nearby'
       qs: options
 
+  userMe: (options) ->
+    request
+      url: '/api/user/me'
+      qs: options
+
+  userMe: (token) ->
+    request
+      url: '/api/user/me'
+      qs: {token}
+
+
+  vote: (token, placeId, vote) ->
+    request
+      url: "/api/user/me/place/#{placeId}/vote"
+      qs: {token}
+      method: 'POST'
+      body: {vote}
+
+  testStart: ->
+    request
+      url: '/api/test/start'
+      method: 'POST'
+      body: {}
+
+  testCleanup: ->
+    request
+      url: '/api/test/cleanup'
+      method: 'POST'
+      body: {}
+
 assertPlace = (place) ->
   expect(place.place_id).to.exist()
   expect(place.name).to.exist()
   expect(place.lat).to.exist()
   expect(place.long).to.exist()
-  expect(place.price).to.exist()
 
 exports.api = Api
 exports.assertPlace = assertPlace
+
+exports.testToken = 'magic-test-user-token'
+exports.testPlaceId = 'testplace1'

@@ -146,12 +146,12 @@ class DAO
 
     @find(whereFunc).then (items) =>
       if items.length > 1
-        return Promise.reject("DAO.modify: found multiple items, only supports 1 item")
+        throw new Error("DAO.modify: found multiple items, only supports 1 item")
 
       original = items[0]
 
       if not allowInsert and not original?
-        return Promise.reject("DAO.modify: item not found")
+        throw new Error("DAO.modify: item not found (table: #{@tableName})")
 
       modified = if original?
         @patchInstance(original)
@@ -183,6 +183,11 @@ class DAO
       for result in results
         result[@idColumn]
     .map(modifyOne, {concurrency: 1})
+
+  del: (whereFunc) =>
+    query = @db(@tableName).del()
+    whereFunc(query)
+    query
 
   @make: (args) ->
     new DAO(args)

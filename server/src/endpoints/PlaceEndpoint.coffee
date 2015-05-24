@@ -68,4 +68,5 @@ class PlaceEndpoint
       @placeDao.modifyMulti where, (place) =>
         @factualRating.recalculateFactualBasedRating(place)
 
+
 provide('endpoint/api/place', PlaceEndpoint)

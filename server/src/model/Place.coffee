@@ -50,7 +50,7 @@ class Place
 
   toDatabase: ->
     fields = {}
-    for k in ['name','lat','long','rating','factual_id','factual_consume_ver',
+    for k in ['place_id', 'name','lat','long','rating','factual_id','factual_consume_ver',
       'upvote_count', 'downvote_count']
       fields[k] = this[k]
     fields

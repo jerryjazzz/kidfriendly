@@ -6,14 +6,16 @@ class TestUser
 
   constructor: ->
     @userDao = depend('UserDAO')
+    @voteDao = depend('VoteDAO')
 
   findOrCreate: ->
     where = (query) => query.where(user_id: @id)
     @userDao.modifyOrInsert where, (user) =>
-      console.log('modifyOrInsert 1', user)
       if not user.user_id?
         user.user_id = @id
       user.email = @email
-      console.log('modifyOrInsert 2', user)
+
+  deleteAllVotes: ->
+    @voteDao.del((query) -> query.where(user_id: @id))
 
 provide('TestUser', -> new TestUser())
