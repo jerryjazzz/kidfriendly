@@ -1,5 +1,5 @@
 
-provide 'Tweaks', class Tweaks
+class Tweaks
   constructor: ->
     @tweakValueDAO = depend('TweakValueDAO')
     @loaded = {}
@@ -40,3 +40,5 @@ provide 'Tweaks', class Tweaks
     @tweakValueDAO.modifyOrInsert where, (tweak) =>
       tweak.name = name
       tweak.value = value
+
+provide.class(Tweaks)

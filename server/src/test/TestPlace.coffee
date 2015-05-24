@@ -18,4 +18,5 @@ class TestPlace
       place.lat = 30
       place.long = 171
 
-provide('TestPlace', -> new TestPlace())
+
+provide.class(TestPlace)

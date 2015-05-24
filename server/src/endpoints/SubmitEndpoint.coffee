@@ -48,4 +48,4 @@ class SubmitEndpoint
 
       @app.insert('survey_answer', row)
 
-provide('endpoint/api/submit', SubmitEndpoint)
+provide.class('endpoint/api/submit', SubmitEndpoint)

@@ -69,6 +69,6 @@ class ExpressUtil
     res.status(statusCode).send(html)
     return
 
-provide('ExpressUtil', ExpressUtil)
+provide.class(ExpressUtil)
 provide('ExpressGet', -> depend('ExpressUtil').wrappedGet)
 provide('ExpressPost', -> depend('ExpressUtil').wrappedPost)

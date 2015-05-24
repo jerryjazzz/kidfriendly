@@ -7,7 +7,7 @@ baseUrl = switch process.env['TARGET_SERVER']
   when 'local'
     'http://localhost:3000'
   when 'prod'
-    'http://kidfriendlyreviews.com'
+    'https://kidfriendlyreviews.com'
   else
     throw new Error("unrecognized TARGET_SERVER")
     

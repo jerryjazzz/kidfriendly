@@ -78,4 +78,4 @@ class FactualConsumer
 
     @placeDao.modifyMulti(queryFunc, @refreshOnePlace)
 
-provide('FactualConsumer', FactualConsumer)
+provide.class(FactualConsumer)

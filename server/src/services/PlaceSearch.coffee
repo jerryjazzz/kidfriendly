@@ -77,4 +77,4 @@ class PlaceSearch
     places.sort((a,b) -> b.context.adjustedRating - a.context.adjustedRating)
     return places
 
-provide('PlaceSearch', PlaceSearch)
+provide.class(PlaceSearch)

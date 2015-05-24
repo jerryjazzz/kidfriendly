@@ -1,5 +1,5 @@
 
-provide 'PlaceReviews', class PlaceReviews
+class PlaceReviews
   constructor: ->
     @db = depend('db')
     @Review = depend('Review')
@@ -19,3 +19,4 @@ provide 'PlaceReviews', class PlaceReviews
             place.reviews.push @Review.fromDatabase(row)
         place
 
+provide.class(PlaceReviews)

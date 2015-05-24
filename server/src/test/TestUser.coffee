@@ -16,6 +16,7 @@ class TestUser
       user.email = @email
 
   deleteAllVotes: ->
-    @voteDao.del((query) -> query.where(user_id: @id))
+    user_id = @id
+    @voteDao.del((query) -> query.where({user_id}))
 
-provide('TestUser', -> new TestUser())
+provide.class(TestUser)

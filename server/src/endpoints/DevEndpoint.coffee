@@ -19,4 +19,4 @@ class DevEndpoint
       value = req.body.value
       depend('Tweaks').set(req.params.name, value)
 
-provide('endpoint/api/dev', DevEndpoint)
+provide.class('endpoint/api/dev', DevEndpoint)

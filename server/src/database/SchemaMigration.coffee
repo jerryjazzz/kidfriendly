@@ -147,4 +147,4 @@ class SchemaMigration
       else
         info.data_type
 
-provide('SchemaMigration', -> SchemaMigration)
+provide.class(SchemaMigration)

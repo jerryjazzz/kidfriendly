@@ -92,9 +92,11 @@ class UserEndpoint
         row.user_id = user_id
         row.place_id = place_id
         row.vote = vote
-        console.log('row = ', row)
       .then =>
         @voteService.recalculateForPlace(place_id)
+      .then =>
+        console.log("vote submitted, user_id: #{user_id}, place_id: #{place_id}, vote: #{vote}")
+        {result: 'ok'}
 
 
-provide('endpoint/api/user', UserEndpoint)
+provide.class('endpoint/api/user', UserEndpoint)

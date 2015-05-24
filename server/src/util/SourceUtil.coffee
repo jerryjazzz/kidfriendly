@@ -80,4 +80,4 @@ class SourceUtil
     else
       return JSON.parse(jsonStr)
 
-provide('SourceUtil', SourceUtil)
+provide.class(SourceUtil)

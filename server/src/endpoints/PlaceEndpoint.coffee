@@ -69,4 +69,4 @@ class PlaceEndpoint
         @factualRating.recalculateFactualBasedRating(place)
 
 
-provide('endpoint/api/place', PlaceEndpoint)
+provide.class('endpoint/api/place', PlaceEndpoint)
