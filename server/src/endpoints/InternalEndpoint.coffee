@@ -9,4 +9,4 @@ class InternalEndpoint
     get @route, '/trigger_nightly', (req) =>
       depend('NightlyTasks').run()
 
-provide('endpoint/api/internal', InternalEndpoint)
+provide.class('endpoint/api/internal', InternalEndpoint)

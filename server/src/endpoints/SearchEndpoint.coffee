@@ -36,4 +36,4 @@ class SearchEndpoint
       options = placeSearch.resolveSearchQuery(req.query)
       factualService.getUrl(options)
 
-provide('endpoint/api/search', SearchEndpoint)
+provide.class('endpoint/api/search', SearchEndpoint)

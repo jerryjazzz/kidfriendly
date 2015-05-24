@@ -56,10 +56,8 @@ class PostgresClient
       @log("skipping migration (no DB)")
       return
 
-    SchemaMigration = depend('SchemaMigration')
-    migration = new SchemaMigration(this)
-    migration.start()
+    depend('SchemaMigration').start()
 
 
-provide('PostgresClient', PostgresClient)
+provide.class(PostgresClient)
 provide('db', -> depend('PostgresClient').knex)

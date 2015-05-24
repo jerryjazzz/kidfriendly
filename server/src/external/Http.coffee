@@ -14,4 +14,4 @@ class Http
         else
           resolve(body)
 
-provide('http', Http)
+provide.class(Http)

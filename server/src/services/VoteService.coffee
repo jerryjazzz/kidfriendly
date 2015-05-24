@@ -12,10 +12,9 @@ class VoteService
       upvote_count: @voteDao.count((query) -> query.where({place_id, vote: 1}))
       downvote_count: @voteDao.count((query) -> query.where({place_id, vote: -1}))
     .then (result) =>
-      console.log('result = ', result)
       where = (query) -> query.where({place_id})
       @placeDao.modify where, (place) ->
         place.upvote_count = result.upvote_count
         place.downvote_count = result.downvote_count
 
-provide('VoteService', -> new VoteService())
+provide.class(VoteService)

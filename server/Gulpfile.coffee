@@ -6,7 +6,7 @@ concat = require('gulp-concat')
 watch = require('gulp-watch')
 sourcemaps = require('gulp-sourcemaps')
 
-coffeeFiles = ['src/DependencyCache.coffee', 'src/**/*.coffee']
+coffeeFiles = ['src/Prelude.coffee', 'src/**/*.coffee']
 watchFiles = coffeeFiles.concat(['config/*'])
 
 gulp.task 'coffee', ->

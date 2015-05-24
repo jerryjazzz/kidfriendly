@@ -61,4 +61,4 @@ class FactualService
       .then (results) ->
         return results.data[0]
 
-provide('FactualService', FactualService)
+provide.class(FactualService)

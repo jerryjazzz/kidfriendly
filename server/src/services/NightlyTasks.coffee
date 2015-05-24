@@ -8,4 +8,4 @@ class NightlyTasks
   run: =>
     depend('FactualConsumer').refreshOldPlaceData()
 
-provide('NightlyTasks', NightlyTasks)
+provide.class(NightlyTasks)

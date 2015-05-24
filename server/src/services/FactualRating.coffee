@@ -80,5 +80,4 @@ class FactualRating
     place.details.detailedRatings = extended.detailedRatings
     place
   
-provide('FactualRating', FactualRating)
-
+provide.class(FactualRating)

@@ -80,7 +80,6 @@ class DAO
 
   insert: (object) =>
     row = @objectToDatabase(object)
-    console.log('insert row: ', row)
     idColumn = @idColumn
 
     if not row.created_at? and @tableSchema.columns.created_at?
@@ -97,7 +96,6 @@ class DAO
       return @db(@tableName).insert(row).then(-> row)
 
     if row[idColumn]?
-      console.log('row already has id: ', row[idColumn])
       # new row already has an ID
       successResult = {}
       successResult[idColumn] = row[idColumn]
@@ -121,7 +119,6 @@ class DAO
       attempt(0)
 
   update: (object) =>
-    console.log('update: ', object)
     if object.dataSource != 'local' or not object.original?
       throw new Error("DAO.update must be called on patch data: "+ object)
 

@@ -14,7 +14,7 @@ class Facebook
 
   constructor: ->
     @userDao = depend('UserDAO')
-    @http = depend('http')
+    @http = depend('Http')
 
     passportOptions =
       clientID: @appId
@@ -91,4 +91,4 @@ class Facebook
           console.log("facebook: created new user #{user.user_id} for facebook id #{data.id}")
         user
 
-provide('Facebook', Facebook)
+provide.class(Facebook)

@@ -62,4 +62,4 @@ class AdminEndpoint
       }
 
 
-provide('endpoint/admin', AdminEndpoint)
+provide.class('endpoint/admin', AdminEndpoint)
