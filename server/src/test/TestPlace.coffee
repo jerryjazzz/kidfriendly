@@ -4,7 +4,7 @@ class TestPlace
   id: 'testplace1'
 
   constructor: ->
-    @placeDao = depend('PlaceDAO')
+    @placeDao = depend('dao/place')
 
   prepare: ->
     where = (query) => query.where(place_id: @id)

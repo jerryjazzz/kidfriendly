@@ -7,7 +7,7 @@ class FactualConsumer
 
   constructor: ->
     @app = depend('App')
-    @placeDao = depend('PlaceDAO')
+    @placeDao = depend('dao/place')
     @factualService = depend('FactualService')
     @factualRating = depend('FactualRating')
 

@@ -5,7 +5,7 @@ Promise = require('bluebird')
 class PlaceEndpoint
   constructor: ->
     @app = depend('App')
-    @placeDao = depend('PlaceDAO')
+    @placeDao = depend('dao/place')
     @placeReviews = depend('PlaceReviews')
     @factualRating = depend('FactualRating')
     get = depend('ExpressGet')

@@ -13,7 +13,7 @@ class Facebook
   tokenValidateCache: {}
 
   constructor: ->
-    @userDao = depend('UserDAO')
+    @user = depend('dao/user')
     @http = depend('Http')
 
     passportOptions =
@@ -32,7 +32,7 @@ class Facebook
       done(null, user.user_id)
 
     passport.deserializeUser (id, done) =>
-      @userDao.findById(id)
+      @user.findById(id)
       .then (user) -> done(null, user)
       .catch (err) -> done(err)
 
@@ -42,14 +42,14 @@ class Facebook
     if not email?
       throw new Error("Email not found")
 
-    @userDao.findOne((query) -> query.where({email}))
+    @user.findOne((query) -> query.where({email}))
     .then (user) =>
       if user?
         console.log("Found user: #{JSON.stringify(user)}")
         return user
 
       console.log("findOrCreateFromPassport: creating user for email #{email}")
-      @userDao.insert
+      @user.insert
         email: email
 
   validateToken: (token) ->
@@ -62,7 +62,7 @@ class Facebook
       @findOrCreateFromToken(data)
 
   findOrCreateFromToken: (data) ->
-    @userDao.find((query) -> query.where({facebook_id:data.id}))
+    @user.find((query) -> query.where({facebook_id:data.id}))
     .then (users) =>
       existing = users[0]
 
@@ -73,7 +73,7 @@ class Facebook
       where = (query) -> query.where({email:data.email})
       isNewUser = false
 
-      @userDao.modifyOrInsert where, (user) =>
+      @user.modifyOrInsert where, (user) =>
         if user.original?
           # Link with an existing user. At the time of this writing (may 2015), linking with an
           # existing user is very rare, it can only happen for users created by using the /admin

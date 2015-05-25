@@ -5,12 +5,12 @@ class TestUser
   email: 'test-user-1@example.com'
 
   constructor: ->
-    @userDao = depend('UserDAO')
-    @voteDao = depend('VoteDAO')
+    @user = depend('dao/user')
+    @voteDao = depend('dao/vote')
 
   findOrCreate: ->
     where = (query) => query.where(user_id: @id)
-    @userDao.modifyOrInsert where, (user) =>
+    @user.modifyOrInsert where, (user) =>
       if not user.user_id?
         user.user_id = @id
       user.email = @email

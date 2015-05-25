@@ -4,8 +4,11 @@ Geolib = require('geolib')
 Cities = require('cities')
 
 class PlaceSearch
+  SearchLimit: 120
+  FinalResultLimit: 100
+
   constructor: ->
-    @placeDao = depend('PlaceDAO')
+    @placeDao = depend('dao/place')
     @geom = depend('GeomUtil')
     @tweaks = depend('Tweaks')
 
@@ -38,7 +41,7 @@ class PlaceSearch
 
       query.orderBy('rating', 'desc')
 
-      query.limit(@tweaks.get('search.db_limit'))
+      query.limit(@SearchLimit)
 
     .then (places) =>
       #console.log("sql gave #{places.length} places")
@@ -48,8 +51,8 @@ class PlaceSearch
       @sortPlaces(places)
     .then (places) =>
       places.filter((place) -> not place.details?.factual_raw?.chain_id)
-    #.then (places) =>
-    #  places.slice(0, 15)
+    .then (places) =>
+      places.slice(0, @FinalResultLimit)
 
   checkDistance: (places, searchOptions) ->
     # Store 'distance' on each result, and filter out places that are too far.

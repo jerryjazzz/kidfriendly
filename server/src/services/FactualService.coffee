@@ -11,7 +11,7 @@ class FactualService
 
   constructor: ->
     @app = depend('App')
-    @placeDao = depend('PlaceDAO')
+    @placeDao = depend('dao/place')
     @placeSearch = depend('PlaceSearch')
 
     lib = require('factual-api')

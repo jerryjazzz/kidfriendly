@@ -4,9 +4,8 @@ Promise = require('bluebird')
 class UserEndpoint
   constructor: ->
     @app = depend('App')
-    @reviewDao = depend('ReviewDAO')
-    @userDao = depend('UserDAO')
-    @voteDao = depend('VoteDAO')
+    @review = depend('dao/review')
+    @voteDao = depend('dao/vote')
     @voteService = depend('VoteService')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
@@ -36,14 +35,14 @@ class UserEndpoint
 
     get @route, '/:user_id/reviews', (req) =>
       user_id = req.user.user_id
-      @reviewDao.find((query) -> query.where({user_id}))
+      @review.find((query) -> query.where({user_id}))
       .then (reviews) ->
         review.toClient() for review in reviews
 
     get @route, '/:user_id/place/:place_id/review', (req) =>
       user_id = req.user.user_id
       place_id = req.params.place_id
-      @reviewDao.findOne((query) -> query.where({user_id,place_id}))
+      @review.findOne((query) -> query.where({user_id,place_id}))
       .then (place) -> place.toClient()
 
     post @route, '/:user_id/place/:place_id/review', (req) =>
@@ -53,7 +52,7 @@ class UserEndpoint
 
       where = (query) -> query.where({user_id, place_id})
 
-      @reviewDao.modifyOrInsert where, (review) ->
+      @review.modifyOrInsert where, (review) ->
         review.body = JSON.stringify(req.body.review)
         review.user_id = user_id
         review.place_id = place_id
