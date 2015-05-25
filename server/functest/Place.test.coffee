@@ -17,4 +17,4 @@ describe 'Place', ->
     .then (details) ->
       helper.assertPlace(details)
       expect(details.place_id).to.equal(place.place_id)
-      expect(details.reviews).to.exist()
+      expect(details.reviews).to.exist

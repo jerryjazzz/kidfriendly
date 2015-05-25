@@ -18,7 +18,7 @@ describe 'UserVotes', ->
       expect(place.upvote_count ? 0).to.equal(0)
       expect(place.downvote_count ? 0).to.equal(0)
 
-  it 'place shows votes', ->
+  it 'place shows total votes', ->
     helper.api.vote(token, placeId, 1)
     .then ->
       helper.api.placeDetails(placeId)
@@ -32,3 +32,28 @@ describe 'UserVotes', ->
     .then (place) ->
       expect(place.upvote_count ? 0).to.equal(0)
       expect(place.downvote_count ? 0).to.equal(1)
+
+  it 'place search shows my votes', ->
+    helper.api.vote(token, placeId, 1)
+    .then ->
+      helper.api.searchForTestPlace({token})
+    .then (places) ->
+      place = places[0]
+      expect(place.place_id).to.equal(placeId) # sanity check
+      expect(place.me.vote).to.equal(1)
+    .then ->
+      helper.api.vote(token, placeId, -1)
+    .then ->
+      helper.api.searchForTestPlace({token})
+    .then (places) ->
+      place = places[0]
+      expect(place.place_id).to.equal(placeId)
+      expect(place.me.vote).to.equal(-1)
+
+  it "place search doesn't show my vote if there isn't one", ->
+    helper.api.testDeleteVotes()
+    .then ->
+      helper.api.searchForTestPlace({token})
+    .then (places) ->
+      place = places[0]
+      expect(place.me?.vote).to.not.exist

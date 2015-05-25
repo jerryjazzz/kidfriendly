@@ -41,6 +41,13 @@ Api =
       url: '/api/search/nearby'
       qs: options
 
+  searchForTestPlace: (options) ->
+    options.lat = 30
+    options.long = 171
+    request
+      url: '/api/search/nearby'
+      qs: options
+
   userMe: (options) ->
     request
       url: '/api/user/me'
@@ -68,6 +75,12 @@ Api =
   testCleanup: ->
     request
       url: '/api/test/cleanup'
+      method: 'POST'
+      body: {}
+
+  testDeleteVotes: ->
+    request
+      url: '/api/test/delete-votes'
       method: 'POST'
       body: {}
 
