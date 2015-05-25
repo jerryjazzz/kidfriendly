@@ -190,7 +190,7 @@ class DAO
     new DAO(args)
 
 provide('newDAO', -> DAO.make)
-provide('UserDAO', -> new DAO(modelClass: depend('User')))
-provide('ReviewDAO', -> new DAO(modelClass: depend('Review')))
-provide('PlaceDAO', -> new DAO(modelClass: depend('Place')))
-provide('VoteDAO', -> new DAO(modelClass: depend('model/Vote')))
+provide('dao/user', -> new DAO(modelClass: depend('User')))
+provide('dao/review', -> new DAO(modelClass: depend('Review')))
+provide('dao/place', -> new DAO(modelClass: depend('Place')))
+provide('dao/vote', -> new DAO(modelClass: depend('model/Vote')))

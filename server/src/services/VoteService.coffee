@@ -4,8 +4,8 @@ Promise = require('bluebird')
 class VoteService
   constructor: ->
     @db = depend('db')
-    @voteDao = depend('VoteDAO')
-    @placeDao = depend('PlaceDAO')
+    @voteDao = depend('dao/vote')
+    @placeDao = depend('dao/place')
 
   recalculateForPlace: (place_id) ->
     Promise.props

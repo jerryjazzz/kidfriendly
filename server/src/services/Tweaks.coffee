@@ -6,8 +6,6 @@ class Tweaks
     @loadAll()
 
   defaults:
-    'search.db_limit': 25
-    'search.count': 15
     'search.distance_mi': 3
     'sort.penalty_points_per_10mi': 0
     'rating.points.randomAdjustment': 3
