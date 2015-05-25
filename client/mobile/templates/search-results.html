@@ -1,6 +1,6 @@
 <ion-view>
     <ion-content class="has-header">
-        <ion-list class="list" can-swipe-items="false">
+        <ion-list class="list" can-swipe="user.isAuthenticated()">
             <ion-item class="item item-thumbnail-left" ng-click="goToDetails(result.place_id, $index)" ng-repeat="result in results">
                 <img src="img/no-image-thumb.png">
                 <kf-rating banner-class="'results-rating-stripe'" rating="result.rating"></kf-rating>
@@ -11,10 +11,10 @@
                 <p>{{result.address}}</p>
                 <kf-hours hours="result.hours"></kf-hours>
                 <ion-option-button class="button-stable" ng-click="up($event, result)">
-                      <i class="ion-thumbsup thumbs-up" ng-class="{'thumbs-alpha':!result.thumbsUp}" style="font-size:60px;"></i>
+                      <i class="ion-thumbsup" ng-class="getThumbClass(result.me.vote, 'up')" style="font-size:60px;"></i>
                 </ion-option-button>
                 <ion-option-button class="button-stable" ng-click="down($event, result)">
-                    <i class="ion-thumbsdown thumbs-down" ng-class="{'thumbs-alpha':!result.thumbsDown}" style="font-size:60px"></i>
+                    <i class="ion-thumbsdown" ng-class="getThumbClass(result.me.vote, 'down')" style="font-size:60px"></i>
                 </ion-option-button>
             </ion-item>
         </ion-list>
