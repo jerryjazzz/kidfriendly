@@ -9,7 +9,6 @@ class UserService
 
   _userFromLocalStorage: ->
     usr = angular.fromJson @$window.localStorage.getItem("user")
-    console.log usr
     if usr?
       @user = new User(usr)
     else
@@ -18,22 +17,19 @@ class UserService
   getUser: ->
     defer = @$q.defer()
     if not @user? then @$timeout =>
-      console.log 'user not defined'
       defer.resolve(@user)
     if @user.isAuthenticated()
-      console.log 'user is authenticated'
       @$timeout => defer.resolve(@user)
-    else
-      console.log 'going to try and get the user'
+    else if @user.accessToken?
       @getUserForToken(@user.accessToken).then (user) =>
         defer.resolve
+    else @$timeout => defer.resolve(@user)
 
     defer.promise
 
   getUserForToken: (token) ->
     defer = @$q.defer()
     @httpGet("/api/user/me?facebook_token=#{token}").success (kfUser) =>
-      console.log 'kfuser', kfUser
       @user.userId = kfUser.user_id
       @user.email = kfUser.email
       @$window.localStorage.setItem('user', angular.toJson(@user))

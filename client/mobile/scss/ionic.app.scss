@@ -52,8 +52,9 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
   color: $assertive;
 }
 
-.thumbs-alpha {
-  opacity: 0.5;
+.thumbs-unchecked {
+  opacity: 0.1;
+  color: $dark;
 }
 
 .input-compact {
