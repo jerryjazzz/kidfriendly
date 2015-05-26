@@ -16,9 +16,7 @@ class UserAnnotatedSearchResults
 
       for place in places
         place.me = place.me ? {}
-
-        if (vote = votesByPlaceId[place.place_id])?
-          place.me.vote = vote
+        place.me.vote = votesByPlaceId[place.place_id] ? 0
 
       places
 
