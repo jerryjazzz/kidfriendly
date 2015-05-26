@@ -50,10 +50,10 @@ describe 'UserVotes', ->
       expect(place.place_id).to.equal(placeId)
       expect(place.me.vote).to.equal(-1)
 
-  it "place search doesn't show my vote if there isn't one", ->
+  it "place search has vote=0 when there's no vote", ->
     helper.api.testDeleteVotes()
     .then ->
       helper.api.searchForTestPlace({token})
     .then (places) ->
       place = places[0]
-      expect(place.me?.vote).to.not.exist
+      expect(place.me?.vote).to.equal(0)
