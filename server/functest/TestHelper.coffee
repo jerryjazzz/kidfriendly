@@ -32,6 +32,18 @@ Api =
     request
       url: "/api/place/#{placeId}/details/reviews"
 
+  getReview: (placeId, token) ->
+    request
+      url: "/api/user/me/place/#{placeId}/review"
+      qs: {token}
+
+  submitReview: (placeId, token, body) ->
+    request
+      url: "/api/user/me/place/#{placeId}/review"
+      method: 'POST'
+      qs: {token}
+      body: body
+
   anyPlace: ->
     request
       url: '/api/place/any'

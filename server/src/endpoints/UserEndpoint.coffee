@@ -47,6 +47,8 @@ class UserEndpoint
 
     post @route, '/:user_id/place/:place_id/review', (req) =>
 
+      console.log('received review post with body: ', req.body)
+
       user_id = req.user.user_id
       place_id = req.params.place_id
 
