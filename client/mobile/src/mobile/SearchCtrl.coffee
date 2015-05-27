@@ -2,10 +2,9 @@
 class SearchCtrl
   constructor:($scope, $state, $stateParams, results, userService, analyticsService, @$ionicListDelegate, @$timeout, @placesService)->
     analyticsService.trackEvent("Results", 'display', $stateParams.keyword, results.length)
-    $scope.$watch userService.getUser().then (user) =>
-      $scope.user = user
+    $scope.$watch userService.getUser().then (user) => $scope.user = user
     $scope.results = results
-    for result in results
+
     $scope.noResults = results.length == 0
     $scope.goToDetails = (placeId, index) ->
       analyticsService.trackEvent("Results", 'select', "", index+1)
