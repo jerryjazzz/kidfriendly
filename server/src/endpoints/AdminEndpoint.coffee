@@ -4,7 +4,7 @@ passport = require('passport')
 class AdminEndpoint
   emailWhitelist:
     'andy.fischer@gmail.com': true
-    'joe.rozek@gmail.com': true
+    'jrozek@gmail.com': true
     'robert.clayton.bell@gmail.com': true
     'taylor.r.bell@gmail.com': true
 
