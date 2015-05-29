@@ -311,6 +311,19 @@ h2 {
   z-index:1;
 }
 
+.results-score {
+  width: 75px;
+  height: 200px;
+  padding: 40px 0px 10px 0px;
+  margin-left: -93px;
+  text-align: center;
+  vertical-align: middle;
+  color: $dark;
+  font-size:48px;
+  position: absolute;
+  z-index:1;
+}
+
 .results-rating-banner {
   width: 30px;
   padding: 2px;

@@ -4,6 +4,7 @@ class SearchCtrl
     analyticsService.trackEvent("Results", 'display', $stateParams.keyword, results.length)
     $scope.$watch userService.getUser().then (user) => $scope.user = user
     $scope.results = results
+    console.log "results", results
 
     $scope.noResults = results.length == 0
     $scope.goToDetails = (placeId, index) ->
@@ -12,23 +13,33 @@ class SearchCtrl
 
     $scope.up = ($event, place) =>
       voteValue = 1
-      if !place.me?.vote != 1
+      if place.me?.vote != 1
+        place.downvote_count-- if place.me.vote == -1
         place.me =
           vote: voteValue
+        place.upvote_count++
       else
         voteValue = 0
         place.me.vote = voteValue
+        place.upvote_count--
+      $scope.$apply()
       @handleThumbEvent($event, place, voteValue)
 
     $scope.down = ($event, place) =>
       voteValue =- 1
-      if !place.me?.vote != -1
+      if place.me?.vote != -1
+        place.upvote_count-- if place.me.vote == 1
         place.me =
           vote: voteValue
+        place.downvote_count++
+
       else
         voteValue = 0
+        place.downvote_count--
         place.me.vote = voteValue
+      $scope.$apply()
       @handleThumbEvent($event, place, voteValue)
+
 
     $scope.getThumbClass  = (voteValue, voteDirection) ->
       if voteDirection == 'down' and voteValue == -1
@@ -37,6 +48,10 @@ class SearchCtrl
         return {'thumbs-up':true}
       return {'thumbs-unchecked':true}
 
+    $scope.getScore = (place) ->
+      score = place.upvote_count - place.downvote_count
+      return "-" if score == 0
+      score
 
   handleThumbEvent: (event, place, vote)->
     event.stopPropagation()
