@@ -9,6 +9,10 @@ describe 'UserVotes', ->
 
   before ->
     helper.api.testStart()
+
+  beforeEach ->
+    helper.api.testDeleteVotes()
+
   after ->
     helper.api.testCleanup()
 
@@ -50,10 +54,26 @@ describe 'UserVotes', ->
       expect(place.place_id).to.equal(placeId)
       expect(place.me.vote).to.equal(-1)
 
-  it "place search has vote=0 when there's no vote", ->
-    helper.api.testDeleteVotes()
+  it 'place/details shows my votes', ->
+    helper.api.vote(token, placeId, 1)
     .then ->
-      helper.api.searchForTestPlace({token})
+      helper.api.placeDetails(placeId, {token})
+    .then (place) ->
+      expect(place.me.vote).to.equal(1)
+      expect(place.downvote_count).to.equal(0)
+      expect(place.upvote_count).to.equal(1)
+
+  it 'place/details/reviews shows my votes', ->
+    helper.api.vote(token, placeId, -1)
+    .then ->
+      helper.api.placeReviews(placeId, {token})
+    .then (place) ->
+      expect(place.me.vote).to.equal(-1)
+      expect(place.downvote_count).to.equal(1)
+      expect(place.upvote_count).to.equal(0)
+
+  it "place search has vote=0 when there's no vote", ->
+    helper.api.searchForTestPlace({token})
     .then (places) ->
       place = places[0]
       expect(place.me?.vote).to.equal(0)

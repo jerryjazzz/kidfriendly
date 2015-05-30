@@ -74,6 +74,10 @@ class Place
     for review in @reviews
       fields['reviews'].push review.toClient()
     fields.type = 'Place'
+
+    fields.upvote_count ?= 0
+    fields.downvote_count ?= 0
+
     return fields
 
   getFactualUrl: ->

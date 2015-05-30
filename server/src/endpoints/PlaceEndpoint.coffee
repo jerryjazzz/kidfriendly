@@ -10,6 +10,7 @@ class PlaceEndpoint
     @factualRating = depend('FactualRating')
     get = depend('ExpressGet')
     post = depend('ExpressPost')
+    MyPlaceDetails = depend('MyPlaceDetails')
 
     @route = require('express')()
 
@@ -30,15 +31,18 @@ class PlaceEndpoint
         if not place?
           return {error: "Place not found", place_id: place_id}
         place.toClient()
+      .then (place) ->
+        MyPlaceDetails.maybeAnnotateOne(req, place)
 
     get @route, '/:place_id/details/reviews', (req) =>
       {place_id} = req.params
       @placeReviews.getWithReviews(place_id)
       .then (place) ->
-        if place?
-          place.toClient()
-        else
-          {error: "Place not found", place_id: place_id}
+        if not place?
+          return Promise.reject({error: "Place not found", place_id: place_id})
+        place.toClient()
+      .then (place) ->
+        MyPlaceDetails.maybeAnnotateOne(req, place)
 
     get @route, '/any', (req) =>
       @placeDao.find((query) -> query.limit(1))
