@@ -60,6 +60,8 @@ describe 'UserVotes', ->
       helper.api.placeDetails(placeId, {token})
     .then (place) ->
       expect(place.me.vote).to.equal(1)
+      expect(place.downvote_count).to.equal(0)
+      expect(place.upvote_count).to.equal(1)
 
   it 'place/details/reviews shows my votes', ->
     helper.api.vote(token, placeId, -1)
@@ -67,6 +69,8 @@ describe 'UserVotes', ->
       helper.api.placeReviews(placeId, {token})
     .then (place) ->
       expect(place.me.vote).to.equal(-1)
+      expect(place.downvote_count).to.equal(1)
+      expect(place.upvote_count).to.equal(0)
 
   it "place search has vote=0 when there's no vote", ->
     helper.api.searchForTestPlace({token})

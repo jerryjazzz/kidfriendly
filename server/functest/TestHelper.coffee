@@ -102,6 +102,8 @@ assertPlace = (place) ->
   expect(place.name).to.exist()
   expect(place.lat).to.exist()
   expect(place.long).to.exist()
+  expect(place.upvote_count).to.exist()
+  expect(place.downvote_count).to.exist()
 
 exports.api = Api
 exports.assertPlace = assertPlace
