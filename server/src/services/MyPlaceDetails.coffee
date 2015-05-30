@@ -1,7 +1,21 @@
 
-class UserAnnotatedSearchResults
+class MyPlaceDetails
   constructor: ->
     @Vote = depend('dao/vote')
+    @UserAuthentication = depend('UserAuthentication')
+
+  maybeAnnotate: (req, places) =>
+    @UserAuthentication.fromRequest(req)
+    .then (user) =>
+      if user?
+        @annotate(places, user.user_id)
+      else
+        places
+
+  maybeAnnotateOne: (req, place) ->
+    @maybeAnnotate(req, [place])
+    .then (places) ->
+      places[0]
 
   annotate: (places, user_id) ->
     placeIds = (place.place_id for place in places)
@@ -20,4 +34,4 @@ class UserAnnotatedSearchResults
 
       places
 
-provide.class(UserAnnotatedSearchResults)
+provide.class(MyPlaceDetails)

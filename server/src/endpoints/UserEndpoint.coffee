@@ -15,7 +15,7 @@ class UserEndpoint
     @route.use '/:user_id*', (req, res, next) =>
       user_id = req.params.user_id
 
-      @userAuthentication.userFromRequest(req)
+      @userAuthentication.fromRequest(req)
       .then (user) ->
         if not user?
           return Promise.reject("no user token")

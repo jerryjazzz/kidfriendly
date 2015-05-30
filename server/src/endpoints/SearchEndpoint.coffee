@@ -7,7 +7,7 @@ class SearchEndpoint
     factualConsumer = depend('FactualConsumer')
     placeSearch = depend('PlaceSearch')
     userAuthentication = depend('UserAuthentication')
-    userAnnotatedSearchResults = depend('UserAnnotatedSearchResults')
+    MyPlaceDetails = depend('MyPlaceDetails')
     @route = require('express')()
     get = depend('ExpressGet')
 
@@ -18,16 +18,11 @@ class SearchEndpoint
       # Just for beta purposes, first do a Factual pull for this range.
       factualConsumer.geoSearch(options)
       .then ->
-        places: placeSearch.search(options)
-        user: userAuthentication.userFromRequest(req)
-      .props()
-      .then ({places, user}) ->
-        places = (place.toClient() for place in places)
-
-        if user?
-          userAnnotatedSearchResults.annotate(places, user.user_id)
-        else
-          places
+        placeSearch.search(options)
+      .then (places) ->
+        (place.toClient() for place in places)
+      .then (places) ->
+        MyPlaceDetails.maybeAnnotate(req, places)
 
     get @route, '/exceldump', (req) =>
       searchOptions = placeSearch.resolveSearchQuery(req.query)

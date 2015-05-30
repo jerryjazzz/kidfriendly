@@ -24,13 +24,15 @@ request = (args) ->
         resolve(body)
 
 Api =
-  placeDetails: (placeId) ->
+  placeDetails: (placeId, options) ->
     request
       url: "/api/place/#{placeId}/details"
+      qs: options
 
-  placeReviews: (placeId) ->
+  placeReviews: (placeId, options) ->
     request
       url: "/api/place/#{placeId}/details/reviews"
+      qs: options
 
   getReview: (placeId, token) ->
     request
@@ -65,11 +67,10 @@ Api =
       url: '/api/user/me'
       qs: options
 
-  userMe: (token) ->
+  userDetails: (user_id, options) ->
     request
-      url: '/api/user/me'
-      qs: {token}
-
+      url: "/api/user/#{user_id}"
+      qs: options
 
   vote: (token, placeId, vote) ->
     request
