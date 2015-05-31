@@ -5,6 +5,7 @@ Cities = require('cities')
 
 class PlaceSearch
   SearchLimit: 120
+  SearchDistanceMiles: 2
   FinalResultLimit: 100
 
   constructor: ->
@@ -19,7 +20,7 @@ class PlaceSearch
       options.meters = MilesToMeters(options.miles)
 
     if not options.meters?
-      options.meters = MilesToMeters(@tweaks.get('search.distance_mi'))
+      options.meters = MilesToMeters(@SearchDistanceMiles)
 
     if options.zipcode?
       cityLookup = Cities.zip_lookup(options.zipcode)

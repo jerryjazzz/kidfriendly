@@ -6,7 +6,6 @@ class Tweaks
     @loadAll()
 
   defaults:
-    'search.distance_mi': 3
     'sort.penalty_points_per_10mi': 0
     'rating.points.randomAdjustment': 3
     'rating.points.kids_goodfor': 2
