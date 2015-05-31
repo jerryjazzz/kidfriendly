@@ -40,16 +40,13 @@ class PlaceSearch
       query.andWhere('long', '>', bounds.long1)
       query.andWhere('long', '<', bounds.long2)
 
-      query.orderBy('rating', 'desc')
+      query.orderByRaw('upvote_count - downvote_count desc')
 
       query.limit(@SearchLimit)
 
     .then (places) =>
       #console.log("sql gave #{places.length} places")
       @checkDistance(places, searchOptions)
-    .then (places) =>
-      #console.log("after checkdistance, have #{places.length} places")
-      @sortPlaces(places)
     .then (places) =>
       places.filter((place) -> not place.details?.factual_raw?.chain_id)
     .then (places) =>
@@ -67,6 +64,7 @@ class PlaceSearch
 
     return places.filter (place) -> place.context.distance < searchOptions.meters
 
+  ###
   sortPlaces: (places) ->
     #penaltyPerMile = @tweaks.get('sort.penalty_points_per_10mi') / 10
 
@@ -80,5 +78,6 @@ class PlaceSearch
 
     places.sort((a,b) -> b.context.adjustedRating - a.context.adjustedRating)
     return places
+  ###
 
 provide.class(PlaceSearch)

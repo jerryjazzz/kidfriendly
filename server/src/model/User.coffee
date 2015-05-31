@@ -31,14 +31,6 @@ class User
     user.dataSource = 'local'
     return user
 
-  startPatch: ->
-    if this.dataSource != 'db'
-      throw Error("User.startPatch can only be called on original DB data")
-    user = new User(this)
-    user.original = this
-    user.dataSource = 'local'
-    return user
-
   toClient: ->
     fields = {}
     for k in ['user_id', 'email']

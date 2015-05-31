@@ -31,8 +31,9 @@ class App
   start: ->
     Promise.resolve()
       .then(@postgresSetup)
-      .then(@sqlMigrate)
+      .then(@schemaMigration)
       .then(@initializeSourceVersion)
+      .then(@dataMigration)
       .then(@setupAdminPort)
       .then(@setupPub)
       .then(@startExpress)
@@ -50,7 +51,7 @@ class App
       @db = @postgresClient.knex
       @insert = @postgresClient.insert
 
-  sqlMigrate: =>
+  schemaMigration: =>
     if @config.appConfig.roles?.dbMigration?
       @postgresClient.sqlMigrate()
 
@@ -69,6 +70,9 @@ class App
       .then (id) =>
         @sourceVersion = id
         @log("current source version is:", id)
+
+  dataMigration: =>
+    depend('DataMigration').run()
 
   setupAdminPort: =>
     @log("listening on admin port: " + @config.appConfig.adminPort)
