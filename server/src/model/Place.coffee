@@ -25,35 +25,20 @@ class Place
     long: {}
     rating: {}
     factual_id: {}
-    details: {}
     factual_consume_ver: {}
+    details: {}
+    upvote_count: {}
+    downvote_count: {}
 
   @fromDatabase: (fields) ->
     place = new Place(fields)
     place.dataSource = 'db'
-    Object.freeze(place)
-    Object.freeze(place.details)
     return place
 
   @make: (fields) ->
     place = new Place(fields)
     place.dataSource = 'local'
     return place
-
-  startPatch: ->
-    if this.dataSource != 'db'
-      throw Error("Place.startPatch can only be called on original DB data")
-    place = new Place(this)
-    place.original = this
-    place.dataSource = 'local'
-    return place
-
-  toDatabase: ->
-    fields = {}
-    for k in ['place_id', 'name','lat','long','rating','factual_id','factual_consume_ver',
-      'upvote_count', 'downvote_count']
-      fields[k] = this[k]
-    fields
 
   toClient: ->
     # Return this place in a format for client usage.

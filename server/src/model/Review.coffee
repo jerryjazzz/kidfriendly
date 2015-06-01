@@ -33,20 +33,10 @@ class Review
   @fromDatabase: (fields) ->
     review = new Review(fields)
     review.dataSource = 'db'
-    Object.freeze(review)
-    Object.freeze(review.body)
     return review
 
   @make: (fields = {}) ->
     review = new Review(fields)
-    review.dataSource = 'local'
-    return review
-
-  startPatch: ->
-    if this.dataSource != 'db'
-      throw Error("startPatch can only be called on original DB data")
-    review = new Review(this)
-    review.original = this
     review.dataSource = 'local'
     return review
 

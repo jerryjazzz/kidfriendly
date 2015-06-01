@@ -32,13 +32,7 @@ class DAO
     if original.dataSource != 'db'
       throw Error("Place.startPatch can only be called on original DB data")
 
-    if original.startPatch?
-      return original.startPatch()
-
-    patch = @newInstance()
-    for k,v of original
-      patch[k] = v
-
+    patch = Object.create(original)
     patch.original = original
     patch.dataSource = 'local'
     return patch
@@ -73,7 +67,7 @@ class DAO
       return object.toDatabase()
 
     fields = {}
-    for name,info of @modelClass.fields
+    for name,info of @modelClass.fields when object.hasOwnProperty(name)
       fields[name] = object[name]
 
     return fields
@@ -130,7 +124,7 @@ class DAO
     
   update2: (whereFunc, object) =>
     if object.dataSource != 'local' or not object.original?
-      throw new Error("DAO.update must be called on patch data: "+ object)
+      throw new Error("DAO.update must be called on patch data: #{JSON.stringify(object)}")
 
     fields = @objectToDatabase(object)
     @db(@tableName).update(fields).where(whereFunc)
@@ -151,6 +145,7 @@ class DAO
         throw new Error("DAO.modify: item not found (table: #{@tableName})")
 
       modified = if original?
+
         @patchInstance(original)
       else
         @newInstance()

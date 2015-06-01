@@ -25,13 +25,6 @@ class TweakValue
     Object.freeze(obj)
     return obj
 
-  startPatch: ->
-    if this.dataSource != 'db'
-      throw Error("startPatch can only be called on original DB data")
-    obj = TweakValue.make(this)
-    obj.original = this
-    return obj
-
   toDatabase: ->
     name: @name
     value: JSON.stringify(@value)
