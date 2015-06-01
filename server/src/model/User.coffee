@@ -20,12 +20,6 @@ class User
       fields[k] = this[k]
     fields
 
-  @fromDatabase: (fields) ->
-    user = new User(fields)
-    user.dataSource = 'db'
-    Object.freeze(user)
-    return user
-
   @make: (fields) ->
     user = new User(fields)
     user.dataSource = 'local'

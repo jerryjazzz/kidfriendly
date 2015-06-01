@@ -22,7 +22,6 @@ class TweakValue
 
     obj = new TweakValue(name: fields.name, value: value)
     obj.dataSource = 'db'
-    Object.freeze(obj)
     return obj
 
   toDatabase: ->
