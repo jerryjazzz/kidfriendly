@@ -49,6 +49,7 @@ class PlaceEndpoint
       .then (places) ->
         places[0].toClient()
 
+    ###
     post @route, '/new', (req) =>
       manualId = req.body.place_id # usually null
       place =
@@ -71,6 +72,7 @@ class PlaceEndpoint
 
       @placeDao.modifyMulti where, (place) =>
         @factualRating.recalculateFactualBasedRating(place)
+    ###
 
 
 provide.class('endpoint/api/place', PlaceEndpoint)

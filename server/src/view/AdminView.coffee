@@ -39,9 +39,6 @@ provide 'view/admin/home', -> (data) ->
     div {}, a {href:"/api/user/me?facebook_token=#{data.facebookToken}"}, '/user/me'
     div {}, a {href:"/api/user/me/reviews?facebook_token=#{data.facebookToken}"}, '/user/me/reviews'
     div {}, a {href:"/api/dev/tweaks"}, 'list all tweaks'
-    div {},
-      a {href:"/api/place/all/rerank"}, "rerank every place"
-      span {}, " (warning: don't push this unless you really mean it)"
 
 provide 'view/admin/login-required', -> (data) ->
   title: 'Error'
