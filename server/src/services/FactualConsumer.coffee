@@ -33,6 +33,8 @@ class FactualConsumer
     place.lat = factualPlace.latitude
     place.long = factualPlace.longitude
     place.rating = 0
+    place.upvote_count = 0
+    place.downvote_count = 0
     place.details =
       address: factualPlace.address
       hours: factualPlace.hours
