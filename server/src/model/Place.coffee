@@ -23,6 +23,7 @@ class Place
     name: {}
     lat: {}
     long: {}
+    zipcode: {}
     rating: {}
     factual_id: {}
     factual_consume_ver: {}

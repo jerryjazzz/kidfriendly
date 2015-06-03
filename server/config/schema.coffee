@@ -88,6 +88,7 @@ schema.place.columns = {
   details: {type: 'json'}
   lat: {type: 'real'}
   long: {type: 'real'}
+  zipcode: {type: 'varchar(10)'}
   rating: {type: 'integer'}
   factual_consume_ver: {type: 'integer'}
   upvote_count: {type: 'integer'}

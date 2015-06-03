@@ -32,6 +32,7 @@ class FactualConsumer
     place.factual_id = factualPlace.factual_id
     place.lat = factualPlace.latitude
     place.long = factualPlace.longitude
+    place.zipcode = factualPlace.postcode
     place.rating = 0
     place.upvote_count = 0
     place.downvote_count = 0
