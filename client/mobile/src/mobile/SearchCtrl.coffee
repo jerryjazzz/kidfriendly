@@ -14,30 +14,31 @@ class SearchCtrl
     $scope.up = ($event, place) =>
       voteValue = 1
       if place.me?.vote != 1
+        analyticsService.trackEvent "Results", "upvote"
         place.downvote_count-- if place.me.vote == -1
         place.me =
           vote: voteValue
         place.upvote_count++
       else
+        analyticsService.trackEvent "Results", "upvote-deselect"
         voteValue = 0
         place.me.vote = voteValue
         place.upvote_count--
-      $scope.$apply()
       @handleThumbEvent($event, place, voteValue)
 
     $scope.down = ($event, place) =>
       voteValue =- 1
       if place.me?.vote != -1
+        analyticsService.trackEvent "Results", "downvote"
         place.upvote_count-- if place.me.vote == 1
         place.me =
           vote: voteValue
         place.downvote_count++
-
       else
+        analyticsService.trackEvent "Results", "downvote-deselect"
         voteValue = 0
         place.downvote_count--
         place.me.vote = voteValue
-      $scope.$apply()
       @handleThumbEvent($event, place, voteValue)
 
 
