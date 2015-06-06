@@ -1,0 +1,4 @@
+
+source /kfly/server/etc/dev.profile
+
+save-database-dump
