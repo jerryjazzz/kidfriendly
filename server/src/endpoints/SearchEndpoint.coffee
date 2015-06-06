@@ -13,19 +13,19 @@ class SearchEndpoint
 
     get @route, '/nearby', (req) =>
 
-      options = placeSearch.resolveSearchQuery(req.query)
+      searchParams = placeSearch.fromRequest(req)
 
       # Just for beta purposes, first do a Factual pull for this range.
-      factualConsumer.geoSearch(options)
+      factualConsumer.geoSearch(searchParams)
       .then ->
-        placeSearch.search(options)
+        placeSearch.search(searchParams)
       .then (places) ->
         (place.toClient() for place in places)
       .then (places) ->
         MyPlaceDetails.maybeAnnotate(req, places)
 
     get @route, '/exceldump', (req) =>
-      searchOptions = placeSearch.resolveSearchQuery(req.query)
+      searchOptions = placeSearch.fromRequest(req)
 
       factualConsumer.geoSearch(searchOptions)
       .then ->
@@ -34,10 +34,10 @@ class SearchEndpoint
         {view: 'view/placesCSV', places: places}
 
     get @route, '/resolve', (req) =>
-      placeSearch.resolveSearchQuery(req.query)
+      placeSearch.fromRequest(req)
 
     get @route, '/to-factual-url', (req) =>
-      options = placeSearch.resolveSearchQuery(req.query)
-      factualService.getUrl(options)
+      searchParams = placeSearch.fromRequest(req)
+      factualService.getUrl(searchParams)
 
 provide.class('endpoint/api/search', SearchEndpoint)

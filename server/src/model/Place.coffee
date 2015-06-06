@@ -20,13 +20,16 @@ class Place
   @tableName: 'place'
 
   @fields:
+    place_id: {}
     name: {}
     lat: {}
     long: {}
     zipcode: {}
     rating: {}
-    factual_id: {}
-    factual_consume_ver: {}
+    factual_id:
+      private: true
+    factual_consume_ver:
+      private: true
     details: {}
     upvote_count: {}
     downvote_count: {}
@@ -44,7 +47,7 @@ class Place
   toClient: ->
     # Return this place in a format for client usage.
     fields = {}
-    for k in ['place_id', 'name', 'lat', 'long', 'rating', 'factual_id','upvote_count','downvote_count']
+    for k,fieldDetails of Place.fields when not (fieldDetails.private ? false)
       fields[k] = this[k]
     for k,v of @context
       fields[k] = v

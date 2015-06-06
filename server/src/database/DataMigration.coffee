@@ -5,7 +5,6 @@ class DataMigration
 
   run: ->
     @initVotes()
-    @initZipCode()
 
   initVotes: ->
     where = (query) ->
@@ -14,11 +13,5 @@ class DataMigration
     @placeDao.modifyMulti where, (place) ->
       place.upvote_count = 0
       place.downvote_count = 0
-
-  initZipCode: ->
-    @placeDao.modifyMulti ((query)->query.whereNull('zipcode')), (place) ->
-      console.log('upgraded place ', place.place_id)
-      if place.details.zipcode?
-        place.zipcode = place.details.postcode
 
 provide.class(DataMigration)

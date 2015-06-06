@@ -27,6 +27,7 @@ GeomUtil =
     @sectorIdForCoords(coords)
 
   getBounds: ({lat, long, meters}) ->
+    console.log('getBounds: ', lat, long, meters)
     bounds = geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
 
     out = {lat1:0,lat2:0,long1:0,long2:0}
