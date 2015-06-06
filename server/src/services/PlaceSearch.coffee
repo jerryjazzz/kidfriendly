@@ -3,6 +3,41 @@
 Geolib = require('geolib')
 Cities = require('cities')
 
+DefaultDistanceMiles = 2
+
+class SearchParams
+
+  constructor: ({@zipcode, @lat, @long, @meters, @miles}) ->
+    if @meters? and @miles?
+      throw new Error("can't specify both 'meters' and 'miles")
+
+    if @zipcode? and @lat?
+      throw new Error("can't specify both 'zipcode' and 'lat")
+
+    if @lat? and not @long?
+      throw new Error("must specify 'long' with 'lat'")
+
+    if @long? and not @lat?
+      throw new Error("must specify 'lat' with 'long'")
+
+    if @miles? and not @meters?
+      @meters = MilesToMeters(@miles)
+
+    if not @meters?
+      @meters = MilesToMeters(DefaultDistanceMiles)
+
+  toGeoLocation: ->
+    if @zipcode?
+      cityLookup = Cities.zip_lookup(@zipcode)
+      if not cityLookup?
+        throw new Error("zipcode not found: " + @zipcode)
+      return {lat: cityLookup.latitude, long: cityLookup.longitude}
+
+    return {lat: @lat, long: @long}
+
+  @fromRequest: (req) ->
+    new SearchParams(req.query)
+
 class PlaceSearch
   SearchLimit: 120
   SearchDistanceMiles: 2
@@ -13,14 +48,12 @@ class PlaceSearch
     @geom = depend('GeomUtil')
     @tweaks = depend('Tweaks')
 
+  fromRequest: (req) ->
+    SearchParams.fromRequest(req)
+
+  ###
   resolveSearchQuery: (query) ->
     options = {lat, long, zipcode, meters, miles} = query
-
-    if options.miles? and not options.meters?
-      options.meters = MilesToMeters(options.miles)
-
-    if not options.meters?
-      options.meters = MilesToMeters(@SearchDistanceMiles)
 
     if options.zipcode?
       cityLookup = Cities.zip_lookup(options.zipcode)
@@ -29,9 +62,19 @@ class PlaceSearch
       [options.lat, options.long] = [cityLookup.latitude, cityLookup.longitude]
 
     return options
+  ###
 
-  search: (searchOptions) ->
-    bounds = @geom.getBounds(searchOptions)
+  search: (searchParams) ->
+    if searchParams.zipcode?
+      @placeDao.find (query) =>
+        query.where(zipcode: searchParams.zipcode)
+        @sortAndLimitQuery(query)
+
+    else
+      @geoSearch(searchParams)
+
+  geoSearch: (searchParams) ->
+    bounds = @geom.getBounds(searchParams)
     
     @placeDao.find (query) =>
       # Filter to nearest rectangle
@@ -40,29 +83,31 @@ class PlaceSearch
       query.andWhere('long', '>', bounds.long1)
       query.andWhere('long', '<', bounds.long2)
 
-      query.orderByRaw('upvote_count - downvote_count desc')
-
-      query.limit(@SearchLimit)
+      @sortAndLimitQuery(query)
 
     .then (places) =>
       #console.log("sql gave #{places.length} places")
-      @checkDistance(places, searchOptions)
+      @checkDistance(places, searchParams)
     .then (places) =>
       places.filter((place) -> not place.details?.factual_raw?.chain_id)
     .then (places) =>
       places.slice(0, @FinalResultLimit)
 
-  checkDistance: (places, searchOptions) ->
+  checkDistance: (places, searchParams) ->
     # Store 'distance' on each result, and filter out places that are too far.
 
     for place in places
       #console.log("distance from: ", {latitude: place.lat, longitude: place.long})
-      #console.log("distance to: ", {latitude: searchOptions.lat, longitude: searchOptions.long})
+      #console.log("distance to: ", {latitude: searchParams.lat, longitude: searchParams.long})
       place.context.distance = Geolib.getDistance({latitude: place.lat, longitude: place.long},
-          {latitude: searchOptions.lat, longitude: searchOptions.long})
+          {latitude: searchParams.lat, longitude: searchParams.long})
       #console.log("is ", place.context.distance)
 
-    return places.filter (place) -> place.context.distance < searchOptions.meters
+    return places.filter (place) -> place.context.distance < searchParams.meters
+
+  sortAndLimitQuery: (query) ->
+    query.orderByRaw('upvote_count - downvote_count desc')
+    query.limit(@SearchLimit)
 
   ###
   sortPlaces: (places) ->

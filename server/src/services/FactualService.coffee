@@ -26,7 +26,10 @@ class FactualService
         else
           resolve(res)
 
-  factualOptions: ({lat, long, meters}) ->
+  factualOptions: (searchParams) ->
+    {lat, long} = searchParams.toGeoLocation()
+    meters = searchParams.meters
+
     Assert.notNull(lat, 'lat')
     Assert.notNull(long, 'long')
     Assert.notNull(meters, 'meters')
@@ -41,13 +44,13 @@ class FactualService
       limit: @queryLimit
     }
 
-  geoSearch: (searchOptions) ->
-    @_apiGet('/t/restaurants-us', @factualOptions(searchOptions))
+  geoSearch: (searchParams) ->
+    @_apiGet('/t/restaurants-us', @factualOptions(searchParams))
       .then (result) =>
         result.data
 
-  getUrl: (searchOptions) ->
-    factualOptions = @factualOptions(searchOptions)
+  getUrl: (searchParams) ->
+    factualOptions = @factualOptions(searchParams)
     params = {}
     for k,v of factualOptions
       params[k] = JSON.stringify(v)

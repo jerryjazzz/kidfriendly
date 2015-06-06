@@ -5,7 +5,6 @@ class DataMigration
 
   run: ->
     @initVotes()
-    @initZipCode()
 
   initVotes: ->
     where = (query) ->
@@ -14,7 +13,5 @@ class DataMigration
     @placeDao.modifyMulti where, (place) ->
       place.upvote_count = 0
       place.downvote_count = 0
-
-  initZipCode: ->
 
 provide.class(DataMigration)

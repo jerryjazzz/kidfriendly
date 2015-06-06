@@ -61,5 +61,11 @@ class AdminEndpoint
         facebookToken: @facebook.recentTokenForUser[user.user_id]
       }
 
+    get @route, '/fix-zipcodes', (req) =>
+      @placeDao.modifyMulti ((query)->query.whereNull('zipcode')), (place) ->
+        if place.details.postcode?
+          place.zipcode = place.details.postcode
+
+
 
 provide.class('endpoint/admin', AdminEndpoint)

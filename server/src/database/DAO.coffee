@@ -127,6 +127,10 @@ class DAO
       throw new Error("DAO.update must be called on patch data: #{JSON.stringify(object)}")
 
     fields = @objectToDatabase(object)
+
+    if Object.keys(fields).length == 0
+      return Promise.resolve(object)
+      
     @db(@tableName).update(fields).where(whereFunc)
     .then -> object
 

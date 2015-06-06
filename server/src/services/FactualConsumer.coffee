@@ -11,8 +11,8 @@ class FactualConsumer
     @factualService = depend('FactualService')
     @factualRating = depend('FactualRating')
 
-  geoSearch: (options) ->
-    @factualService.geoSearch(options)
+  geoSearch: (searchParams) ->
+    @factualService.geoSearch(searchParams)
     .then (factualPlaces) =>
       #console.log("factual returned #{factualPlaces.length} places")
       @correlateFactualPlaces(factualPlaces)
@@ -32,6 +32,7 @@ class FactualConsumer
     place.factual_id = factualPlace.factual_id
     place.lat = factualPlace.latitude
     place.long = factualPlace.longitude
+    place.zipcode = factualPlace.postcode
     place.rating = 0
     place.upvote_count = 0
     place.downvote_count = 0
