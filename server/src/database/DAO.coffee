@@ -138,6 +138,7 @@ class DAO
     allowInsert = allowInsert ? false
 
     original = null
+    modified = null
 
     @find(whereFunc).then (items) =>
       if items.length > 1
@@ -156,6 +157,7 @@ class DAO
 
       modifyFunc(modified)
 
+    .then =>
       if original?
         @update2(whereFunc, modified).then -> modified
       else
