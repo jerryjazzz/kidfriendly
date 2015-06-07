@@ -13,6 +13,7 @@ class AdminEndpoint
     get = depend('ExpressGet')
     @facebook = depend('Facebook')
     @placeDao = depend('dao/place')
+    @voteService = depend('VoteService')
 
     @route.use(require('cookie-parser')('718473'))
     @route.use(require('express-session')(secret: '718473', resave: false, saveUninitialized: false))
@@ -66,6 +67,12 @@ class AdminEndpoint
       @placeDao.modifyMulti ((query)->query.whereNull('zipcode')), (place) ->
         if place.details.postcode?
           place.zipcode = place.details.postcode
+
+    get @route, '/fix-votes', (req) =>
+      @placeDao.modifyMulti (->), (place) =>
+        @voteService.recalculate(place)
+      .then ->
+        {}
 
 
 provide.class('endpoint/admin', AdminEndpoint)
