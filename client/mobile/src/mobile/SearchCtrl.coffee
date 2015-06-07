@@ -4,7 +4,16 @@ class SearchCtrl
     analyticsService.trackEvent("Results", 'display', $stateParams.keyword, results.length)
     $scope.$watch userService.getUser().then (user) => $scope.user = user
     $scope.results = results
-    console.log "results", results
+    images = [
+      "img/place1.jpg"
+      "img/place2.jpg"
+      "img/place3.jpg"
+      "img/place4.png"
+      "img/place5.jpg"
+      "img/place6.jpg"
+    ]
+    for result in results
+      result.url = images[Math.floor(Math.random() * 6)]
 
     $scope.noResults = results.length == 0
     $scope.goToDetails = (placeId, index) ->
@@ -14,30 +23,31 @@ class SearchCtrl
     $scope.up = ($event, place) =>
       voteValue = 1
       if place.me?.vote != 1
+        analyticsService.trackEvent "Results", "upvote"
         place.downvote_count-- if place.me.vote == -1
         place.me =
           vote: voteValue
         place.upvote_count++
       else
+        analyticsService.trackEvent "Results", "upvote-deselect"
         voteValue = 0
         place.me.vote = voteValue
         place.upvote_count--
-      $scope.$apply()
       @handleThumbEvent($event, place, voteValue)
 
     $scope.down = ($event, place) =>
       voteValue =- 1
       if place.me?.vote != -1
+        analyticsService.trackEvent "Results", "downvote"
         place.upvote_count-- if place.me.vote == 1
         place.me =
           vote: voteValue
         place.downvote_count++
-
       else
+        analyticsService.trackEvent "Results", "downvote-deselect"
         voteValue = 0
         place.downvote_count--
         place.me.vote = voteValue
-      $scope.$apply()
       @handleThumbEvent($event, place, voteValue)
 
 
