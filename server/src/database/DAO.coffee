@@ -74,6 +74,12 @@ class DAO
 
   insert: (object) =>
     row = @objectToDatabase(object)
+
+    # populate defaults
+    for name, fieldDetails of @modelClass.fields
+      if not row[name]? and fieldDetails.default?
+        row[name] = fieldDetails.default
+
     idColumn = @idColumn
 
     if not row.created_at? and @tableSchema.columns.created_at?

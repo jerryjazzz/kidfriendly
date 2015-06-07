@@ -31,8 +31,10 @@ class Place
     factual_consume_ver:
       private: true
     details: {}
-    upvote_count: {}
-    downvote_count: {}
+    upvote_count:
+      default: 0
+    downvote_count:
+      default: 0
 
   @fromDatabase: (fields) ->
     place = new Place(fields)

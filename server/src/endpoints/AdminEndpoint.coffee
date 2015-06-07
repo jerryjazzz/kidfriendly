@@ -71,8 +71,8 @@ class AdminEndpoint
     get @route, '/fix-votes', (req) =>
       @placeDao.modifyMulti (->), (place) =>
         @voteService.recalculate(place)
-      .then ->
-        {}
+      .then (results) ->
+        {count: results.length}
 
 
 provide.class('endpoint/admin', AdminEndpoint)
