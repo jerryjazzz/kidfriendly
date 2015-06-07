@@ -4,7 +4,16 @@ class SearchCtrl
     analyticsService.trackEvent("Results", 'display', $stateParams.keyword, results.length)
     $scope.$watch userService.getUser().then (user) => $scope.user = user
     $scope.results = results
-    console.log "results", results
+    images = [
+      "img/place1.jpg"
+      "img/place2.jpg"
+      "img/place3.jpg"
+      "img/place4.png"
+      "img/place5.jpg"
+      "img/place6.jpg"
+    ]
+    for result in results
+      result.url = images[Math.floor(Math.random() * 6)]
 
     $scope.noResults = results.length == 0
     $scope.goToDetails = (placeId, index) ->

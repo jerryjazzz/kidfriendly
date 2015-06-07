@@ -3,7 +3,14 @@ class DetailsCtrl
   constructor:($scope, place, @placesService, analyticsService, $window, $document)->
     console.log 'place', place
     @_calculateScores(place)
-    place.photos = ['img/no-image.jpg'] unless place.photos?
+    place.photos = [
+      "img/place1.jpg"
+      "img/place2.jpg"
+      "img/place3.jpg"
+      "img/place4.png"
+      "img/place5.jpg"
+      "img/place6.jpg"
+    ]
     analyticsService.trackEvent("Details", "View", place.name, place.rating)
     $scope.ratingStyle = (rating) ->
       "rating-bad": rating < 60
