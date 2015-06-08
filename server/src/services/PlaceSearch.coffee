@@ -8,17 +8,20 @@ DefaultDistanceMiles = 2
 class SearchParams
 
   constructor: ({@zipcode, @lat, @long, @meters, @miles}) ->
+
+    @error = null
+
     if @meters? and @miles?
-      throw new Error("can't specify both 'meters' and 'miles")
+      @error ?= "can't specify both 'meters' and 'miles"
 
     if @zipcode? and @lat?
-      throw new Error("can't specify both 'zipcode' and 'lat")
+      @error ?= "can't specify both 'zipcode' and 'lat"
 
     if @lat? and not @long?
-      throw new Error("must specify 'long' with 'lat'")
+      @error ?= "must specify 'long' with 'lat'"
 
     if @long? and not @lat?
-      throw new Error("must specify 'lat' with 'long'")
+      @error ?= "must specify 'lat' with 'long'"
 
     if @miles? and not @meters?
       @meters = MilesToMeters(@miles)
@@ -27,10 +30,13 @@ class SearchParams
       @meters = MilesToMeters(DefaultDistanceMiles)
 
   toGeoLocation: ->
+    if @error?
+      throw new Error("toGeoLocation called on bad SearchParams: #{@error}")
+
     if @zipcode?
       cityLookup = Cities.zip_lookup(@zipcode)
       if not cityLookup?
-        throw new Error("zipcode not found: " + @zipcode)
+        return {error: "zipcode not found: " + @zipcode}
       return {lat: cityLookup.latitude, long: cityLookup.longitude}
 
     return {lat: @lat, long: @long}
@@ -65,6 +71,9 @@ class PlaceSearch
   ###
 
   search: (searchParams) ->
+    if searchParams.error?
+      return Promise.reject(searchParams.error)
+
     if searchParams.zipcode?
       @placeDao.find (query) =>
         query.where(zipcode: searchParams.zipcode)
@@ -74,6 +83,9 @@ class PlaceSearch
       @geoSearch(searchParams)
 
   geoSearch: (searchParams) ->
+    if searchParams.error?
+      return Promise.reject(searchParams.error)
+
     bounds = @geom.getBounds(searchParams)
     
     @placeDao.find (query) =>

@@ -1,7 +1,5 @@
 'use strict'
 
-Promise = require('bluebird')
-
 class FactualConsumer
   CurrentVersion: 2
 
@@ -12,6 +10,9 @@ class FactualConsumer
     @factualRating = depend('FactualRating')
 
   geoSearch: (searchParams) ->
+    if searchParams.error?
+      return Promise.reject(searchParams.error)
+
     @factualService.geoSearch(searchParams)
     .then (factualPlaces) =>
       #console.log("factual returned #{factualPlaces.length} places")
