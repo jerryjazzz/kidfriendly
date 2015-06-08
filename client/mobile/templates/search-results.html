@@ -1,19 +1,25 @@
 <ion-view>
-    <ion-content class="has-header">
+    <ion-content class="has-header" overflow-scroll="true">
         <ion-list class="list" can-swipe="user.isAuthenticated()">
-            <ion-item class="item item-thumbnail-left" ng-click="goToDetails(result.place_id, $index)" ng-repeat="result in results">
-                <img src="{{result.url}}" class="thumb-treatment">
-                <kf-rating banner-class="'results-rating-stripe'" rating="getScore(result)"></kf-rating>
-                <!--<div class="results-score">{{getScore(result)}}</div>-->
-                <h2 class="results-restaurant-name">{{result.name}}</h2>
-                <span class="distance-text">{{result.distance}} mi</span>
-                <!--<kf-rating style="display:inline-block" banner-class="'results-rating-banner'" rating="result.rating">{{result.rating}}</kf-rating>-->
-                <kf-price-level style="position:absolute; right:6px; top:20px" level="result.price"></kf-price-level>
-                <div class="slide-cue">< Slide for options</div>
-                <i class="ion-thumbsup" ng-show="result.me.vote == 1" style="position:absolute; right:6px; top:40px; font-size:24px" ng-class="getThumbClass(result.me.vote, 'up')"></i>
-                <i class="ion-thumbsdown" ng-show="result.me.vote == -1" style="position:absolute; right:6px; top:40px; font-size:24px" ng-class="getThumbClass(result.me.vote, 'down')"></i>
-                <p>{{result.address}}</p>
-                <p>{{result.locality}}, {{result.region}} {{result.postcode}}</p>
+            <ion-item class="item item-thumbnail-left" ng-click="goToDetails(result.place_id, result.me.vote, $index)" ng-repeat="result in results">
+                <img src="{{::result.url}}" class="thumb-treatment">
+                <kf-rating banner-class="'results-rating-stripe'" rating="::getScore(result)"></kf-rating>
+                <h2 class="results-restaurant-name">{{::result.name}}</h2>
+                <span class="distance-text">{{::result.distance}} mi</span>
+                <kf-price-level style="position:absolute; right:6px; top:20px" level="::result.price"></kf-price-level>
+                <div class="slide-cue" ng-if="user.isAuthenticated()">Slide to vote <</div>
+                <div style="position:absolute; bottom:0px; left:8px">
+                    <div style="display:inline-block; width:17px">
+                        <span class="vote-count-text" style="display:block; text-align:right; width:100%;">{{result.upvote_count}}</span>
+                    </div>
+                    <i class="ion-thumbsup" style="font-size:24px" ng-class="getThumbClass(result.me.vote, 'up')"></i>
+                    <i class="ion-thumbsdown" style="font-size:24px" ng-class="getThumbClass(result.me.vote, 'down')"></i>
+                    <div style="display:inline-block; width:17px">
+                        <span class="vote-count-text" style="">{{result.downvote_count}}</span>
+                    </div>
+                </div>
+                <p ng-if="::result.address">{{::result.address}}</p>
+                <p ng-if="::result.address">{{::result.locality}}, {{::result.region}} {{::result.postcode}}</p>
                 <kf-hours hours="result.hours"></kf-hours>
                 <ion-option-button class="button-stable" ng-click="up($event, result)">
                       <i class="ion-thumbsup" ng-class="getThumbClass(result.me.vote, 'up')" style="font-size:60px;"></i>

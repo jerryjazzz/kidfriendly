@@ -15,7 +15,6 @@ RatingDirective = ->
         "rating-bad": rating < 0
         "rating-average": rating == 0 or rating == "-"
         "rating-good": rating > 0
-      console.log style, rating
       scope.ratingClass = style
     getRatingClass()
     scope.$watch 'rating', getRatingClass

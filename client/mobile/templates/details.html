@@ -1,14 +1,14 @@
 <ion-view>
-    <ion-nav-buttons side="secondary">
-        <a class="button button-clear" href="#/review/{{data.place.place_id}}">
-            Review
-        </a>
-    </ion-nav-buttons>
+    <!--<ion-nav-buttons side="secondary">-->
+        <!--<a class="button button-clear" href="#/review/{{data.place.place_id}}">-->
+            <!--Review-->
+        <!--</a>-->
+    <!--</ion-nav-buttons>-->
     <ion-content>
-        <kf-rating banner-class="'rating-banner'" rating="data.place.rating">
-            <p class="rating-text">{{data.place.rating}}</p>
-            <p class="rating-text-small">{{data.place.distance}} mi</p>
-        </kf-rating>
+        <!--<kf-rating banner-class="'rating-banner'" rating="data.place.rating">-->
+            <!--<p class="rating-text">{{data.place.rating}}</p>-->
+            <!--<p class="rating-text-small">{{data.place.distance}} mi</p>-->
+        <!--</kf-rating>-->
         <ul ng-if="data.place.photos.length > 1" rn-carousel class="photo-container">
             <li ng-repeat="photo in data.place.photos">
                 <img class="center-cropped" ng-src="{{photo}}">
@@ -16,36 +16,48 @@
         </ul>
         <img ng-if="data.place.photos.length <= 1" class="photo-container center-cropped" ng-src="{{data.place.photos[0]}}">
         <p class="detail-name">{{data.place.name}}</p>
-        <p class="detail-address">{{data.place.address}}</p>
         <div class="card">
+            <div class="row row-border">
+                <div class="col col-center">
+                    <button class="button ion-thumbsup button-clear button-full-width big-thumb" ng-class="getThumbClass(data.place.me.vote, 'up')" style="font-size:30px" ng-click="up($event)">
+                        {{data.place.upvote_count}}
+                    </button>
+                </div>
+                <div class="col col-center col-left-border" >
+                    <button class="button ion-thumbsdown button-clear button-full-width big-thumb" ng-class="getThumbClass(data.place.me.vote, 'down')" style="font-size:30px" ng-click="down($event)">
+                        {{data.place.downvote_count}}
+                    </button>
+                </div>
+            </div>
             <div class="row">
                 <div class="col col-center">
-                    <a class="button icon-left ion-ios7-telephone button-clear button-dark responsive-button" ng-click="makeCall(data.place.tel)">
-                        Call
+                    <a class="button ion-ios7-telephone button-clear button-dark compact-button button-full-width responsive-button" ng-click="makeCall(data.place.tel)">
+                        <span style="font-size:12px;">{{data.place.tel}}</span>
                     </a>
                 </div>
-                <div class="col col-center" >
-                    <button class="button icon-left ion-compass button-clear button-dark responsive-button" ng-click="navigate()">
+                <div class="col col-center col-left-border" >
+                    <button class="button ion-compass button-clear button-dark compact-button button-full-width responsive-button" ng-click="navigate()">
                         Directions
                     </button>
                 </div>
-                <div class="col col-center">
-                <button ng-class="data.mapStyle" class="button icon-left ion-map button-clear responsive-button" ng-click="toggleMap()">
-                    Map
-                </button>
+                <div class="col col-center col-left-border">
+                    <button class="button ion-earth button-clear button-dark compact-button button-full-width responsive-button" ng-click="openWebsite()">
+                        Website
+                    </button>
                 </div>
             </div>
         </div>
         <div class="card" ng-show="data.mapVisible">
             <div class="row">
                 <div class="col col-center">
+                <p>{{data.place.address}}, {{data.place.locality}} {{data.place.region}}, {{data.place.postcode}}</p>
                 <ui-gmap-google-map center='map.center' zoom="14" options="map.options">
                     <ui-gmap-marker idKey="data.place.place_id" coords="map.center"></ui-gmap-marker>
                 </ui-gmap-google-map>
             </div>
                 </div>
         </div>
-        <div class="card ">
+ <!--       <div class="card ">
             <div class="item compact-card">
                 <h2 class="small-indent">Ratings</h2>
                 <hr>
@@ -82,5 +94,6 @@
                 </div>
             </div>
         </div>
+        -->
     </ion-content>
 </ion-view>

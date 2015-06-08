@@ -5,20 +5,23 @@ class SearchCtrl
     $scope.$watch userService.getUser().then (user) => $scope.user = user
     $scope.results = results
     images = [
-      "img/place1.jpg"
-      "img/place2.jpg"
-      "img/place3.jpg"
-      "img/place4.png"
-      "img/place5.jpg"
-      "img/place6.jpg"
+      "img/place1-thumb.jpg"
+      "img/place2-thumb.jpg"
+      "img/place3-thumb.jpg"
+      "img/place4-thumb.jpg"
+      "img/place5-thumb.jpg"
+      "img/place6-thumb.jpg"
     ]
     for result in results
-      result.url = images[Math.floor(Math.random() * 6)]
+      num = Math.floor(Math.random() * 6)
+      url = images[num]
+      console.log num, url
+      result.url = url
 
     $scope.noResults = results.length == 0
-    $scope.goToDetails = (placeId, index) ->
+    $scope.goToDetails = (placeId, vote, index) ->
       analyticsService.trackEvent("Results", 'select', "", index+1)
-      $state.go 'details', {placeId:placeId}
+      $state.go 'details', {placeId:placeId, vote:vote}
 
     $scope.up = ($event, place) =>
       voteValue = 1

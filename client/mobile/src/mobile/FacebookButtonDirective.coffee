@@ -5,7 +5,6 @@ FacebookButtonDirective = ->
     $scope.login = ->
       userService.loginOrSignUp().then (user) =>
         #might might need a callback for redirection?
-        console.log 'logged in!!!', user
         $scope.user = user
     userService.getUser().then (user) => $scope.user = user
 
