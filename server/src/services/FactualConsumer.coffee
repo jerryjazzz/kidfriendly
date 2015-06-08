@@ -3,7 +3,7 @@
 Promise = require('bluebird')
 
 class FactualConsumer
-  CurrentVersion: 1
+  CurrentVersion: 2
 
   constructor: ->
     @app = depend('App')
@@ -78,5 +78,7 @@ class FactualConsumer
       query.limit(count)
 
     @placeDao.modifyMulti(queryFunc, @refreshOnePlace)
+    .then (results) ->
+      console.log("FactualConsumer.refreshOldPlaceData modified #{results.length} places")
 
 provide.class(FactualConsumer)

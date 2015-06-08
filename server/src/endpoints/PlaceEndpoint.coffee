@@ -76,3 +76,18 @@ class PlaceEndpoint
 
 
 provide.class('endpoint/api/place', PlaceEndpoint)
+
+provide 'admin-endpoint/place', ->
+  Place = depend('dao/place')
+  FactualService = depend('FactualService')
+
+  '/:place_id/factual': (req) ->
+    Place.findById(req.params.place_id)
+    .then (place) ->
+      FactualService.singlePlace(place.factual_id)
+
+  '/:place_id/factual/refresh': (req) ->
+    Place.findById(req.params.place_id)
+    .then (place) ->
+      FactualService.singlePlace(place.factual_id)
+    
