@@ -14,6 +14,7 @@ class AdminEndpoint
     @facebook = depend('Facebook')
     @placeDao = depend('dao/place')
     @voteService = depend('VoteService')
+    ExpressUtil = depend('ExpressUtil')
 
     @route.use(require('cookie-parser')('718473'))
     @route.use(require('express-session')(secret: '718473', resave: false, saveUninitialized: false))
@@ -42,6 +43,10 @@ class AdminEndpoint
 
     # Enforce login and check email
     @route.use (req, res, next) =>
+      if not req.user? and req.get_ip() == '127.0.0.1'
+        req.user = {user_id: 'localhost', email: 'localhost@example.com'}
+        return next()
+
       if not req.user?
         return res.redirect('/admin/login-required')
 
@@ -56,9 +61,12 @@ class AdminEndpoint
     get @route, '/', (req) =>
       user = req.user
 
+      if user.toClient?
+        user = user.toClient()
+
       {
         view: 'view/admin/home'
-        user: user.toClient()
+        user: user
         session: req.session
         facebookToken: @facebook.recentTokenForUser[user.user_id]
       }
@@ -74,5 +82,7 @@ class AdminEndpoint
       .then (results) ->
         {count: results.length}
 
+    for path, obj of depend.multi('admin-endpoint')
+      @route.use(path, ExpressUtil.routerFromObject(obj))
 
 provide.class('endpoint/admin', AdminEndpoint)

@@ -10,8 +10,6 @@ class Facebook
   # oauth. Used for displaying on /admin page
   recentTokenForUser: {}
 
-  tokenValidateCache: {}
-
   constructor: ->
     @user = depend('dao/user')
     @http = depend('Http')
@@ -82,6 +80,8 @@ class Facebook
           user.facebook_id = data.id
         else
           console.log("facebook: creating new user for facebook id #{data.id}")
+          user.first_name = data.first_name
+          user.last_name = data.last_name
           user.email = data.email
           user.facebook_id = data.id
           isNewUser = true

@@ -25,6 +25,12 @@ class ExpressUtil
 
     return handler
 
+  routerFromObject: (obj) ->
+    router = require('express')()
+    for path, handler of obj
+      router.get(path, @wrapRequestHandler(handler))
+    return router
+
   renderResponse: (req, res, data) ->
     statusCode = data?.statusCode ? 200
 

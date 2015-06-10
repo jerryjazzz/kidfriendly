@@ -27,7 +27,10 @@ class FactualService
           resolve(res)
 
   factualOptions: (searchParams) ->
-    {lat, long} = searchParams.toGeoLocation()
+    {lat, long, error} = searchParams.toGeoLocation()
+    if error?
+      return {error}
+
     meters = searchParams.meters
 
     Assert.notNull(lat, 'lat')
@@ -45,7 +48,11 @@ class FactualService
     }
 
   geoSearch: (searchParams) ->
-    @_apiGet('/t/restaurants-us', @factualOptions(searchParams))
+    options = @factualOptions(searchParams)
+    if options.error?
+      return Promise.reject(options.error)
+
+    @_apiGet('/t/restaurants-us', options)
       .then (result) =>
         result.data
 
