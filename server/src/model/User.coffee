@@ -9,16 +9,12 @@ class User
 
   @fields:
     user_id: {}
+    first_name: {}
+    last_name: {}
     email: {}
     facebook_id: {}
     created_at: {}
     updated_at: {}
-
-  toDatabase: ->
-    fields = {}
-    for k in ['user_id','email','facebook_id']
-      fields[k] = this[k]
-    fields
 
   @make: (fields) ->
     user = new User(fields)

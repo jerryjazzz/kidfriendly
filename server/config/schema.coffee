@@ -53,6 +53,8 @@ schema.users.columns = {
   user_id
   email: {type: 'varchar(255)', options: 'not null unique'}
   facebook_id: {type: 'varchar(20)'}
+  first_name: {type: 'varchar(50)'}
+  last_name: {type: 'varchar(80)'}
   created_at
   updated_at
   source_ver
