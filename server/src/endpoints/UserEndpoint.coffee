@@ -28,9 +28,13 @@ class UserEndpoint
 
       .catch (err) ->
         console.log("getValidatedUser error: #{err}")
-        res.sendRendered({error: err})
+        res.sendRendered({statusCode: 500, error: err})
 
     get @route, '/:user_id', (req) =>
+      # Logging to chase a bug around bad user IDs
+      if req.params.user_id == 'me'
+        console.log("/user/me returning #{req.user.user_id} for request: #{JSON.stringify(req.query)}")
+
       req.user.toClient()
 
     get @route, '/:user_id/reviews', (req) =>

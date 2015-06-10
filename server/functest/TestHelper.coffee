@@ -19,7 +19,7 @@ request = (args) ->
       if error?
         reject(error)
       else if message.statusCode != 200
-        reject(new Error("status code #{message.statusCode}, body: #{body}"))
+        reject(body)
       else
         resolve(body)
 
@@ -98,15 +98,27 @@ Api =
       body: {}
 
 assertPlace = (place) ->
-  expect(place.place_id).to.exist()
-  expect(place.name).to.exist()
-  expect(place.lat).to.exist()
-  expect(place.long).to.exist()
-  expect(place.upvote_count).to.exist()
-  expect(place.downvote_count).to.exist()
+  expect(place.place_id).to.exist
+  expect(place.name).to.exist
+  expect(place.lat).to.exist
+  expect(place.long).to.exist
+  expect(place.upvote_count).to.exist
+  expect(place.downvote_count).to.exist
 
 exports.api = Api
 exports.assertPlace = assertPlace
 
 exports.testToken = 'magic-test-user-token'
 exports.testPlaceId = 'testplace1'
+
+exports.assertThrows = (promise, checkError) ->
+  # supposedly, chai-as-promised has support for checking that a promise has been
+  # rejected. But I couldn't get their examples to work.
+
+  new Promise (resolve, reject) ->
+    promise.then (val) ->
+      reject('expected promise to throw, resolved with: ' + val)
+    .catch (err) ->
+      if checkError?
+        checkError(err)
+      resolve()

@@ -19,7 +19,5 @@ describe 'User', ->
       expect(user.email).to.equal('test-user-1@example.com')
 
   it "can't get user details for a different user", ->
-    helper.api.userDetails('test-user2', {token})
-    .then (result) ->
-      expect(result.error).to.be.defined
-      expect(result.user_id).not.to.be.defined
+    helper.assertThrows helper.api.userDetails('test-user2', {token}), (err) ->
+      expect(err.statusCode).to.equal(500)
