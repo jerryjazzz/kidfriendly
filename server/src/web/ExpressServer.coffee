@@ -42,6 +42,7 @@ class ExpressServer
     @server.use("/mobile", staticDir('client/mobile/www'))
     @server.use("/dashboard", staticDir('client/dashboard'))
 
+    @server.use("/admin", depend('AdminEndpoint'))
     for path, obj of depend.multi('endpoint')
       @server.use(path, @expressUtil.routerFromObject(obj))
 

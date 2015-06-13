@@ -13,9 +13,11 @@ class ExpressUtil
           @renderResponse(req, res, data)
 
         .catch (err) ->
-          statusCode = err?.statusCode ? 500
+          if typeof err == 'string'
+            err = {error: err}
+          err.statusCode ?= 500
           res.set('Content-Type', 'text/plain')
-          res.status(statusCode).send(err.stack ? err)
+          res.status(err.statusCode).send(err.stack ? err)
 
     return handler
 
