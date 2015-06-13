@@ -33,7 +33,7 @@ provide 'AdminEndpoint', ->
       view: 'view/admin/logged-out'
     }
         
-  router.get '/auth/facebook', ExpressUtil.wrapRequestHandler passport.authenticate('facebook', {
+  router.get '/auth/facebook', passport.authenticate('facebook', {
     callbackURL: '/admin/auth/facebook'
     successRedirect: '/admin'
     failureRedirect: '/admin'
@@ -49,7 +49,7 @@ provide 'AdminEndpoint', ->
       return res.redirect('/admin/login-required')
 
     email = req.user?.email
-    if not @emailWhitelist[email]
+    if not emailWhitelist[email]
       return res.redirect('/admin/email-not-on-whitelist')
 
     next()
