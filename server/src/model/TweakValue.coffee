@@ -4,7 +4,8 @@ class TweakValue
     for k,v of fields
       this[k] = v
 
-  @tableName: 'tweak_values'
+  @table:
+    name: 'tweak_values'
 
   @fields:
     name: {}
@@ -29,4 +30,4 @@ class TweakValue
     value: JSON.stringify(@value)
 
 provide 'model/TweakValue', -> TweakValue
-provide 'TweakValueDAO', -> depend('newDAO')(modelClass: TweakValue)
+provide 'TweakValueDAO', -> depend('newDAO')(TweakValue)

@@ -3,6 +3,8 @@ Promise = require('bluebird')
 class DAO
   constructor: ({@modelClass}) ->
     @db = depend('db')
+    if not @modelClass.table?
+      throw new Error("missing .table for #{@modelClass.name}")
     @tableName = @modelClass.tableName ? @modelClass.table.name
     @tableSchema  = depend('Configs').schema[@tableName]
     if not @tableSchema?
@@ -40,7 +42,12 @@ class DAO
   find: (whereFunc) =>
     fieldNames = (k for k,v of @modelClass.fields)
     query = @db.select.apply(fieldNames).from(@tableName)
-    whereFunc(query)
+
+    if typeof whereFunc == 'function'
+      whereFunc(query)
+    else
+      query.where(whereFunc)
+
     query.then (rows) =>
       @instanceFromDatabase(row) for row in rows
 
@@ -82,10 +89,10 @@ class DAO
 
     idColumn = @idColumn
 
-    if not row.created_at? and @tableSchema.columns.created_at?
+    if not row.created_at? and @tableSchema?.columns?.created_at?
       row.created_at = timestamp()
 
-    if not row.source_ver? and @tableSchema.columns.source_ver?
+    if not row.source_ver? and @tableSchema?.columns?.source_ver?
       row.source_ver = @sourceVersion
 
     # Check to auto-generate an ID. This involves some retry logic on the (unlikely)
@@ -196,8 +203,10 @@ class DAO
   @make: (args) ->
     new DAO(args)
 
-provide('newDAO', -> DAO.make)
 provide('dao/user', -> new DAO(modelClass: depend('User')))
 provide('dao/review', -> new DAO(modelClass: depend('Review')))
 provide('dao/place', -> new DAO(modelClass: depend('Place')))
 provide('dao/vote', -> new DAO(modelClass: depend('model/Vote')))
+
+provide 'newDAO', -> (modelClass) ->
+  new DAO({modelClass})

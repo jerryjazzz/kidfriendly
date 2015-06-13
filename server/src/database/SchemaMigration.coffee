@@ -5,6 +5,9 @@ class ColumnDefinition
   # Definition for our *desired* state of a single column. This data comes from schema config.
   constructor: (@name, {@type, @options, @foreign_key, @change_type_from}) ->
 
+    if @type == 'id'
+      @type = 'varchar(10)'
+
   definitionStr: ->
     if @foreign_key?
       return "foreign key (#{@name}) references #{@foreign_key}"
@@ -58,37 +61,55 @@ class SchemaMigration
         @db.select('typname').from('pg_type').where(typname:typename)
         .then (existing) =>
           if not existing[0]?
-            console.log("SchemaMigration: creating type #{typename}")
+            #console.log("SchemaMigration: creating type #{typename}")
             @db.raw("create type #{typename} as #{details.decl}")
     )
 
   updateEveryTable: =>
     Promise.all(\
-      for tableName, table of @config.schema
-        if tableName == '_types'
-          continue
-        @updateTable(tableName, table)
+      for tableName, tableDetails of @config.schema when tableName != '_types'
+        @updateTable(tableName, tableDetails)
     )
 
 
   updateTable: (tableName, table) ->
     if not (tableName in @existingTableNames)
-      #console.log('create table: ', tableName)
+      console.log('create table: ', tableName)
       @createTable(tableName, table)
     else
-      #console.log('update table: ', tableName)
+      console.log('update table: ', tableName)
       @updateExistingTable(tableName, table)
 
-  createTable: (tableName, table) ->
-    columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of table.columns)
+  createTable: (tableName, tableDetails) ->
+
+    if tableDetails.use_model?
+      # New style
+      dao = depend(tableDetails.use_model)
+      columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of dao.modelClass.fields)
+      #console.log('new style = ', dao.fields)
+      #console.log(JSON.stringify(columnDefinitions))
+    else
+      columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of tableDetails.columns)
+
     strs = (column.definitionStr() for column in columnDefinitions)
     console.log("SchemaMigration: creating table #{tableName}")
     return @db.raw("create table #{tableName} (#{strs.join(', ')})")
 
-  updateExistingTable: (tableName, table) ->
+  updateExistingTable: (tableName, tableDetails) ->
+
+    # New style
+    if tableDetails.use_model?
+      dao = depend(tableDetails.use_model)
+      columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of dao.modelClass.fields)
+      #console.log('new style1 = ', dao)
+      #console.log('new style = ', dao.fields)
+      #console.log(JSON.stringify(columnDefinitions))
+    else
+      columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of tableDetails.columns)
+
     @getExistingFields(tableName).then (existingFields) =>
       #console.log('existingFields1 = ', existingFields)
-      columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of table.columns)
+
       changeList = @buildChangeList(tableName, columnDefinitions, existingFields)
       @runChangeList(tableName, changeList)
 

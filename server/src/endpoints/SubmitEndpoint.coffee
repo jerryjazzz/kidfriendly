@@ -1,51 +1,38 @@
 mcapi = require('mailchimp-api')
 
-class SubmitEndpoint
-  constructor: ->
-    @app = depend('App')
-    @route = require('express')()
-    Log = depend('Log')
-    @emailSignupLog = new Log(@app, 'email_signup.json')
-    @surveyAnswerLog = new Log(@app, 'survey_answer.json')
-    mc = new mcapi.Mailchimp('7c0352fbb770ec2a76b0d631df95d473-us9')
-    get = depend('ExpressGet')
-    post = depend('ExpressPost')
+provide 'endpoint/api/submit', ->
+  App = depend('App')
+  mc = new mcapi.Mailchimp('7c0352fbb770ec2a76b0d631df95d473-us9')
 
-    post @route, '/email', (req) =>
+  'post /email': (req) ->
+    data =
+      email: req.body.email
+      created_at: timestamp()
+      ip: req.get_ip()
+      source_ver: App.sourceVersion
 
-      data =
-        email: req.body.email
-        created_at: timestamp()
-        ip: req.get_ip()
-        source_ver: @app.sourceVersion
+    mc.lists.subscribe({id: '60e31526fb', email:{email:req.body.email}},
+    (data) ->
+      #do nothing
+      (error) =>
+        if error.error?
+          console.log("MailChimp Error: #{error.error}")
+        else
+          console.log("MailChimp Error: unspecified error")
+    )
 
-      @emailSignupLog.write(data)
-      mc.lists.subscribe({id: '60e31526fb', email:{email:req.body.email}},
-      (data) ->
-        #do nothing
-        (error) =>
-          if error.error?
-            @app.log("MailChimp Error: #{error.error}")
-          else
-            @app.log("MailChimp Error: unspecified error")
-      )
+    App.insert('email_signup', data)
+    .then ->
+      data.id
 
-      @app.insert('email_signup', data)
-      .then ->
-        data.id
+  'post /survey_answer': (req) ->
 
-    post @route, '/survey_answer', (req) =>
+    row =
+      signup_id: req.body.signup_id
+      body: JSON.stringify
+        survey_version: req.body.survey_version
+        answer: req.body.answer
+      created_at: timestamp()
+      source_ver: App.sourceVersion
 
-      row =
-        signup_id: req.body.signup_id
-        body: JSON.stringify
-          survey_version: req.body.survey_version
-          answer: req.body.answer
-        created_at: timestamp()
-        source_ver: @app.sourceVersion
-
-      @surveyAnswerLog.write(row)
-
-      @app.insert('survey_answer', row)
-
-provide.class('endpoint/api/submit', SubmitEndpoint)
+    App.insert('survey_answer', row)

@@ -5,12 +5,6 @@ React = require('react')
 class ExpressUtil
   constructor: ->
 
-  wrappedGet: (router, path, arg1, arg2) =>
-    router.get(path, @wrapRequestHandler(arg1, arg2))
-
-  wrappedPost: (router, path, arg1, arg2) =>
-    router.post(path, @wrapRequestHandler(arg1, arg2))
-  
   wrapRequestHandler: (callback) ->
     handler = (req, res) =>
       callbackResult = callback(req)
@@ -28,7 +22,16 @@ class ExpressUtil
   routerFromObject: (obj) ->
     router = require('express')()
     for path, handler of obj
-      router.get(path, @wrapRequestHandler(handler))
+      wrappedHandler = @wrapRequestHandler(handler)
+      switch
+        when path.indexOf('post ') == 0
+          router.post(path.slice(5), wrappedHandler)
+        when path == 'use'
+          router.use(handler)
+        when path.indexOf('use ') == 0
+          router.use(path.slice(4), handler)
+        else
+          router.get(path, wrappedHandler)
     return router
 
   renderResponse: (req, res, data) ->
@@ -76,5 +79,3 @@ class ExpressUtil
     return
 
 provide.class(ExpressUtil)
-provide('ExpressGet', -> depend('ExpressUtil').wrappedGet)
-provide('ExpressPost', -> depend('ExpressUtil').wrappedPost)

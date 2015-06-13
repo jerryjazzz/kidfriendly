@@ -17,7 +17,8 @@ class Place
     # location search.
     @context = {}
 
-  @tableName: 'place'
+  @table:
+    name: 'place'
 
   @fields:
     place_id: {}

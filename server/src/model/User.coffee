@@ -5,7 +5,8 @@ class User
       this[k] = v
     @dataSource = null
 
-  @tableName: 'users'
+  @table:
+    name: 'users'
 
   @fields:
     user_id: {}

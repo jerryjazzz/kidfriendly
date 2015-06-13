@@ -1,5 +1,5 @@
 
-geolib = require('geolib')
+Geolib = require('geolib')
 
 GeomUtil =
   milesToMeters: (miles) ->
@@ -27,7 +27,7 @@ GeomUtil =
     @sectorIdForCoords(coords)
 
   getBounds: ({lat, long, meters}) ->
-    bounds = geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
+    bounds = Geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
 
     out = {lat1:0,lat2:0,long1:0,long2:0}
     [out.lat1, out.lat2] = @sort2(bounds[0].latitude, bounds[1].latitude)
@@ -35,7 +35,7 @@ GeomUtil =
     return out
 
   sectorIdsForLocationDistance: ({lat, long, meters}) ->
-    bounds = geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
+    bounds = Geolib.getBoundsOfDistance({latitude:lat, longitude:long}, meters)
     coords = [@sectorCoordsForLocation(bounds[0]), @sectorCoordsForLocation(bounds[1])]
 
     [x1, x2] = @sort2(coords[0].x, coords[1].x)
@@ -46,6 +46,14 @@ GeomUtil =
       for y in [y1..y2]
         results.push(@sectorIdForCoords({x,y}))
     results
+
+  getDistance: (loc1, loc2) ->
+    Geolib.getDistance({latitude: loc1.lat, longitude: loc1.long},
+      {latitude: loc2.lat, longitude: loc2.long})
+
+  closerThan: (loc, meters) ->
+    (compareLoc) =>
+      return @getDistance(loc, compareLoc) < meters
 
 exports.GeomUtil = GeomUtil
 provide('GeomUtil', -> GeomUtil)
