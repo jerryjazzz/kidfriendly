@@ -1,6 +1,6 @@
 
 fs = require('fs')
-path = require('path')
+Path = require('path')
 
 class ExpressServer
   constructor: (@app, @expressConfig) ->
@@ -30,8 +30,8 @@ class ExpressServer
     @server.use(@cors)
 
     # Routes
-    staticFile = (filename) -> ((req,res) -> res.sendFile(path.resolve(filename)))
-    staticDir = (dir) -> express.static(path.resolve(dir))
+    staticFile = (filename) -> ((req,res) -> res.sendFile(Path.resolve(filename)))
+    staticDir = (dir) -> express.static(Path.resolve(dir))
     redirect = (to) -> ((req,res) -> res.redirect(301, to))
 
     @server.get("/", staticFile('client/web/dist/index.html'))
@@ -41,8 +41,6 @@ class ExpressServer
     @server.use(staticDir('client/web/dist'))
     @server.use("/mobile", staticDir('client/mobile/www'))
     @server.use("/dashboard", staticDir('client/dashboard'))
-
-    @server.use('/admin', depend('AdminEndpoint').route)
 
     for path, obj of depend.multi('endpoint')
       @server.use(path, @expressUtil.routerFromObject(obj))
