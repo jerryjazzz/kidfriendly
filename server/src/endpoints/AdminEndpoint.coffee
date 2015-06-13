@@ -80,6 +80,6 @@ provide 'endpoint/admin', ->
         {count: results.length}
 
   for path, obj of depend.multi('admin-endpoint')
-    methods[path] = ExpressUtil.routerFromObject(obj)
+    methods['use ' + path] = ExpressUtil.routerFromObject(obj)
 
   methods
