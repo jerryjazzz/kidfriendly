@@ -85,4 +85,4 @@ class AdminEndpoint
     for path, obj of depend.multi('admin-endpoint')
       @route.use(path, ExpressUtil.routerFromObject(obj))
 
-provide.class('endpoint/admin', AdminEndpoint)
+provide.class(AdminEndpoint)

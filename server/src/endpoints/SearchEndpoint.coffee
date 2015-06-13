@@ -1,43 +1,35 @@
 
-class SearchEndpoint
+provide 'endpoint/api/search', ->
+  FactualService = depend('FactualService')
+  FactualConsumer = depend('FactualConsumer')
+  PlaceSearch = depend('PlaceSearch')
+  MyPlaceDetails = depend('MyPlaceDetails')
 
-  constructor: ->
-    @app = depend('App')
-    factualService = depend('FactualService')
-    factualConsumer = depend('FactualConsumer')
-    placeSearch = depend('PlaceSearch')
-    userAuthentication = depend('UserAuthentication')
-    MyPlaceDetails = depend('MyPlaceDetails')
-    @route = require('express')()
-    get = depend('ExpressGet')
+  '/nearby': (req) ->
 
-    get @route, '/nearby', (req) =>
+    searchParams = PlaceSearch.fromRequest(req)
 
-      searchParams = placeSearch.fromRequest(req)
+    # Just for beta purposes, first do a Factual pull for this range.
+    FactualConsumer.geoSearch(searchParams)
+    .then ->
+      PlaceSearch.search(searchParams)
+    .then (places) ->
+      (place.toClient() for place in places)
+    .then (places) ->
+      MyPlaceDetails.maybeAnnotate(req, places)
 
-      # Just for beta purposes, first do a Factual pull for this range.
-      factualConsumer.geoSearch(searchParams)
-      .then ->
-        placeSearch.search(searchParams)
-      .then (places) ->
-        (place.toClient() for place in places)
-      .then (places) ->
-        MyPlaceDetails.maybeAnnotate(req, places)
+  '/exceldump': (req) ->
+    searchOptions = PlaceSearch.fromRequest(req)
 
-    get @route, '/exceldump', (req) =>
-      searchOptions = placeSearch.fromRequest(req)
+    FactualConsumer.geoSearch(searchOptions)
+    .then ->
+      PlaceSearch.search(searchOptions)
+    .then (places) ->
+      {view: 'view/placesCSV', places: places}
 
-      factualConsumer.geoSearch(searchOptions)
-      .then ->
-        placeSearch.search(searchOptions)
-      .then (places) ->
-        {view: 'view/placesCSV', places: places}
+  '/resolve': (req) ->
+    PlaceSearch.fromRequest(req)
 
-    get @route, '/resolve', (req) =>
-      placeSearch.fromRequest(req)
-
-    get @route, '/to-factual-url', (req) =>
-      searchParams = placeSearch.fromRequest(req)
-      factualService.getUrl(searchParams)
-
-provide.class('endpoint/api/search', SearchEndpoint)
+  '/to-factual-url': (req) ->
+    searchParams = PlaceSearch.fromRequest(req)
+    FactualService.getUrl(searchParams)

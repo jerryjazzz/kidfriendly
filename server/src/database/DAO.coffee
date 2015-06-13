@@ -3,6 +3,8 @@ Promise = require('bluebird')
 class DAO
   constructor: ({@modelClass}) ->
     @db = depend('db')
+    if not @modelClass.table?
+      throw new Error("missing .table for #{@modelClass.name}")
     @tableName = @modelClass.tableName ? @modelClass.table.name
     @tableSchema  = depend('Configs').schema[@tableName]
     if not @tableSchema?
@@ -196,8 +198,10 @@ class DAO
   @make: (args) ->
     new DAO(args)
 
-provide('newDAO', -> DAO.make)
 provide('dao/user', -> new DAO(modelClass: depend('User')))
 provide('dao/review', -> new DAO(modelClass: depend('Review')))
 provide('dao/place', -> new DAO(modelClass: depend('Place')))
 provide('dao/vote', -> new DAO(modelClass: depend('model/Vote')))
+
+provide 'newDAO', -> (modelClass) ->
+  new DAO({modelClass})

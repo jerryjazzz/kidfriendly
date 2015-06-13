@@ -13,7 +13,8 @@ class Review
     # location search.
     @context = {}
 
-  @tableName: 'review'
+  @table:
+    name: 'review'
 
   @fields:
     review_id: {}

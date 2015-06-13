@@ -2,80 +2,72 @@
 Factual = require('factual-api')
 Promise = require('bluebird')
 
-class PlaceEndpoint
-  constructor: ->
-    @app = depend('App')
-    @placeDao = depend('dao/place')
-    @placeReviews = depend('PlaceReviews')
-    @factualRating = depend('FactualRating')
-    get = depend('ExpressGet')
-    post = depend('ExpressPost')
-    MyPlaceDetails = depend('MyPlaceDetails')
+provide 'endpoint/api/place', ->
+  Place = depend('dao/place')
+  PlaceReviews = depend('PlaceReviews')
+  FactualRating = depend('FactualRating')
+  MyPlaceDetails = depend('MyPlaceDetails')
 
-    @route = require('express')()
+  '/:place_id/explain': (req) ->
+    {place_id} = req.params
+    Place.findById(place_id)
+    .then (place) ->
+      if not place?
+        return {error: "Place not found", place_id: place_id}
 
-    get @route, '/:place_id/explain', (req) =>
-      {place_id} = req.params
-      @placeDao.findById(place_id)
-      .then (place) ->
-        if not place?
-          return {error: "Place not found", place_id: place_id}
+      factualRating = FactualRating.getExtendedRating(place)
+      {raw: place, factualRating: factualRating}
 
-        factualRating = depend('FactualRating').getExtendedRating(place)
-        {raw: place, factualRating: factualRating}
+  '/:place_id/details': (req) ->
+    {place_id} = req.params
+    Place.findById(place_id)
+    .then (place) ->
+      if not place?
+        return {error: "Place not found", place_id: place_id}
+      place.toClient()
+    .then (place) ->
+      MyPlaceDetails.maybeAnnotateOne(req, place)
 
-    get @route, '/:place_id/details', (req) =>
-      {place_id} = req.params
-      @placeDao.findById(place_id)
-      .then (place) ->
-        if not place?
-          return {error: "Place not found", place_id: place_id}
-        place.toClient()
-      .then (place) ->
-        MyPlaceDetails.maybeAnnotateOne(req, place)
+  '/:place_id/details/reviews': (req) ->
+    {place_id} = req.params
+    PlaceReviews.getWithReviews(place_id)
+    .then (place) ->
+      if not place?
+        return Promise.reject({error: "Place not found", place_id: place_id})
+      place.toClient()
+    .then (place) ->
+      MyPlaceDetails.maybeAnnotateOne(req, place)
 
-    get @route, '/:place_id/details/reviews', (req) =>
-      {place_id} = req.params
-      @placeReviews.getWithReviews(place_id)
-      .then (place) ->
-        if not place?
-          return Promise.reject({error: "Place not found", place_id: place_id})
-        place.toClient()
-      .then (place) ->
-        MyPlaceDetails.maybeAnnotateOne(req, place)
+  '/any': (req) ->
+    Place.find((query) -> query.limit(1))
+    .then (places) ->
+      places[0].toClient()
 
-    get @route, '/any', (req) =>
-      @placeDao.find((query) -> query.limit(1))
-      .then (places) ->
-        places[0].toClient()
+  ###
+  post @route, '/new', (req) =>
+    manualId = req.body.place_id # usually null
+    place =
+      place_id: manualId
+      name: req.body.name
+      location: req.body.location
+      google_id: req.body.google_id
+      created_at: timestamp()
+      source_ver: @app.sourceVersion
 
-    ###
-    post @route, '/new', (req) =>
-      manualId = req.body.place_id # usually null
-      place =
-        place_id: manualId
-        name: req.body.name
-        location: req.body.location
-        google_id: req.body.google_id
-        created_at: timestamp()
-        source_ver: @app.sourceVersion
+    @app.insert('place',place)
 
-      @app.insert('place',place)
+  get @route, '/:place_id/rerank', (req) =>
 
-    get @route, '/:place_id/rerank', (req) =>
+    where = switch
+      when req.params.place_id == 'all'
+        ->
+      else
+        (query) -> query.where(place_id: req.params.place_id)
 
-      where = switch
-        when req.params.place_id == 'all'
-          ->
-        else
-          (query) -> query.where(place_id: req.params.place_id)
+    Place.modifyMulti where, (place) =>
+      FactualRating.recalculateFactualBasedRating(place)
+  ###
 
-      @placeDao.modifyMulti where, (place) =>
-        @factualRating.recalculateFactualBasedRating(place)
-    ###
-
-
-provide.class('endpoint/api/place', PlaceEndpoint)
 
 provide 'admin-endpoint/place', ->
   Place = depend('dao/place')

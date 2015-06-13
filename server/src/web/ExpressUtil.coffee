@@ -28,7 +28,16 @@ class ExpressUtil
   routerFromObject: (obj) ->
     router = require('express')()
     for path, handler of obj
-      router.get(path, @wrapRequestHandler(handler))
+      wrappedHandler = @wrapRequestHandler(handler)
+      if path.indexOf('post ') == 0
+        console.log('post -- ', path)
+        router.post(path.slice(5), wrappedHandler)
+      else if path.indexOf('use ') == 0
+        console.log('use -- ', path)
+        router.use(path.slice(4), handler)
+      else
+        console.log('get -- ', path)
+        router.get(path, wrappedHandler)
     return router
 
   renderResponse: (req, res, data) ->

@@ -151,3 +151,7 @@ schema.user_vote.columns = {
   place_id: {type: id_type}
   vote: {type: 'integer'}
 }
+
+schema.google_place =
+  # Migrating to new style
+  use_model: 'dao/GooglePlace'

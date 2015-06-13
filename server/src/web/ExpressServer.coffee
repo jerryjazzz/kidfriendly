@@ -42,8 +42,10 @@ class ExpressServer
     @server.use("/mobile", staticDir('client/mobile/www'))
     @server.use("/dashboard", staticDir('client/dashboard'))
 
-    for name, endpoint of depend.multi('endpoint/')
-      @server.use("/#{name}", endpoint.route)
+    @server.use('/admin', depend('AdminEndpoint').route)
+
+    for path, obj of depend.multi('endpoint')
+      @server.use(path, @expressUtil.routerFromObject(obj))
 
     port = @expressConfig.port
 
