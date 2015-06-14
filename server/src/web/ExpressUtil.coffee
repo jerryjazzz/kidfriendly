@@ -48,7 +48,7 @@ class ExpressUtil
 
     # Find view name, possibly from the data itself.
     # Default view is jsonDump (used when a browser loads a plain JSON endpoint)
-    viewName = data.view ? 'view/jsonDump'
+    viewName = data?.view ? 'view/jsonDump'
 
     view = depend(viewName)(data)
 

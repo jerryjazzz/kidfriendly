@@ -27,11 +27,12 @@ class FactualService
           resolve(res)
 
   factualOptions: (searchParams) ->
-    {lat, long, error} = searchParams.toGeoLocation()
+    if searchParams.toGeoLocation?
+      searchParams = searchParams.toGeoLocation()
+
+    {lat, long, meters, error} = searchParams
     if error?
       return {error}
-
-    meters = searchParams.meters
 
     Assert.notNull(lat, 'lat')
     Assert.notNull(long, 'long')
@@ -67,8 +68,12 @@ class FactualService
     }
 
   singlePlace: (factual_id) ->
-    @_apiGet('/t/restaurants-us/' + factual_id)
-      .then (results) ->
-        return results.data[0]
+    url = '/t/restaurants-us/' + factual_id
+    @_apiGet(url)
+    .then (results) ->
+      return results.data[0]
+    .catch (err) ->
+      console.log("Factual returned error for #{url}: ", err)
+      null
 
 provide.class(FactualService)

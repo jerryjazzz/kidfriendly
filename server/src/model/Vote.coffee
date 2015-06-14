@@ -12,4 +12,4 @@ class Vote
     vote:
       type: 'integer'
 
-provide('model/Vote', -> Vote)
+provide('dao/vote', -> depend('newDAO')(Vote))

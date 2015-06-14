@@ -8,8 +8,11 @@ class GooglePlaces
     @Place = depend('dao/place')
     @GooglePlace = depend('dao/GooglePlace')
     @GeomUtil = depend('GeomUtil')
+    @Sector = depend('dao/sector')
+    @SectorService = depend('SectorService')
 
   nearbySearch: ({lat, long}) ->
+    console.log('google nearby search: ', {lat, long})
     @Http.request
       url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       qs:
@@ -24,6 +27,25 @@ class GooglePlaces
       qs:
         placeid: place_id
         key: @apiKey
+
+  runSectorSearches: (sectorCount) ->
+    @Sector.find((query) -> query.whereNull('google_search_at').whereNotNull('factual_search_at').limit(sectorCount))
+    .map (sector) =>
+      @correlateAndSaveSector(sector)
+
+  correlateAndSaveSector: (sector) ->
+    sector_id = sector.sector_id
+    found_count = null
+
+    @nearbySearch({lat: sector.lat,long: sector.long})
+    .then (response) ->
+      results = response.results
+      found_count = results.length
+      results
+    .map (googlePlace) =>
+      @correlateAndSaveGooglePlace(googlePlace)
+    .then =>
+      @Sector.update2({sector_id}, {google_search_at: Timestamp(), google_search_count: found_count})
 
   correlateAndSaveGooglePlace: (googlePlace) ->
     google_place_id = googlePlace.place_id
@@ -59,7 +81,6 @@ class GooglePlaces
 
     @Place.find(name: googlePlace.name)
     .then (results) ->
-      console.log("[google correlate] found #{results.length} places for #{googlePlace.name}")
       results.filter(closeEnough)
 
     .then (results) ->
@@ -80,9 +101,23 @@ provide.class(GooglePlaces)
 
 provide 'admin-endpoint/google', ->
   googlePlaces = depend('GooglePlaces')
+  SectorService = depend('SectorService')
+
+  resolveLocation = (req) ->
+    Promise.resolve()
+    .then ->
+      if req.query.sector_id?
+        SectorService.sectorToLatLong(req.query.sector_id)
+      else
+        {lat: req.query.lat, long: req.query.long}
+
+  '/background-update': (req) ->
+    googlePlaces.runSectorSearches(req.query.count)
 
   '/nearby': (req) ->
-    googlePlaces.nearbySearch(req.query)
+    resolveLocation(req)
+    .then (loc) ->
+      googlePlaces.nearbySearch(loc)
     .then (answer) ->
       answer.results
 
@@ -92,7 +127,9 @@ provide 'admin-endpoint/google', ->
       answer.result
 
   '/nearby/correlate': (req) ->
-    googlePlaces.nearbySearch(req.query)
+    resolveLocation(req)
+    .then (loc) ->
+      googlePlaces.nearbySearch(loc)
     .then (answer) ->
       answer.results
     .map (googlePlace) ->

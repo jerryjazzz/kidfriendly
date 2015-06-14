@@ -77,7 +77,7 @@ class SchemaMigration
       console.log('create table: ', tableName)
       @createTable(tableName, table)
     else
-      console.log('update table: ', tableName)
+      # console.log('update table: ', tableName)
       @updateExistingTable(tableName, table)
 
   createTable: (tableName, tableDetails) ->

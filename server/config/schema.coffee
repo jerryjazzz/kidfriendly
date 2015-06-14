@@ -145,13 +145,14 @@ schema.tweak_values.columns = {
   value: {type: 'json'}
 }
 
-schema.user_vote = {}
-schema.user_vote.columns = {
-  user_id: {type: id_type}
-  place_id: {type: id_type}
-  vote: {type: 'integer'}
-}
+schema.user_vote =
+  # Migrating to new style
+  use_model: 'dao/vote'
 
 schema.google_place =
   # Migrating to new style
   use_model: 'dao/GooglePlace'
+
+schema.sector =
+  # Migrating to new style
+  use_model: 'dao/sector'
