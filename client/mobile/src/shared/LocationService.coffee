@@ -6,7 +6,6 @@ class LocationService
     deferred = @$q.defer()
     @$ionicPlatform.ready =>
       @$cordovaGeolocation.getCurrentPosition({timeout:30000, maximumAge:60000}).then (position) =>
-        console.log 'position', position
         deferred.resolve(position)
       , (reason) =>
         console.log 'reject', reason

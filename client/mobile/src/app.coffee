@@ -16,6 +16,7 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch'
   $rootScope.$on '$authenticationSuccess', (user)->
     analyticsService.setUser(user.id)
     analyticsService.trackEvent("Auth", "SignIn", "Success")
+    $ionicHistory.clearCache()
     if attemptedRoute?
       $ionicHistory.currentView($ionicHistory.backView());
       $state.transitionTo  attemptedRoute.route.name, attemptedRoute.params
@@ -31,12 +32,26 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch'
       # org.apache.cordova.statusbar required
       StatusBar.styleDefault()
 
-.config ($stateProvider, $urlRouterProvider, resolvers, uiGmapGoogleMapApiProvider, $ionicConfigProvider) ->
+.config ($stateProvider, $urlRouterProvider, resolvers, uiGmapGoogleMapApiProvider, $ionicConfigProvider, $provide, $httpProvider) ->
   $ionicConfigProvider.views.swipeBackEnabled(false)
   uiGmapGoogleMapApiProvider.configure
     key: 'AIzaSyC0wntPebMoKnIwbpa82NzLPbwEIlvZvlM'
     v: '3.17'
     libraries: 'weather,geometry,visualization'
+
+  $httpProvider.interceptors.push 'myHttpInterceptor'
+
+  $provide.decorator '$exceptionHandler', ['$delegate', ($delegate) ->
+    return (exception, cause) ->
+      $delegate(exception, cause)
+      if(exception)
+        console.log exception
+        data = {}
+        data.message = exception.message if exception.message?
+        data.name = exception.name if exception.name?
+        data.stack = exception.stack if exception.stack?
+        window.analytics.trackException(data, false)
+  ]
 
   $stateProvider
   .state 'search',
@@ -73,7 +88,7 @@ angular.module('Mobile', ['ionic', 'config', 'kf.shared', 'ngCordova', 'ngTouch'
     }
 
   .state 'details',
-    url:'/details/:placeId'
+    url:'/details/:placeId/review/:vote'
     templateUrl: 'templates/details.html'
     resolve:
       place: resolvers.place
