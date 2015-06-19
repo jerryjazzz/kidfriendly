@@ -37,9 +37,9 @@ class SearchParams
       cityLookup = Cities.zip_lookup(@zipcode)
       if not cityLookup?
         return {error: "zipcode not found: " + @zipcode}
-      return {lat: cityLookup.latitude, long: cityLookup.longitude}
+      return {lat: cityLookup.latitude, long: cityLookup.longitude, meters: @meters}
 
-    return {lat: @lat, long: @long}
+    return {lat: @lat, long: @long, meters: @meters}
 
   @fromRequest: (req) ->
     new SearchParams(req.query)
