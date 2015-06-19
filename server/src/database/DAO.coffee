@@ -11,6 +11,8 @@ class DAO
       throw new Error("no schema found for table: #{@tableName}")
     @idColumn = @tableSchema.primary_key ? @modelClass.table.primary_key
     @databaseUtil = depend('DatabaseUtil')
+    @hasCreatedAtColumn = @tableSchema?.columns?.created_at? or @modelClass?.fields?.created_at?
+    @hasSourceVerColumn = @tableSchema?.columns?.source_ver? or @modelClass?.fields?.source_ver?
 
   newInstance: ->
     if @modelClass.make?
@@ -92,10 +94,10 @@ class DAO
 
     idColumn = @idColumn
 
-    if not row.created_at? and @tableSchema?.columns?.created_at?
+    if not row.created_at? and @hasCreatedAtColumn
       row.created_at = timestamp()
 
-    if not row.source_ver? and @tableSchema?.columns?.source_ver?
+    if not row.source_ver? and @hasSourceVerColumn
       row.source_ver = @sourceVersion
 
     # Check to auto-generate an ID. This involves some retry logic on the (unlikely)
