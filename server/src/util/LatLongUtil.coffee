@@ -29,12 +29,6 @@ LatLongUtil =
     items = latLongString.split(',')
     return new Location(parseFloat(items[0]), parseFloat(items[1]))
 
-  latLongDeltaFromDistance: (latLong, distanceMiles) ->
-    # Returns a delta (x,y) where, if you start at latLong and travel distanceMiles,
-    # the location will be within +/- the delta.
-    dlat = distanceMiles / LatLongUtil.earthRadiusMiles
-    dlong = Math.asin(Math.sin(dlat) / Math.cos(toRadians(latLong.lat)))
-    return {dlat: toDegrees(dlat), dlong: toDegrees(dlong)}
 
   latticePointsForAreaSimpler: (area, radiusMiles) ->
     if not area.isSquare

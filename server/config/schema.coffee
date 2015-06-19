@@ -82,23 +82,9 @@ schema.survey_answer.columns = {
 
 # Place table #
 
-schema.place = {primary_key: 'place_id'}
-schema.place.columns = {
-  place_id: standard_id
-  name: {type: 'varchar(255)'}
-  factual_id: {type: 'varchar(61)', options: 'unique'}
-  details: {type: 'json'}
-  lat: {type: 'real'}
-  long: {type: 'real'}
-  zipcode: {type: 'varchar(10)'}
-  rating: {type: 'integer'}
-  factual_consume_ver: {type: 'integer'}
-  upvote_count: {type: 'integer'}
-  downvote_count: {type: 'integer'}
-  created_at
-  updated_at
-  source_ver
-}
+schema.place =
+  # Migrating to new style
+  use_model: 'dao/place'
 
 # Review table #
 
@@ -145,13 +131,14 @@ schema.tweak_values.columns = {
   value: {type: 'json'}
 }
 
-schema.user_vote = {}
-schema.user_vote.columns = {
-  user_id: {type: id_type}
-  place_id: {type: id_type}
-  vote: {type: 'integer'}
-}
+schema.user_vote =
+  # Migrating to new style
+  use_model: 'dao/vote'
 
 schema.google_place =
   # Migrating to new style
   use_model: 'dao/GooglePlace'
+
+schema.sector =
+  # Migrating to new style
+  use_model: 'dao/sector'

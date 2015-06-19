@@ -11,7 +11,7 @@ JsonTable = (data) ->
   table {className: "table table-striped"}, rows
 
 getTitle = (data) ->
-  data.name ? ''
+  data?.name ? ''
 
 getLinks = (data) ->
   if data.type == 'Place'

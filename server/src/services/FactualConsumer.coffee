@@ -5,9 +5,18 @@ class FactualConsumer
 
   constructor: ->
     @app = depend('App')
-    @placeDao = depend('dao/place')
+    @Place = depend('dao/place')
     @factualService = depend('FactualService')
     @factualRating = depend('FactualRating')
+    @Sector = depend('dao/sector')
+
+  sectorSearch: (sector) =>
+    @geoSearch(lat: sector.lat, long: sector.long, meters: sector.radius_meters)
+    .then (places) =>
+      @Sector.update2({sector_id: sector.sector_id}, \
+        {factual_search_at: Timestamp(), factual_search_count: places.length})
+      .then ->
+        places
 
   geoSearch: (searchParams) ->
     if searchParams.error?
@@ -24,7 +33,7 @@ class FactualConsumer
     Promise.all factualPlaces.map (factualPlace) =>
       where = (query) -> query.where({factual_id: factualPlace.factual_id})
       where.factual_id = factualPlace.factual_id
-      @placeDao.modifyOrInsert where, (place) =>
+      @Place.modifyOrInsert where, (place) =>
         @updatePlaceWithFactualData(place, factualPlace)
 
   updatePlaceWithFactualData: (place, factualPlace) ->
@@ -63,23 +72,27 @@ class FactualConsumer
     @factualRating.recalculateFactualBasedRating(place)
 
   refreshOnePlace: (place) =>
-    #console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
+    console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
     @factualService.singlePlace(place.factual_id)
     .then (factualPlace) =>
+      return if not factualPlace?
       @updatePlaceWithFactualData(place, factualPlace)
 
-  refreshOldPlaceData: ->
+  updatePlacesWithOldVersion: (count) ->
     # triggered during nightly tasks
-
-    count = 100
 
     queryFunc = (query) =>
       query.where('factual_consume_ver', '!=', @CurrentVersion)
       query.orWhereNull('factual_consume_ver')
       query.limit(count)
 
-    @placeDao.modifyMulti(queryFunc, @refreshOnePlace)
+    @Place.modifyMulti(queryFunc, @refreshOnePlace)
     .then (results) ->
-      console.log("FactualConsumer.refreshOldPlaceData modified #{results.length} places")
+      console.log("FactualConsumer.updatePlacesWithOldVersion modified #{results.length} places")
+      results
+
+  runSectorSearches: (count) ->
+    @Sector.find((query) -> query.whereNull('factual_search_at').limit(count))
+    .map(@sectorSearch, {concurrency: 1})
 
 provide.class(FactualConsumer)

@@ -77,7 +77,7 @@ class SchemaMigration
       console.log('create table: ', tableName)
       @createTable(tableName, table)
     else
-      console.log('update table: ', tableName)
+      # console.log('update table: ', tableName)
       @updateExistingTable(tableName, table)
 
   createTable: (tableName, tableDetails) ->
@@ -137,12 +137,12 @@ class SchemaMigration
     queries = for change in changeList
       switch change.type
         when 'add'
-          console.log("SchemaMigration: adding column #{change.column.name} to table #{tableName}")
+          console.log("SchemaMigration: adding column '#{change.column.name}' to table '#{tableName}'")
           @db.raw("alter table #{tableName} add column #{change.column.definitionStr()}")
 
         when 'change_type'
-          console.log("SchemaMigration: changing type of column #{change.to.name} to #{change.to.type} on "\
-            +"table #{tableName}")
+          console.log("SchemaMigration: changing type of column '#{change.to.name}' to '#{change.to.type}' on "\
+            +"table '#{tableName}'")
 
           @db.raw("alter table #{tableName} alter column #{change.to.name} type #{change.to.type}")
 

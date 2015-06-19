@@ -9,7 +9,7 @@ class DAO
     @tableSchema  = depend('Configs').schema[@tableName]
     if not @tableSchema?
       throw new Error("no schema found for table: #{@tableName}")
-    @idColumn = @tableSchema.primary_key
+    @idColumn = @tableSchema.primary_key ? @modelClass.table.primary_key
     @databaseUtil = depend('DatabaseUtil')
 
   newInstance: ->
@@ -57,6 +57,9 @@ class DAO
       rows[0]
 
   findById: (id) =>
+    if not id? or id == ''
+      throw new Error('id is required')
+
     where = {}
     where[@idColumn] = id
     @find((query) -> query.where(where))
@@ -136,16 +139,20 @@ class DAO
     .then -> object
     
   update2: (whereFunc, object) =>
-    if object.dataSource != 'local' or not object.original?
-      throw new Error("DAO.update must be called on patch data: #{JSON.stringify(object)}")
-
     fields = @objectToDatabase(object)
 
     if Object.keys(fields).length == 0
       return Promise.resolve(object)
       
-    @db(@tableName).update(fields).where(whereFunc)
-    .then -> object
+    query = @db(@tableName).update(fields)
+      
+    if typeof whereFunc == 'function'
+      whereFunc(query)
+    else
+      query.where(whereFunc)
+
+    query.then ->
+      object
 
   modify: (whereFunc, modifyFunc, {allowInsert} = {}) =>
     allowInsert = allowInsert ? false
@@ -206,7 +213,6 @@ class DAO
 provide('dao/user', -> new DAO(modelClass: depend('User')))
 provide('dao/review', -> new DAO(modelClass: depend('Review')))
 provide('dao/place', -> new DAO(modelClass: depend('Place')))
-provide('dao/vote', -> new DAO(modelClass: depend('model/Vote')))
 
 provide 'newDAO', -> (modelClass) ->
   new DAO({modelClass})
