@@ -20,9 +20,13 @@ class NightlyTasks
       .then (sectors) ->
         result.factual_sector_searches = sectors?.length
     .then =>
-      @GooglePlaces.runSectorSearches(200)
+      @GooglePlaces.runSectorSearchJob(200)
       .then (sectors) ->
         result.google_sector_searches = sectors?.length
+    .then =>
+      @GooglePlaces.runDetailsRequestJob(200)
+      .then (results) ->
+        result.google_detail_requests = results?.length
     .then =>
       console.log("[NightlyTasks] finished: #{result}")
       result

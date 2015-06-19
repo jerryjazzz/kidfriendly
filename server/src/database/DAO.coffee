@@ -57,6 +57,9 @@ class DAO
       rows[0]
 
   findById: (id) =>
+    if not id? or id == ''
+      throw new Error('id is required')
+
     where = {}
     where[@idColumn] = id
     @find((query) -> query.where(where))

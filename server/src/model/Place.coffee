@@ -19,23 +19,46 @@ class Place
 
   @table:
     name: 'place'
+    primary_key: 'place_id'
 
   @fields:
-    place_id: {}
-    name: {}
-    lat: {}
-    long: {}
-    zipcode: {}
-    rating: {}
+    place_id:
+      type: 'id'
+    name:
+      type: 'varchar(255)'
+    lat:
+      type: 'real'
+    long:
+      type: 'real'
+    zipcode:
+      type: 'varchar(10)'
+    rating:
+      type: 'integer'
     factual_id:
+      type: 'varchar(61)'
+      unique: true
       private: true
     factual_consume_ver:
+      type: 'integer'
       private: true
-    details: {}
+    details:
+      type: 'json'
     upvote_count:
+      type: 'integer'
       default: 0
     downvote_count:
+      type: 'integer'
       default: 0
+    thumb_img_url:
+      type: 'text'
+    big_img_url:
+      type: 'text'
+    created_at:
+      type: 'timestamp'
+    updated_at:
+      type: 'timestamp'
+    source_ver:
+      type: 'integer'
 
   @fromDatabase: (fields) ->
     place = new Place(fields)
