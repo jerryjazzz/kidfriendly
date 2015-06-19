@@ -192,8 +192,7 @@ class DAO
     modifyOne = (id) =>
       where = {}
       where[@idColumn] = id
-      oneWhereFunc = (query) -> query.where(where)
-      @modify(oneWhereFunc, modifyFunc)
+      @modify(where, modifyFunc)
 
     query = @db.select([@idColumn]).from(@tableName)
     whereFunc(query)

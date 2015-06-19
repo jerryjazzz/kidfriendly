@@ -31,9 +31,7 @@ class FactualConsumer
     Assert.type(factualPlaces, Array)
 
     Promise.all factualPlaces.map (factualPlace) =>
-      where = (query) -> query.where({factual_id: factualPlace.factual_id})
-      where.factual_id = factualPlace.factual_id
-      @Place.modifyOrInsert where, (place) =>
+      @Place.modifyOrInsert {factual_id: factualPlace.factual_id}, (place) =>
         @updatePlaceWithFactualData(place, factualPlace)
 
   updatePlaceWithFactualData: (place, factualPlace) ->
@@ -72,10 +70,14 @@ class FactualConsumer
     @factualRating.recalculateFactualBasedRating(place)
 
   refreshOnePlace: (place) =>
-    console.log('FactualConsumer.refreshOnePlace: ', place.place_id)
     @factualService.singlePlace(place.factual_id)
     .then (factualPlace) =>
       return if not factualPlace?
+
+      if place.factual_id != factualPlace.factual_id
+        console.log("Factual place has changed ID, old: #{place.factual_id}, new: #{factualPlace.factual_id}. Will ignore this place for now.")
+        return
+
       @updatePlaceWithFactualData(place, factualPlace)
 
   updatePlacesWithOldVersion: (count) ->
@@ -88,7 +90,6 @@ class FactualConsumer
 
     @Place.modifyMulti(queryFunc, @refreshOnePlace)
     .then (results) ->
-      console.log("FactualConsumer.updatePlacesWithOldVersion modified #{results.length} places")
       results
 
   runSectorSearches: (count) ->
