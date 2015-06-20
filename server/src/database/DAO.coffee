@@ -95,7 +95,7 @@ class DAO
     idColumn = @idColumn
 
     if not row.created_at? and @hasCreatedAtColumn
-      row.created_at = timestamp()
+      row.created_at = Timestamp()
 
     if not row.source_ver? and @hasSourceVerColumn
       row.source_ver = @sourceVersion

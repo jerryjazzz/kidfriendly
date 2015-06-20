@@ -2,6 +2,9 @@
 path = require('path')
 Promise = require('bluebird')
 
+global.InternalError = (err) ->
+  console.log("[internal error] #{err} #{err.stack ? ""}")
+
 class App
   constructor: ->
     @config = depend('Configs')

@@ -32,6 +32,8 @@ class GooglePlaces
         key: ApiKey
 
   saveDetailsForGooglePlace: (google_place) =>
+    console.log('saveDetailsForGooglePlace: ', google_place)
+
     new_google_place = null
 
     @requestDetails(google_place.google_place_id)

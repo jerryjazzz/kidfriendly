@@ -19,7 +19,7 @@ class SourceUtil
             reject(error)
             return
 
-          time = timestamp(1000*parseInt(stdout.trim()))
+          time = Timestamp(1000*parseInt(stdout.trim()))
           resolve({sha1, time})
 
   insertSourceVersion: ->
@@ -29,7 +29,7 @@ class SourceUtil
       data =
         sha1: gitCommit.sha1
         commit_date: gitCommit.timestamp
-        first_deployed_at: timestamp()
+        first_deployed_at: Timestamp()
         feature_list: JSON.stringify(@app.config.currentFeatures)
 
       @app.db.select('id').from('source_version').where(sha1:data.sha1)

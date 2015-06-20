@@ -51,7 +51,7 @@ provide 'endpoint/api/place', ->
       name: req.body.name
       location: req.body.location
       google_id: req.body.google_id
-      created_at: timestamp()
+      created_at: Timestamp()
       source_ver: @app.sourceVersion
 
     @app.insert('place',place)

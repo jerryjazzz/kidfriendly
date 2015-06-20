@@ -11,6 +11,10 @@ provide 'endpoint/api/search', ->
 
     # Just for beta purposes, first do a Factual pull for this range.
     FactualConsumer.geoSearch(searchParams)
+    .catch (err) ->
+      # Squash errors from FactualConsumer, so the search still happens.
+      InternalError(err)
+
     .then ->
       PlaceSearch.search(searchParams)
     .then (places) ->

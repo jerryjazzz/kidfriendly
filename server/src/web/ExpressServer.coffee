@@ -23,7 +23,7 @@ class ExpressServer
     @server.use(require('passport').initialize())
 
     morgan = require('morgan')
-    morgan.token('timestamp', (req, res) -> timestamp())
+    morgan.token('timestamp', (req, res) -> Timestamp())
     logFormat = '[:timestamp] :method :url :status :res[content-length] - :response-time ms'
     @server.use(require('morgan')(logFormat))
 

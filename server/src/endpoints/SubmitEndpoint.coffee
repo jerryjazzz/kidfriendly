@@ -7,7 +7,7 @@ provide 'endpoint/api/submit', ->
   'post /email': (req) ->
     data =
       email: req.body.email
-      created_at: timestamp()
+      created_at: Timestamp()
       ip: req.get_ip()
       source_ver: App.sourceVersion
 
@@ -32,7 +32,7 @@ provide 'endpoint/api/submit', ->
       body: JSON.stringify
         survey_version: req.body.survey_version
         answer: req.body.answer
-      created_at: timestamp()
+      created_at: Timestamp()
       source_ver: App.sourceVersion
 
     App.insert('survey_answer', row)

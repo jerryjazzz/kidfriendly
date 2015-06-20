@@ -18,9 +18,7 @@ timestamp = (value=null) ->
         ':' + pad( date.getUTCSeconds() )
 
 exports.timestamp = timestamp
-global.timestamp = timestamp
 global.Timestamp = timestamp
 
 global.MilesToMeters = (miles) -> miles * 1609.34
 global.MetersToMiles = (meters) -> meters / 1609.34
-  
