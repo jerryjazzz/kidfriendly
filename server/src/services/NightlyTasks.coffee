@@ -28,7 +28,7 @@ class NightlyTasks
       .then (results) ->
         result.google_detail_requests = results?.length
     .then =>
-      console.log("[NightlyTasks] finished: #{result}")
+      console.log("[NightlyTasks] finished: #{JSON.stringify(result)}")
       result
     .catch (err) =>
       console.log("[NightlyTasks] error: #{err.message}\n#{err.stack}")

@@ -15,7 +15,6 @@ class GooglePlaces
     @SectorService = depend('SectorService')
 
   nearbySearch: ({lat, long}) ->
-    console.log('google nearby search: ', {lat, long})
     @Http.request
       url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       qs:
@@ -32,8 +31,6 @@ class GooglePlaces
         key: ApiKey
 
   saveDetailsForGooglePlace: (google_place) =>
-    console.log('saveDetailsForGooglePlace: ', google_place)
-
     new_google_place = null
 
     @requestDetails(google_place.google_place_id)

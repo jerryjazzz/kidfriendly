@@ -8,6 +8,16 @@ provide 'endpoint/api/place', ->
   FactualRating = depend('FactualRating')
   MyPlaceDetails = depend('MyPlaceDetails')
 
+  getPlaceDetails = (req) ->
+    {place_id} = req.params
+    Place.findById(place_id)
+    .then (place) ->
+      if not place?
+        return {error: "Place not found", place_id: place_id}
+      place.toClient()
+    .then (place) ->
+      MyPlaceDetails.maybeAnnotateOne(req, place)
+
   '/:place_id/explain': (req) ->
     {place_id} = req.params
     Place.findById(place_id)
@@ -18,15 +28,8 @@ provide 'endpoint/api/place', ->
       factualRating = FactualRating.getExtendedRating(place)
       {raw: place, factualRating: factualRating}
 
-  '/:place_id/details': (req) ->
-    {place_id} = req.params
-    Place.findById(place_id)
-    .then (place) ->
-      if not place?
-        return {error: "Place not found", place_id: place_id}
-      place.toClient()
-    .then (place) ->
-      MyPlaceDetails.maybeAnnotateOne(req, place)
+  '/:place_id': getPlaceDetails
+  '/:place_id/details': getPlaceDetails
 
   '/:place_id/details/reviews': (req) ->
     {place_id} = req.params
