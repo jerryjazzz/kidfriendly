@@ -51,11 +51,11 @@ class GooglePlaces
 
   runSectorSearchJob: (sectorCount) ->
     @Sector.find((query) -> query.whereNull('google_search_at').whereNotNull('factual_search_at').limit(sectorCount))
-    .map(@searchAndSaveForSector)
+    .map(@searchAndSaveForSector, {concurrency: 1})
 
   runDetailsRequestJob: (count) ->
     @GooglePlace.find((query) -> query.whereNull('details_request_at').limit(count))
-    .map(@saveDetailsForGooglePlace)
+    .map(@saveDetailsForGooglePlace, {concurrency: 1})
 
   searchAndSaveForSector: (sector) =>
     sector_id = sector.sector_id
@@ -66,12 +66,11 @@ class GooglePlaces
       results = response.results
       found_count = results.length
       results
-    .map (googleResult) =>
-      @correlateAndSaveGooglePlace(googleResult)
+    .map(@correlateAndSaveGooglePlace, {concurrency: 1})
     .then =>
       @Sector.update2({sector_id}, {google_search_at: Timestamp(), google_search_count: found_count})
 
-  correlateAndSaveGooglePlace: (googleResult) ->
+  correlateAndSaveGooglePlace: (googleResult) =>
     google_place_id = googleResult.place_id
 
     @GooglePlace.findOne({google_place_id})
@@ -109,16 +108,15 @@ class GooglePlaces
 
     .then (results) ->
       if results.length == 0
-        console.log("[google correlate] No local place found for google place, name = #{googleResult.name}, "+\
+        console.log("[google correlate] No local place found, name = #{googleResult.name}, "+\
           "google_place_id = #{google_place_id}")
         return null
       else if results.length > 1
-        console.log("[google correlate] Multiple local places found for google place, name = #{googleResult.name}, "+\
+        console.log("[google correlate] Multiple local places found, name = #{googleResult.name}, "+\
           "google_place_id = #{google_place_id}, matches = #{p.id for p in results}")
         return null
       else
         # Found 1 result
-        console.log("[google correlate] One result found for #{googleResult.name}: ", results[0].place_id)
         return results[0]
 
 provide.class(GooglePlaces)

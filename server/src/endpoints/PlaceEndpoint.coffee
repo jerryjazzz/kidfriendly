@@ -18,6 +18,11 @@ provide 'endpoint/api/place', ->
     .then (place) ->
       MyPlaceDetails.maybeAnnotateOne(req, place)
 
+  '/any': (req) ->
+    Place.find((query) -> query.limit(1))
+    .then (places) ->
+      places[0].toClient()
+
   '/:place_id/explain': (req) ->
     {place_id} = req.params
     Place.findById(place_id)
@@ -41,10 +46,6 @@ provide 'endpoint/api/place', ->
     .then (place) ->
       MyPlaceDetails.maybeAnnotateOne(req, place)
 
-  '/any': (req) ->
-    Place.find((query) -> query.limit(1))
-    .then (places) ->
-      places[0].toClient()
 
   ###
   post @route, '/new', (req) =>
