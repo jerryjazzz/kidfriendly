@@ -7,6 +7,12 @@ class Sector
   @fields:
     sector_id:
       type: 'id'
+    x:
+      type: 'integer'
+    y:
+      type: 'integer'
+    zoom:
+      type: 'integer'
     lat:
       type: 'numeric'
     long:

@@ -1,4 +1,8 @@
 
+###
+  see: https://developers.google.com/places/webservice/search
+###
+
 ApiKey = '***REMOVED***'
 BrowserApiKey = '***REMOVED***'
 
@@ -139,8 +143,6 @@ provide 'admin-endpoint/google', ->
     resolveLocation(req)
     .then (loc) ->
       googleService.nearbySearch(loc)
-    .then (response) ->
-      response.results
 
   '/cached-place/any': (req) ->
     GooglePlace.find((query) -> query.limit(1))
