@@ -92,7 +92,7 @@ class SchemaMigration
       columnDefinitions = (new ColumnDefinition(columnName, column) for columnName, column of tableDetails.columns)
 
     strs = (column.definitionStr() for column in columnDefinitions)
-    console.log("SchemaMigration: creating table #{tableName}")
+    console.log("SchemaMigration: creating table '#{tableName}'")
     return @db.raw("create table #{tableName} (#{strs.join(', ')})")
 
   updateExistingTable: (tableName, tableDetails) ->

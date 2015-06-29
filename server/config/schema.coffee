@@ -139,6 +139,7 @@ schema.google_place =
   # Migrating to new style
   use_model: 'dao/GooglePlace'
 
-schema.sector =
+schema.google_nearby_search_attempt =
   # Migrating to new style
-  use_model: 'dao/sector'
+  use_model: 'dao/GoogleNearbySearchAttempt'
+

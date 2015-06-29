@@ -8,15 +8,6 @@ class FactualConsumer
     @Place = depend('dao/place')
     @factualService = depend('FactualService')
     @factualRating = depend('FactualRating')
-    @Sector = depend('dao/sector')
-
-  sectorSearch: (sector) =>
-    @geoSearch(lat: sector.lat, long: sector.long, meters: sector.radius_meters)
-    .then (places) =>
-      @Sector.update2({sector_id: sector.sector_id}, \
-        {factual_search_at: Timestamp(), factual_search_count: places.length})
-      .then ->
-        places
 
   geoSearch: (searchParams) ->
     if searchParams.error?
@@ -91,9 +82,5 @@ class FactualConsumer
     @Place.modifyMulti(queryFunc, @refreshOnePlace)
     .then (results) ->
       results
-
-  runSectorSearches: (count) ->
-    @Sector.find((query) -> query.whereNull('factual_search_at').limit(count))
-    .map(@sectorSearch, {concurrency: 1})
 
 provide.class(FactualConsumer)

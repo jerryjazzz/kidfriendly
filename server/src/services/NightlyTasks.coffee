@@ -1,4 +1,14 @@
 
+ProdBudget =
+  factualUpdate: 200
+  googleCorrelationSearch: 200
+  googleDetails: 400
+
+ManualRunBudget =
+  factualUpdate: 5
+  googleCorrelationSearch: 2
+  googleDetails: 2
+
 class NightlyTasks
   constructor: ->
     CronJob = require('cron').CronJob
@@ -7,28 +17,26 @@ class NightlyTasks
     @FactualConsumer = depend('FactualConsumer')
     @GooglePlaces = depend('GooglePlaces')
 
-  run: =>
+
+  run: (budget) =>
     result = {}
+    started_at = Date.now()
+    if not budget?
+      budget = ProdBudget
 
     Promise.resolve()
     .then =>
-      @FactualConsumer.updatePlacesWithOldVersion(200)
+      @FactualConsumer.updatePlacesWithOldVersion(budget.factualUpdate)
       .then (places) ->
         result.factual_old_version_updates = places?.length
     .then =>
-      @FactualConsumer.runSectorSearches(200)
-      .then (sectors) ->
-        result.factual_sector_searches = sectors?.length
+      @GooglePlaces.runCorrelationSearchJob(budget.googleCorrelationSearch)
     .then =>
-      @GooglePlaces.runSectorSearchJob(200)
-      .then (sectors) ->
-        result.google_sector_searches = sectors?.length
-    .then =>
-      @GooglePlaces.runDetailsRequestJob(200)
+      @GooglePlaces.runDetailsRequestJob(budget.googleDetails)
       .then (results) ->
         result.google_detail_requests = results?.length
     .then =>
-      console.log("[NightlyTasks] finished: #{JSON.stringify(result)}")
+      console.log("[NightlyTasks] finished in #{Date.now() - started_at}ms, results: #{JSON.stringify(result)}")
       result
     .catch (err) =>
       console.log("[NightlyTasks] error: #{err.message}\n#{err.stack}")
@@ -37,4 +45,4 @@ provide.class(NightlyTasks)
 
 provide 'admin-endpoint/nightly', ->
   '/run-now': (req) ->
-    depend('NightlyTasks').run()
+    depend('NightlyTasks').run(ManualRunBudget)
