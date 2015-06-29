@@ -36,7 +36,6 @@ class App
       .then(@postgresSetup)
       .then(@schemaMigration)
       .then(@initializeSourceVersion)
-      .then(@dataMigration)
       .then(@setupAdminPort)
       .then(@setupPub)
       .then(@startExpress)
@@ -73,9 +72,6 @@ class App
       .then (id) =>
         @sourceVersion = id
         @log("current source version is:", id)
-
-  dataMigration: =>
-    depend('DataMigration').run()
 
   setupAdminPort: =>
     @log("listening on admin port: " + @config.appConfig.adminPort)

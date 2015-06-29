@@ -1,4 +1,8 @@
 
+###
+  see: https://developers.google.com/places/webservice/search
+###
+
 ApiKey = '***REMOVED***'
 BrowserApiKey = '***REMOVED***'
 
@@ -9,10 +13,10 @@ class GooglePlaces
     @Http = depend('Http')
     @Place = depend('dao/place')
     @GooglePlace = depend('dao/GooglePlace')
+    @GoogleNearbySearchAttempt = depend('dao/GoogleNearbySearchAttempt')
     @GooglePhotos = depend('GooglePhotos')
     @GeomUtil = depend('GeomUtil')
-    @Sector = depend('dao/sector')
-    @SectorService = depend('SectorService')
+    @Db = depend('db')
 
   nearbySearch: ({lat, long}) ->
     @Http.request
@@ -49,29 +53,11 @@ class GooglePlaces
     .then =>
       new_google_place
 
-  runSectorSearchJob: (sectorCount) ->
-    @Sector.find((query) -> query.whereNull('google_search_at').whereNotNull('factual_search_at').limit(sectorCount))
-    .map(@searchAndSaveForSector)
-
   runDetailsRequestJob: (count) ->
     @GooglePlace.find((query) -> query.whereNull('details_request_at').limit(count))
-    .map(@saveDetailsForGooglePlace)
+    .map(@saveDetailsForGooglePlace, {concurrency: 1})
 
-  searchAndSaveForSector: (sector) =>
-    sector_id = sector.sector_id
-    found_count = null
-
-    @nearbySearch({lat: sector.lat,long: sector.long})
-    .then (response) ->
-      results = response.results
-      found_count = results.length
-      results
-    .map (googleResult) =>
-      @correlateAndSaveGooglePlace(googleResult)
-    .then =>
-      @Sector.update2({sector_id}, {google_search_at: Timestamp(), google_search_count: found_count})
-
-  correlateAndSaveGooglePlace: (googleResult) ->
+  correlateAndSaveGooglePlace: (googleResult) =>
     google_place_id = googleResult.place_id
 
     @GooglePlace.findOne({google_place_id})
@@ -105,44 +91,72 @@ class GooglePlaces
 
     @Place.find(name: googleResult.name)
     .then (results) ->
+      if null in results
+        console.log("null in results? searching for name: #{name}, results: #{results}")
       results.filter(closeEnough)
 
     .then (results) ->
       if results.length == 0
-        console.log("[google correlate] No local place found for google place, name = #{googleResult.name}, "+\
+        console.log("[google correlate] No local place found, name = #{googleResult.name}, "+\
           "google_place_id = #{google_place_id}")
         return null
       else if results.length > 1
-        console.log("[google correlate] Multiple local places found for google place, name = #{googleResult.name}, "+\
+        console.log("[google correlate] Multiple local places found, name = #{googleResult.name}, "+\
           "google_place_id = #{google_place_id}, matches = #{p.id for p in results}")
         return null
       else
         # Found 1 result
-        console.log("[google correlate] One result found for #{googleResult.name}: ", results[0].place_id)
         return results[0]
+
+  findUncorrelatedPlaces: (count) ->
+    # Returns {place_id, lat, long}
+
+    @Db.raw("""
+      select place_id,lat,long from place where not exists
+      (select * from google_place,google_nearby_search_attempt where google_place.place_id = place.place_id
+        or google_nearby_search_attempt.place_id = place.place_id)
+      limit ?
+      """, count)
+    .then (result) ->
+      result.rows
+
+  runCorrelationSearchJob: (count) ->
+    @findUncorrelatedPlaces(count)
+    .map(@runDirectedSearch, {concurrency:1})
+
+  runDirectedSearch: ({lat, long, place_id}) =>
+    result_count = null
+
+    @nearbySearch({lat, long})
+    .then (response) ->
+      result_count = response.results.length
+      response.results
+    .map (googleResult) =>
+      @correlateAndSaveGooglePlace(googleResult)
+    .then =>
+      @GoogleNearbySearchAttempt.modifyOrInsert {place_id}, (directedSearch) ->
+        directedSearch.place_id = place_id
+        directedSearch.search_at = Timestamp()
+    .then ->
+      {place_id, result_count}
+    .catch (err) ->
+      console.log('GooglePlaces.runDirectedSearch failed with: ', err)
 
 provide.class(GooglePlaces)
 
 provide 'admin-endpoint/google', ->
   googleService = depend('GooglePlaces')
-  SectorService = depend('SectorService')
   GooglePlace = depend('dao/GooglePlace')
   GooglePhotos = depend('GooglePhotos')
 
   resolveLocation = (req) ->
-    Promise.resolve()
-    .then ->
-      if req.query.sector_id?
-        SectorService.sectorToLatLong(req.query.sector_id)
-      else
-        {lat: req.query.lat, long: req.query.long}
+    # this function once did more stuff
+    {lat: req.query.lat, long: req.query.long}
 
   '/nearby': (req) ->
     resolveLocation(req)
     .then (loc) ->
       googleService.nearbySearch(loc)
-    .then (response) ->
-      response.results
 
   '/cached-place/any': (req) ->
     GooglePlace.find((query) -> query.limit(1))
@@ -186,9 +200,11 @@ provide 'admin-endpoint/google', ->
       googleService.correlateAndSaveGooglePlace(googleResult)
 
   '/job/details-request/:count': (req) ->
-    console.log('count = ', req.params.count)
     googleService.runDetailsRequestJob(req.params.count)
 
-  '/job/sector-search/:count': (req) ->
-    console.log('count = ', req.params.count)
-    googleService.runSectorSearchJob(req.params.count)
+  '/job/correlation-search/:count': (req) ->
+    googleService.runCorrelationSearchJob(req.params.count)
+
+  '/find-uncorrelated/:count': (req) ->
+    googleService.findUncorrelatedPlaceIds(req.params.count)
+
