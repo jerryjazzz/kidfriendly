@@ -8,10 +8,37 @@ BrowserApiKey = '***REMOVED***'
 
 provide('google/BrowserApiKey', -> BrowserApiKey)
 
+getprop = (propName) ->
+  (obj) ->
+    if Array.isArray(obj)
+      item[propName] for item in obj
+    else
+      obj[propName]
+
+normalizeName = (name) ->
+  name = name.toUpperCase()
+    
+  name = name.replace('\'', '')
+  name = name.replace('THE ', '')
+  name = name.replace('CO.', 'COMPANY')
+  name = name.replace('&', 'AND')
+  name = name.replace('É', 'E')
+  name = name.replace('BBQ', 'BARBEQUE')
+  name = name.replace('FINE CHINESE RESTAURANT', '')
+  name = name.replace('FINE JAPANESE RESTAURANT', '')
+  name = name.replace('RESTAURANT', '')
+  name = name.replace('ITALIAN RESTAURANTS', '')
+
+  # keep these steps at the end
+  name = name.replace(' ', '')
+
+  return name
+
 class GooglePlaces
   constructor: ->
     @Http = depend('Http')
     @Place = depend('dao/place')
+    @PlaceSearch = depend('PlaceSearch')
     @GooglePlace = depend('dao/GooglePlace')
     @GoogleNearbySearchAttempt = depend('dao/GoogleNearbySearchAttempt')
     @GooglePhotos = depend('GooglePhotos')
@@ -19,6 +46,8 @@ class GooglePlaces
     @Db = depend('db')
 
   nearbySearch: ({lat, long}) ->
+    #console.log('running google place search for: ', {lat,long})
+
     @Http.request
       url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       qs:
@@ -26,6 +55,47 @@ class GooglePlaces
         types: 'restaurant'
         location: "#{lat},#{long}"
         rankby: 'distance'
+
+  nearbySearchSave: (params) ->
+    @nearbySearch(params)
+    .then (response) ->
+      #console.log("received #{response.results.length} google results for #{params}")
+      response.results
+    .map (googleResult) =>
+      google_place_id = googleResult.place_id
+      @GooglePlace.modifyOrInsert {google_place_id}, (ourGooglePlace) =>
+        ourGooglePlace.google_place_id = googleResult.place_id
+        ourGooglePlace.lat = googleResult.geometry.location.lat
+        ourGooglePlace.long = googleResult.geometry.location.lng
+        ourGooglePlace.name = googleResult.name
+
+  correlateGooglePlace2: (googlePlace) =>
+    if googlePlace.place_id?
+      return {place_id: googlePlace.place_id}
+
+    google_place_id = googlePlace.google_place_id
+
+    console.log('[google] correlating google place: ', {google_place_id})
+
+    @PlaceSearch.geoSearch(lat: googlePlace.lat, long: googlePlace.long, meters: 500)
+    .then (places) =>
+      matches = (p for p in places when normalizeName(p.name) == normalizeName(googlePlace.name))
+
+      if matches.length > 1
+        console.log("warning: multiple matches for #{googlePlace.name}: ", getprop('place_id')(places))
+
+      if (match = matches[0])?
+
+        place_id = match.place_id
+        # console.log('found a match ', {name: match.name, place_id, google_place_id})
+        @GooglePlace.update2 {google_place_id}, {place_id}
+      else
+        console.log("no match found for #{googlePlace.name}, candidates were: ", getprop('name')(places))
+        {google_place_id, correlate_result: 'not found'}
+
+  runCorrelateJob: (count) ->
+    @GooglePlace.find((query) -> query.whereNull('place_id').limit(count))
+    .map(@correlateGooglePlace2, {concurrency:1})
 
   requestDetails: (google_place_id) ->
     @Http.request
@@ -58,6 +128,7 @@ class GooglePlaces
     .map(@saveDetailsForGooglePlace, {concurrency: 1})
 
   correlateAndSaveGooglePlace: (googleResult) =>
+    # deprecated
     google_place_id = googleResult.place_id
 
     @GooglePlace.findOne({google_place_id})
@@ -78,6 +149,7 @@ class GooglePlaces
           {result: 'success', place_id: place.place_id}
 
   correlateGoogleResult: (googleResult) ->
+    # deprecated
 
     location =
       lat: googleResult.geometry.location.lat
@@ -112,27 +184,22 @@ class GooglePlaces
     # Returns {place_id, lat, long}
 
     @Db.raw("""
-      select place_id,lat,long from place where not exists
-      (select * from google_place,google_nearby_search_attempt where google_place.place_id = place.place_id
-        or google_nearby_search_attempt.place_id = place.place_id)
-      limit ?
-      """, count)
+      select p.place_id,p.lat,p.long from place p left join google_place gp on p.place_id=gp.place_id left join google_nearby_search_attempt gnsa on p.place_id=gnsa.place_id where gp.place_id is null and gnsa.place_id is null
+      """)
     .then (result) ->
-      result.rows
+      console.log("there are #{result.rows.length} places to search")
+      result.rows.slice(0, count)
 
   runCorrelationSearchJob: (count) ->
     @findUncorrelatedPlaces(count)
     .map(@runDirectedSearch, {concurrency:1})
 
   runDirectedSearch: ({lat, long, place_id}) =>
+    console.log('[google] running directed search: ', {place_id})
     result_count = null
 
-    @nearbySearch({lat, long})
-    .then (response) ->
-      result_count = response.results.length
-      response.results
-    .map (googleResult) =>
-      @correlateAndSaveGooglePlace(googleResult)
+    @nearbySearchSave({lat, long})
+    .map(@correlateGooglePlace2)
     .then =>
       @GoogleNearbySearchAttempt.modifyOrInsert {place_id}, (directedSearch) ->
         directedSearch.place_id = place_id
@@ -140,18 +207,23 @@ class GooglePlaces
     .then ->
       {place_id, result_count}
     .catch (err) ->
-      console.log('GooglePlaces.runDirectedSearch failed with: ', err)
+      console.log('GooglePlaces.runDirectedSearch failed with: ', err.stack ? err)
 
 provide.class(GooglePlaces)
 
 provide 'admin-endpoint/google', ->
   googleService = depend('GooglePlaces')
+  Place = depend('dao/place')
   GooglePlace = depend('dao/GooglePlace')
   GooglePhotos = depend('GooglePhotos')
 
   resolveLocation = (req) ->
-    # this function once did more stuff
-    {lat: req.query.lat, long: req.query.long}
+    if req.query.place_id?
+      Place.findOne(place_id: req.query.place_id)
+      .then (place) ->
+        {lat: place.lat, long: place.long}
+    else
+      {lat: req.query.lat, long: req.query.long}
 
   '/nearby': (req) ->
     resolveLocation(req)
@@ -190,6 +262,12 @@ provide 'admin-endpoint/google', ->
     .then (googlePlace) ->
       googleService.saveDetailsForGooglePlace(googlePlace)
 
+  '/nearby/save': (req) ->
+    resolveLocation(req)
+    .then (loc) ->
+      console.log('loc = ', loc)
+      googleService.nearbySearchSave(loc)
+
   '/nearby/correlate': (req) ->
     resolveLocation(req)
     .then (loc) ->
@@ -202,7 +280,10 @@ provide 'admin-endpoint/google', ->
   '/job/details-request/:count': (req) ->
     googleService.runDetailsRequestJob(req.params.count)
 
-  '/job/correlation-search/:count': (req) ->
+  '/job/correlate/:count': (req) ->
+    googleService.runCorrelateJob(req.params.count)
+
+  '/job/search/:count': (req) ->
     googleService.runCorrelationSearchJob(req.params.count)
 
   '/find-uncorrelated/:count': (req) ->
