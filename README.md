@@ -1,5 +1,20 @@
 # kidfriendly
 
+## What is this?
+
+Kidfriendly is an unfinished app/startup idea that we worked on from 2014-2015.
+Users search for restaurants and then write reviews about how kid-friendly they are.
+
+In this repo:
+
+ client/
+
+   A cross platform mobile app using Ionic+Angular
+
+ server/
+
+   A node.js server using Postgres+Express and lots of Bluebird.js
+
 ## Setup instructions
 
 ### Server
